@@ -17,11 +17,16 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.commands.Climb;
+import frc.robot.commands.Flywheel;
+//import frc.robot.commands.Climb;
+//*import frc.robot.subsystems.FlywheelSub;
 
 public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-
+     public static Flywheel Flywheel = new Flywheel();
+     public static Climb Climb = new Climb();
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -50,6 +55,13 @@ public class RobotContainer {
                     .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+            //spins the flywheel to feed when the X button is held
+          driverXbox.x().whileTrue(
+            FlywheelCommand()
+            );
+          driverXbox.y().whileTrue(
+            ClimbCommand()
+            );
 
         driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
         driverXbox.b().whileTrue(drivetrain.applyRequest(() ->
@@ -71,5 +83,12 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
+    }
+    //makes the flywheel command
+    public Command FlywheelCommand() {
+    return new Flywheel();
+    }
+    public Command ClimbCommand() {
+    return new Climb();
     }
 }
