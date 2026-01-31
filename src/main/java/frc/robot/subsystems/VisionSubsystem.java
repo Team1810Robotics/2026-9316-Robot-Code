@@ -22,27 +22,48 @@ public class VisionSubsystem extends SubsystemBase {
         this.limelightName = name;
     }
 
-    // gets botpose estimates for both alliances
-    @Override
+    //gets botpose estimates for both alliances, but also autodetects alliance which is cool.
+@Override
     public void periodic() {
         LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
         LimelightHelpers.getBotPoseEstimate_wpiRed(limelightName);
     }
 
-    // gets the april tag ID
+    //gets the april tag ID
     /** @return AprilTag / fiducial ID (tid) */
     public int getTargetID() {
         return (int) LimelightHelpers.getFiducialID(limelightName);
     }
 
+     /** @return whether the limelight currently sees a valid target */
+    public boolean targetValid() {
+        return LimelightHelpers.getTV(limelightName);
+    }
+
+    /** @return X offset (degrees) reported by Limelight (tx) */
+    public double targetXOffset() {
+        return LimelightHelpers.getTX(limelightName);
+    }
+
+    /** @return Y offset (degrees) reported by Limelight (ty) */
+    public double targetYOffset() {
+        return LimelightHelpers.getTY(limelightName);
+    }
+
+    /** @return target area (ta) */
+    public double targetArea() {
+        return LimelightHelpers.getTA(limelightName);
+    }
+
     /**
      * this is the one that matters ;)
+     * 676676767676676767676767676767676767676767676767676767676767676767676767676767676767676
      * CALL THIS NUMBER -> (913) 488-2670
      * -sam
      * @return
      */
 
-    // translates the botpose to 2d
+     //translates the botpose to 2d
     public Pose2d getBotPoseTargetSpace() {
         return LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_TargetSpace(limelightName)).toPose2d();
     }
