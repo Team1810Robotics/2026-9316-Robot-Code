@@ -4,9 +4,17 @@ import frc.robot.LimelightHelpers;
 import frc.robot.LimelightHelpers.RawDetection;
 // DriverStation not used in this subsystem
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import com.ctre.phoenix6.hardware.Pigeon2;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.Constants.GyroAndIMUConstants;
 
 /**
  * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting
@@ -19,8 +27,17 @@ public class VisionSubsystem extends SubsystemBase {
     // Limelight identifier ("" for default 'limelight' table, or the hostname if using multiple)
     private final String limelightName;
 
-    public VisionSubsystem(String name) {
-        this.limelightName = name;
+    private final Pigeon2 m_gyro = new Pigeon2(0); // '0' is the CAN ID
+
+    public VisionSubsystem(String name, SwerveDriveKinematics kinematics, SwerveModulePosition[] modulePositions) {
+    this.limelightName = name;
+
+    this.m_poseEstimator = new SwerveDrivePoseEstimator(
+        kinematics,
+        m_gyro.getRotation2d(), // Phoenix 6 helper
+        modulePositions,
+        new Pose2d()            // Starting position (usually 0,0,0)
+    );
 
          // Get raw neural detector results
 RawDetection[] detections = LimelightHelpers.getRawDetections(limelightName); {
@@ -36,20 +53,23 @@ for (RawDetection detection : detections) {
 }
 }
 
+// Switch to pipeline 0 (list more as needed)
+LimelightHelpers.setPipelineIndex(limelightName, 0);
+
 // Seed the internal IMU with your external gyro (call while disabled)
-LimelightHelpers.SetIMUMode("", 1);
+LimelightHelpers.SetIMUMode(limelightName, 1);
 
 // Switch to internal IMU with external assist when enabled
-LimelightHelpers.SetIMUMode("", 4);
-LimelightHelpers.SetIMUAssistAlpha("", 0.001);  // Adjust correction strength
+LimelightHelpers.SetIMUMode(limelightName, 4);
+LimelightHelpers.SetIMUAssistAlpha(limelightName, 0.001);  // Adjust correction strength
 
 
 
 // Set a custom crop window for improved performance (-1 to 1 for each value)
-LimelightHelpers.setCropWindow("", -0.5, 0.5, -0.5, 0.5);
+LimelightHelpers.setCropWindow(limelightName, -0.5, 0.5, -0.5, 0.5);
 
 // Change the camera pose relative to robot center (x forward, y left, z up, degrees)
-LimelightHelpers.setCameraPose_RobotSpace("",
+LimelightHelpers.setCameraPose_RobotSpace(limelightName,
     0.5,    // Forward offset (meters)
     0.0,    // Side offset (meters)
     0.5,    // Height offset (meters)
@@ -60,7 +80,7 @@ LimelightHelpers.setCameraPose_RobotSpace("",
 
 
 // Set AprilTag offset tracking point (meters)
-LimelightHelpers.setFiducial3DOffset("",
+LimelightHelpers.setFiducial3DOffset(limelightName,
     0.0,    // Forward offset
     0.0,    // Side offset
     0.5     // Height offset
@@ -68,22 +88,38 @@ LimelightHelpers.setFiducial3DOffset("",
 
 
 // Configure AprilTag detection
-LimelightHelpers.SetFiducialIDFiltersOverride("", new int[]{9, 10, 15, 16, 25, 26, 29, 30, 31, 32}); // Only track these tag IDs (CHANGE TO THE ONES YOU WANT)
-LimelightHelpers.SetFiducialDownscalingOverride("", 2.0f); // Process at half resolution
+LimelightHelpers.SetFiducialIDFiltersOverride(limelightName, new int[]{9, 10, 15, 16, 25, 26, 29, 30, 31, 32}); // Only track these tag IDs (ADD THE ONES YOU WANT)
+LimelightHelpers.SetFiducialDownscalingOverride(limelightName, 2.0f); // Process at half resolution
 
 
 // Adjust keystone crop window (-0.95 to 0.95 for both horizontal and vertical)
-LimelightHelpers.setKeystone("", 0.1, -0.05);
+LimelightHelpers.setKeystone(limelightName, 0.1, -0.05);
+
+// First, tell Limelight your robot's current orientation
+// Add .getValueAsDouble() to the end
+double robotYaw = m_gyro.getYaw().getValueAsDouble() + Constants.GyroAndIMUConstants.GYRO_YAW_OFFSET_DEGREES;
+LimelightHelpers.SetRobotOrientation(limelightName, robotYaw, 0.0, 0.0, 0.0, 0.0, 0.0);
+
     }
-
-
 
     /*gets botpose estimates for both alliances with megatag 2 which with IMU creates
     improved localization during rotation, but also autodetects alliance which is cool.*/
-@Override
+private final SwerveDrivePoseEstimator m_poseEstimator;
+    @Override
     public void periodic() {
-        LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-        LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(limelightName);
+        LimelightHelpers.PoseEstimate limelightMeasurementBlue = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+        LimelightHelpers.PoseEstimate limelightMeasurementRed = LimelightHelpers.getBotPoseEstimate_wpiRed_MegaTag2(limelightName);
+
+        // Add it to your pose estimator
+m_poseEstimator.setVisionMeasurementStdDevs(VecBuilder.fill(.5, .5, 9999999));
+m_poseEstimator.addVisionMeasurement(
+    limelightMeasurementBlue.pose,
+    limelightMeasurementBlue.timestampSeconds
+);
+m_poseEstimator.addVisionMeasurement(
+    limelightMeasurementRed.pose,
+    limelightMeasurementRed.timestampSeconds
+);
     }
 
 

@@ -13,6 +13,10 @@ public class Constants {
 	 * should be replaced with your robot's actual forward hood limit (in the
 	 * same units used by your hoodDistance calculation).
 	 */
+	public static class GyroAndIMUConstants {
+		// Placeholder; set to a sensible value for your robot (e.g. -50.0)
+		public static final double GYRO_YAW_OFFSET_DEGREES = 0.0;
+	}
 	public static class HoodConstants {
 		// Placeholder; set to a sensible value for your robot (e.g. -50.0)
 		public static final double FORWARD_HOOD_LIMIT = -1000.0;
