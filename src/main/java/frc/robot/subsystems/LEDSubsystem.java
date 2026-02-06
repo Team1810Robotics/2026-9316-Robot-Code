@@ -21,15 +21,14 @@ import com.ctre.phoenix6.controls.TwinkleOffAnimation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.LEDConstants;
-import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 
 public class LEDSubsystem extends SubsystemBase {
 
-    private final CANdle m_candle;
+    private CANdle m_candle;
 
-    public LEDSubsystem() { 
+    public void StartLEDSubsystem() { 
         m_candle = new CANdle(LEDConstants.CANDLE_ID);
         configureCANdle();
     }
@@ -208,7 +207,14 @@ public class LEDSubsystem extends SubsystemBase {
         LEDColor = color;
     }
 
+    public void StopLEDSubsystem() {
+        setLEDColor(new RGBWColor(0, 0, 0, 0), false);
+    }
+
     public String getLEDStats(){
         return LEDSubsystem.strLEDAnimation + ", " + LEDSubsystem.LEDColor;
+    }
+
+    public class setLEDColor {
     }
 }
