@@ -53,13 +53,12 @@ public class Constants {
     }
 
     public static final class FlywheelConstants {
-        public static final int leftMotorID = 1; //TODO: Get actual IDs
-        public static final int rightMotorID = 2;
+        public static final int leftMotorID = 13; //TODO: Get actual IDs
+        public static final int rightMotorID = 15;
     }
 
         public static final class ClimbConstants {
-        public static final int motor2ID = 3; //TODO: Get actual IDs
-        public static final int motor1ID = 4;
+        public static final int motor1ID = 12; //TODO: Get actual IDs
     }
     public static final int FlywheelBeamBreak = 5;
     public static class OperatorConstants {
