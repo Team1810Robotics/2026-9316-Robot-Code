@@ -2,8 +2,6 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-
-
 package frc.robot;
 import com.ctre.phoenix6.signals.RGBWColor;
 public class Constants {
@@ -59,6 +57,10 @@ public class Constants {
         public static final int rightMotorID = 2;
     }
 
+        public static final class ClimbConstants {
+        public static final int motor2ID = 3; //TODO: Get actual IDs
+        public static final int motor1ID = 4;
+    }
     public static final int FlywheelBeamBreak = 5;
     public static class OperatorConstants {
     	public static final int kDriverControllerPort = 0;
