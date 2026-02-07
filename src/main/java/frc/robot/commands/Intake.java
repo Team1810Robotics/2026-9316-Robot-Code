@@ -19,7 +19,8 @@ public class Intake extends Command {
      * @param mode           The mode to run the command in        
      */
 
-     boolean pSensor = intakeSubsystem.proximitySensor.get();
+     boolean pSensorL = intakeSubsystem.proximitySensorL.get();
+     boolean pSensorR = intakeSubsystem.proximitySensorR.get();
 
 
     public Intake(IntakeSubsystem intakeSubsystem, IntakeConstants.Mode mode) {
@@ -33,7 +34,7 @@ public class Intake extends Command {
 
     @Override
     public void execute() {
-        if (mode == Mode.ON && pSensor) {
+        if (mode == Mode.ON && (intakeSubsystem.isObjectDetected() == false)) {
             intakeSubsystem.intakeMotor.set(1.0); // Run intake at full speed
         } else if (mode == Mode.OFF) {
             intakeSubsystem.intakeMotor.set(0.0); // Stop the intake
