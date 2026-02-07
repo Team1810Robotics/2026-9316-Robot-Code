@@ -1,9 +1,9 @@
 package frc.robot.subsystems;
+import com.revrobotics.spark.SparkMax;
 
-
-import com.ctre.phoenix6.hardware.TalonFX;
+//import com.revrobotics.spark.SparkLowLevel.MotorType;
 public class ClimbSub {
-        private final TalonFX m_motor = new TalonFX(0);
+        private final SparkMax m_motor = new SparkMax(0, null);
 
     //set_parameter(hb, "FlywheelSub", "frc.robot.subsystems.FlywheelSub");
     //new.motorcontrol = "edu.wpi.first.wpilibj.motorcontrol.Kraken";
@@ -13,6 +13,9 @@ public class ClimbSub {
   }
 
 
+  public void Stop() {
+    m_motor.set(0.0);
+  }
 
   public void Retract() {
     m_motor.set(-0.25);
