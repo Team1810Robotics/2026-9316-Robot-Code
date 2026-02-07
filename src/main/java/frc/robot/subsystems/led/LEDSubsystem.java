@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.led;
 
 import com.ctre.phoenix6.hardware.CANdle;
 import com.ctre.phoenix6.signals.AnimationDirectionValue;
@@ -20,7 +20,7 @@ import com.ctre.phoenix6.controls.TwinkleOffAnimation;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.LEDConstants;
+import frc.robot.subsystems.led.LEDConstants;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 

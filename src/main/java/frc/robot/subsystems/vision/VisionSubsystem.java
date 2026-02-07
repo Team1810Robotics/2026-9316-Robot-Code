@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.vision;
 
 // DriverStation not used in this subsystem
 import edu.wpi.first.math.geometry.Pose2d;

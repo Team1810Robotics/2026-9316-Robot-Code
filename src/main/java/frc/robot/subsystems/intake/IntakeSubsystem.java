@@ -1,10 +1,9 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.IntakeConstants;
-         
-import com.revrobotics.spark.SparkMax;
+
 
 public class IntakeSubsystem extends SubsystemBase {
   public SparkMax intakeMotor;
