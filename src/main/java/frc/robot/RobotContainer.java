@@ -111,10 +111,16 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
+ // An example command will be run in autonomous
     return Autos.exampleAuto(m_exampleSubsystem);
   }
-
+    //makes the flywheel command
+    public Command FlywheelCommand() {
+    return new Flywheel();
+    }
+    public Command ClimbCommand() {
+    return new Climb();
+    }
 
     public Command intakeCommand() {
         if (intakeSubsystem.getMode() == Mode.OFF) {
