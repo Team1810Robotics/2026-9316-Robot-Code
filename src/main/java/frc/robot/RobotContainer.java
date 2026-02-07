@@ -78,13 +78,13 @@ public class RobotContainer {
             )
         );
             //spins the flywheel to feed when the X button is held
-          driverXbox.x().whileTrue(
+         gamepadManipulator.x().whileTrue(
             FlywheelCommand()
             );
-          driverXbox.y().whileTrue(
+          gamepadManipulator.y().whileTrue(
             ClimbUpCommand()
             );
-          driverXbox.rightBumper().and(driverXbox.y()).whileTrue(
+          gamepadManipulator.y().and(gamepadManipulator.rightBumper()).whileTrue(
             ClimbDownCommand()
             );
         driverXbox.rightBumper().whileTrue(
