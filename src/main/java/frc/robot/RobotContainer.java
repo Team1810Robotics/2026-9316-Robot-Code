@@ -51,7 +51,7 @@ public class RobotContainer {
     private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
     private final Telemetry logger = new Telemetry(MaxSpeed);
-
+    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
     private final CommandXboxController driverXbox = new CommandXboxController(0);
     private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
@@ -129,4 +129,5 @@ public class RobotContainer {
             return new Intake(intakeSubsystem, Mode.OFF);
         }
     }
+    
 }

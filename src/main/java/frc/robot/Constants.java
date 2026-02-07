@@ -54,10 +54,15 @@ public class Constants {
         }
     }
 
+    public static final class FlywheelConstants {
+        public static final int leftMotorID = 1; //TODO: Get actual IDs
+        public static final int rightMotorID = 2;
+    }
 
-  public static class OperatorConstants {
-    public static final int kDriverControllerPort = 0;
-  }
+    public static final int FlywheelBeamBreak = 5;
+    public static class OperatorConstants {
+    	public static final int kDriverControllerPort = 0;
+    }
 
    public static final class LEDConstants {
         public static final int[] RED = {255, 0, 0, 0}; // RGB values
