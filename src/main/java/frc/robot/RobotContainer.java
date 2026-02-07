@@ -32,8 +32,9 @@ import frc.robot.commands.ClimbUp;
 import frc.robot.commands.Flywheel;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.commands.Hood;
+import frc.robot.commands.AimHood;
 import frc.robot.commands.ClimbDown;
+
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
