@@ -98,7 +98,7 @@ public class RobotContainer {
     }
     public Command ClimbCommand() {
     return new Climb();
-
+    }
     public Command intakeCommand() {
         if (intakeSubsystem.getMode() == Mode.OFF) {
             return new Intake(intakeSubsystem, Mode.ON);
