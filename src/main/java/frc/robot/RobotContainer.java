@@ -31,12 +31,14 @@ import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.subsystems.IntakeSubsystem;
-
+import frc.robot.subsystems.HoodSubsystem;
+import frc.robot.commands.Hood;
 
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
     private static IntakeSubsystem intakeSubsystem;
+    private static HoodSubsystem hoodSubsystem;
     private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
