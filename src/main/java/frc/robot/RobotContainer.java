@@ -8,12 +8,20 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
+import frc.robot.Constants.OperatorConstants;
+import edu.wpi.first.math.geometry.Rotation2d;
+import frc.robot.commands.Autos;
+import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.LEDsCommand;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 //import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 //import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants.IntakeConstants.Mode;
@@ -26,7 +34,10 @@ import frc.robot.subsystems.IntakeSubsystem;
 
 
 public class RobotContainer {
+
+    // The robot's subsystems and commands are defined here...
     private static IntakeSubsystem intakeSubsystem;
+    private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     public static Flywheel Flywheel = new Flywheel();
@@ -42,10 +53,14 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController driverXbox = new CommandXboxController(0);
+    private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
+
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
     public RobotContainer() {
+
+
         configureBindings();
     }
 
@@ -87,11 +102,18 @@ public class RobotContainer {
         driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
         drivetrain.registerTelemetry(logger::telemeterize);
+
+          // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
+    new Trigger(m_exampleSubsystem::exampleCondition)
+        .onTrue(new ExampleCommand(m_exampleSubsystem));
+
+     gamepadManipulator.b().onTrue(new LEDsCommand(m_LEDSubsystem));
     }
 
     public Command getAutonomousCommand() {
-        return Commands.print("No autonomous command configured");
-    }
+ // An example command will be run in autonomous
+    return Autos.exampleAuto(m_exampleSubsystem);
+  }
     //makes the flywheel command
     public Command FlywheelCommand() {
     return new Flywheel();
@@ -99,6 +121,7 @@ public class RobotContainer {
     public Command ClimbCommand() {
     return new Climb();
     }
+
     public Command intakeCommand() {
         if (intakeSubsystem.getMode() == Mode.OFF) {
             return new Intake(intakeSubsystem, Mode.ON);
