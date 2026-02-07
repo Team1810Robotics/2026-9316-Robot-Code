@@ -20,6 +20,8 @@ import frc.robot.Constants.IntakeConstants.Mode;
 import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
+import frc.robot.commands.Climb;
+import frc.robot.commands.Flywheel;
 import frc.robot.subsystems.IntakeSubsystem;
 
 
@@ -27,6 +29,8 @@ public class RobotContainer {
     private static IntakeSubsystem intakeSubsystem;
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+    public static Flywheel Flywheel = new Flywheel();
+    public static Climb Climb = new Climb();
     public static Intake intake = new Intake(intakeSubsystem, Mode.ON);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -56,6 +60,13 @@ public class RobotContainer {
                     .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate) // Drive counterclockwise with negative X (left)
             )
         );
+            //spins the flywheel to feed when the X button is held
+          driverXbox.x().whileTrue(
+            FlywheelCommand()
+            );
+          driverXbox.y().whileTrue(
+            ClimbCommand()
+            );
         driverXbox.rightBumper().whileTrue(
             intakeCommand()
         );
@@ -81,6 +92,12 @@ public class RobotContainer {
     public Command getAutonomousCommand() {
         return Commands.print("No autonomous command configured");
     }
+    //makes the flywheel command
+    public Command FlywheelCommand() {
+    return new Flywheel();
+    }
+    public Command ClimbCommand() {
+    return new Climb();
 
     public Command intakeCommand() {
         if (intakeSubsystem.getMode() == Mode.OFF) {
