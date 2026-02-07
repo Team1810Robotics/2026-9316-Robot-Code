@@ -28,12 +28,12 @@ import frc.robot.Constants.IntakeConstants.Mode;
 import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.commands.Climb;
+import frc.robot.commands.ClimbUp;
 import frc.robot.commands.Flywheel;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
 import frc.robot.commands.Hood;
-
+import frc.robot.commands.ClimbDown;
 public class RobotContainer {
 
     // The robot's subsystems and commands are defined here...
@@ -43,7 +43,7 @@ public class RobotContainer {
     private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
     public static Flywheel Flywheel = new Flywheel();
-    public static Climb Climb = new Climb();
+    public static ClimbUp Climb = new ClimbUp();
     public static Intake intake = new Intake(intakeSubsystem, Mode.ON);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -82,7 +82,10 @@ public class RobotContainer {
             FlywheelCommand()
             );
           driverXbox.y().whileTrue(
-            ClimbCommand()
+            ClimbUpCommand()
+            );
+          driverXbox.rightBumper().and(driverXbox.y()).whileTrue(
+            ClimbDownCommand()
             );
         driverXbox.rightBumper().whileTrue(
             intakeCommand()
@@ -120,8 +123,11 @@ public class RobotContainer {
     public Command FlywheelCommand() {
     return new Flywheel();
     }
-    public Command ClimbCommand() {
-    return new Climb();
+    public Command ClimbUpCommand() {
+    return new ClimbUp();
+    }
+    public Command ClimbDownCommand() {
+    return new ClimbDown();
     }
 
     public Command intakeCommand() {

@@ -8,7 +8,7 @@ import frc.robot.subsystems.ClimbSub;
 /** Flywheel command */
 
 
-public class Climb extends Command {
+public class ClimbUp extends Command {
   //*private final TalonFX m_motor = new TalonFX(0);
   public static ClimbSub ClimbSub = new ClimbSub();
 
@@ -17,11 +17,11 @@ public class Climb extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {ClimbSub.Stop();}
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {ClimbSub.Retract();}
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override
