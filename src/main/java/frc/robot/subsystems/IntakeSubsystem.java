@@ -24,7 +24,6 @@ public class IntakeSubsystem extends SubsystemBase {
         intakeMotor = new SparkMax(Constants.IntakeConstants.INTAKE_MOTOR, null);
         proximitySensorL = new DigitalInput(Constants.IntakeConstants.PROXIMITY_SENSOR_PORT_LEFT);
         proximitySensorR = new DigitalInput(Constants.IntakeConstants.PROXIMITY_SENSOR_PORT_RIGHT);
-    // very important... change the id number to test!!!!!! 
         intakeMotor.set(0);
         this.mode = IntakeConstants.Mode.OFF; // initialize default0
         
@@ -44,11 +43,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     }
 
-     private final DigitalInput m_proximitySensor = new DigitalInput(0);
-
     
     public boolean isObjectDetected() {
-        return !m_proximitySensor.get(); // NPN logic: true when object is present
+        return proximitySensorL.get() || proximitySensorR.get(); // NPN logic: true when object is present on either sensor
     }
 }
 

@@ -10,6 +10,6 @@ package frc.robot.commands;
  * up and down movement
  * 
  */
-public class Hood {
+public class AimHood {
    
 }

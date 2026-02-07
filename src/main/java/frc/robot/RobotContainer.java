@@ -32,7 +32,7 @@ import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.commands.Hood;
+import frc.robot.commands.AimHood;
 
 public class RobotContainer {
 

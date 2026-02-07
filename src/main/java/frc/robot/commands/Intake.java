@@ -34,7 +34,7 @@ public class Intake extends Command {
 
     @Override
     public void execute() {
-        if (mode == Mode.ON && (pSensorL || pSensorR)) {
+        if (mode == Mode.ON && (intakeSubsystem.isObjectDetected() == false)) {
             intakeSubsystem.intakeMotor.set(1.0); // Run intake at full speed
         } else if (mode == Mode.OFF) {
             intakeSubsystem.intakeMotor.set(0.0); // Stop the intake
