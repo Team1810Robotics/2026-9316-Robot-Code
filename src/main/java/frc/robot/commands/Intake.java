@@ -18,10 +18,14 @@ public class Intake extends Command {
      * @param intakeSubsystem The IntakeSubsystem to run the command on.
      * @param mode           The mode to run the command in        
      */
+
+     boolean pSensor = intakeSubsystem.proximitySensor.get();
+
+
     public Intake(IntakeSubsystem intakeSubsystem, IntakeConstants.Mode mode) {
         this.intakeSubsystem = intakeSubsystem;
         this.mode = mode;
-
+        
         addRequirements(intakeSubsystem);
     }
 
@@ -29,7 +33,7 @@ public class Intake extends Command {
 
     @Override
     public void execute() {
-        if (mode == Mode.ON) {
+        if (mode == Mode.ON && pSensor) {
             intakeSubsystem.intakeMotor.set(1.0); // Run intake at full speed
         } else if (mode == Mode.OFF) {
             intakeSubsystem.intakeMotor.set(0.0); // Stop the intake

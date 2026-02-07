@@ -6,11 +6,11 @@ import frc.robot.Constants.IntakeConstants;
          
 import com.revrobotics.spark.SparkMax;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 
 
 public class IntakeSubsystem extends SubsystemBase {
     public SparkMax intakeMotor;
+    public DigitalInput proximitySensor;
     private IntakeConstants.Mode mode;
     
     
@@ -20,9 +20,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         intakeMotor = new SparkMax(0, null);
+        proximitySensor = new DigitalInput(0);
     // very important... change the id number to test!!!!!! 
         intakeMotor.set(0);
-        this.mode = IntakeConstants.Mode.OFF; // initialize default
+        this.mode = IntakeConstants.Mode.OFF; // initialize default0
+        
     }
 
     public IntakeConstants.Mode getMode() { 
