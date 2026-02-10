@@ -11,11 +11,13 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import frc.robot.Constants.OperatorConstants;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.robot.commands.Autos;
+import frc.robot.commands.Climb;
+import frc.robot.commands.Intake;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.commands.LEDs;
-import frc.robot.subsystems.ExampleSubsystem;
-import frc.robot.subsystems.LEDSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.commands.Flywheel;
+import frc.robot.commands.Hood;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -26,29 +28,34 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 //import frc.robot.Constants.IntakeConstants;
 import frc.robot.Constants;
-import frc.robot.commands.Intake;
+import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
+import frc.robot.subsystems.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.hood.HoodSubsystem;
+
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
-import frc.robot.commands.Climb;
-import frc.robot.subsystems.flywheel.FlywheelSubsystem;
-import frc.robot.commands.Flywheel;
-import frc.robot.subsystems.IntakeSubsystem;
+
 import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.HoodSubsystem;
-import frc.robot.commands.Hood;
+
+
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
-    // The robot's subsystems and commands are defined here...
-    private static IntakeSubsystem intakeSubsystem;
-    private static HoodSubsystem hoodSubsystem;
-    private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
-    private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
-    private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-    public static Flywheel Flywheel = new Flywheel();
-    public static Climb Climb = new Climb();
-    public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
+  // The robot's subsystems and commands are defined here...
+  private static IntakeSubsystem intakeSubsystem;
+  private static HoodSubsystem hoodSubsystem;
+  private static LEDSubsystem LEDSubsystem = new LEDSubsystem();
+  private static FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  private static ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  public static Flywheel Flywheel = new Flywheel();
+  public static Climb Climb = new Climb();
+  public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
     /* Setting up bindings for necessary control of the swerve drive platform */
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(MaxSpeed * 0.1).withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
@@ -57,7 +64,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
