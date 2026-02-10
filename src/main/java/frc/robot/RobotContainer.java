@@ -57,7 +57,7 @@ public class RobotContainer {
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
-    private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
+  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
@@ -123,7 +123,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-     gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
   }
 
   public Command getAutonomousCommand() {

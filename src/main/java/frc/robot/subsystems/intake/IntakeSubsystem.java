@@ -3,6 +3,7 @@ package frc.robot.subsystems.intake;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 
 public class IntakeSubsystem extends SubsystemBase {
