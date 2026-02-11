@@ -1,11 +1,5 @@
 package frc.robot.subsystems.led;
 
-import com.ctre.phoenix6.hardware.CANdle;
-import com.ctre.phoenix6.signals.AnimationDirectionValue;
-import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
-import com.ctre.phoenix6.signals.RGBWColor;
-import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
-import com.ctre.phoenix6.signals.StripTypeValue;
 import com.ctre.phoenix6.configs.CANdleConfiguration;
 import com.ctre.phoenix6.controls.ColorFlowAnimation;
 import com.ctre.phoenix6.controls.FireAnimation;
@@ -17,13 +11,14 @@ import com.ctre.phoenix6.controls.SolidColor;
 import com.ctre.phoenix6.controls.StrobeAnimation;
 import com.ctre.phoenix6.controls.TwinkleAnimation;
 import com.ctre.phoenix6.controls.TwinkleOffAnimation;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.subsystems.led.LEDConstants;
-
+import com.ctre.phoenix6.hardware.CANdle;
+import com.ctre.phoenix6.signals.AnimationDirectionValue;
+import com.ctre.phoenix6.signals.LossOfSignalBehaviorValue;
+import com.ctre.phoenix6.signals.RGBWColor;
+import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
+import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDSubsystem extends SubsystemBase {
 
@@ -108,31 +103,23 @@ public class LEDSubsystem extends SubsystemBase {
           strLEDAnimation = m_anim0State.toString();
         case ColorFlow:
           m_candle.setControl(
-          		new ColorFlowAnimation(kSlot0StartIdx, kSlot0EndIdx)
-				  .withSlot(0)
-			  	  .withColor(LEDColor));
+              new ColorFlowAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0).withColor(LEDColor));
           break;
         case Rainbow:
-          m_candle.setControl(
-		  		new RainbowAnimation(kSlot0StartIdx, kSlot0EndIdx)
-		  	 	  .withSlot(0));
+          m_candle.setControl(new RainbowAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0));
           break;
         case Twinkle:
           m_candle.setControl(
-              	new TwinkleAnimation(kSlot0StartIdx, kSlot0EndIdx)
-				  .withSlot(0)
-				  .withColor(LEDColor));
+              new TwinkleAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0).withColor(LEDColor));
           break;
         case TwinkleOff:
           m_candle.setControl(
-              	new TwinkleOffAnimation(kSlot0StartIdx, kSlot0EndIdx)
+              new TwinkleOffAnimation(kSlot0StartIdx, kSlot0EndIdx)
                   .withSlot(0)
                   .withColor(LEDColor));
           break;
         case Fire:
-          m_candle.setControl(
-		  		new FireAnimation(kSlot0StartIdx, kSlot0EndIdx)
-					.withSlot(0));
+          m_candle.setControl(new FireAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0));
           break;
       }
     }

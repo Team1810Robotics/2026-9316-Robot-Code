@@ -9,7 +9,7 @@ import frc.robot.util.LimelightHelpers;
  * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting the appropriate
  * alliance botpose entries (wpiblue / wpired) based on DriverStation.
  *
- * Includes a small runtime validator to log raw Limelight arrays and converted poses for
+ * <p>Includes a small runtime validator to log raw Limelight arrays and converted poses for
  * on-robot verification.
  */
 public class VisionSubsystem extends SubsystemBase {
