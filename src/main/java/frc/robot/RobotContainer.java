@@ -13,15 +13,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-// import frc.robot.Constants.IntakeConstants;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants.Mode;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
@@ -29,11 +30,11 @@ import frc.robot.subsystems.led.LEDSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private static IntakeSubsystem intakeSubsystem;
-  private static HoodSubsystem hoodSubsystem;
-  private static LEDSubsystem LEDSubsystem = new LEDSubsystem();
-  private static FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
-  private static ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
+  private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
+  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
@@ -84,13 +85,7 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    driverXbox
-        .rightBumper()
-        .whileTrue(
-            // TODO: Fix this
-            ClimbCommand()
-            // intakeCommand()
-            );
+    driverXbox.rightBumper().whileTrue(intakeCommand());
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -134,13 +129,12 @@ public class RobotContainer {
   public Command ClimbCommand() {
     return new Climb();
   }
-  /*
-     public Command intakeCommand() {
-         if (intakeSubsystem.getMode() == Mode.OFF) {
-             return new Intake(intakeSubsystem, Mode.ON);
-         } else {
-             return new Intake(intakeSubsystem, Mode.OFF);
-         }
-     }
-  */
+
+  public Command intakeCommand() {
+    if (intakeSubsystem.getMode() == Mode.OFF) {
+      return new Intake(intakeSubsystem, Mode.ON);
+    } else {
+      return new Intake(intakeSubsystem, Mode.OFF);
+    }
+  }
 }
