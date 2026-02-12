@@ -114,7 +114,7 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
   }
 
   public Command getAutonomousCommand() {
