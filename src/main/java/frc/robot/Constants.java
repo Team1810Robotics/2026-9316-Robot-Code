@@ -54,6 +54,10 @@ public class Constants {
         public static final int PROXIMITY_SENSOR_PORT_LEFT = 0; // Digital Input port for the proximity sensor TODO: Get actual port numbers
         public static final int PROXIMITY_SENSOR_PORT_RIGHT = 1; // Digital Input port for the proximity sensor  TODO: Get actual port numbers
 
+        public static double kP = 0;
+        public static double kI = 0;
+        public static double kD = 0;
+
         public enum Mode {
             ON,
             OFF,
