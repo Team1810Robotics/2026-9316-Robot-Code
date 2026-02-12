@@ -1,41 +1,77 @@
-package frc.robot.subsystems.intake;
+package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.IntakeConstants;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
+         
+import com.revrobotics.spark.SparkMax;
+
+
 
 public class IntakeSubsystem extends SubsystemBase {
-  public SparkMax intakeMotor;
-  public DigitalInput proximitySensor;
-  private IntakeConstants.Mode mode;
+    public SparkMax intakeMotorL;
+    public SparkMax intakeMotorR;
+    public SparkMax intakeMotor;
+    public DigitalInput proximitySensorL;
+    public DigitalInput proximitySensorR;
+    private IntakeConstants.Mode mode;
+    private PIDController intakePIDController;
+    public DutyCycleEncoder encoderL;
+    public DutyCycleEncoder encoderR;
+    
+    
+    public void setMode(IntakeConstants.Mode mode) {
+        this.mode = mode;
+    }
 
-  public void setMode(IntakeConstants.Mode mode) {
-    this.mode = mode;
-  }
+    public IntakeSubsystem() {
+        intakeMotor = new SparkMax(Constants.IntakeConstants.INTAKE_MOTOR, null);
+        proximitySensorL = new DigitalInput(Constants.IntakeConstants.PROXIMITY_SENSOR_PORT_LEFT);
+        proximitySensorR = new DigitalInput(Constants.IntakeConstants.PROXIMITY_SENSOR_PORT_RIGHT);
+        intakeMotor.set(0);
+        this.mode = IntakeConstants.Mode.OFF; // initialize default0
+        
 
-  public IntakeSubsystem() {
-    intakeMotor = new SparkMax(0, null);
-    proximitySensor = new DigitalInput(0);
-    // very important... change the id number to test!!!!!!
-    intakeMotor.set(0);
-    this.mode = IntakeConstants.Mode.OFF; // initialize default0
-  }
+        intakePIDController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
+        
+    }
 
-  public IntakeConstants.Mode getMode() {
-    return mode;
-  }
+    public IntakeConstants.Mode getMode() { 
+        return mode;
+    }
 
-  public void run(double speed) {
-    intakeMotor.set(speed);
-  }
 
-  public void stop() {
-    intakeMotor.stopMotor(); // Stop the intake motor
-  }
+    public void run(double speed) {
+        intakeMotor.set(speed);
+    }
 
-  private final DigitalInput m_proximitySensor = new DigitalInput(0);
 
-  public boolean isObjectDetected() {
-    return !m_proximitySensor.get(); // NPN logic: true when object is present
-  }
+
+    public void runH(double speedH) {
+        intakeMotorL.set(speedH);
+        intakeMotorR.set(-speedH);
+    }
+
+
+    public void stop() {
+        intakeMotor.stopMotor(); // Stop the intake motor
+
+    }
+
+    
+    public boolean isObjectDetected() {
+        return proximitySensorL.get() || proximitySensorR.get(); // NPN logic: true when object is present on either sensor
+    }
+
+
+
+    public double getMeasurement(){
+        double position = 
+    }
 }
+
+
+
