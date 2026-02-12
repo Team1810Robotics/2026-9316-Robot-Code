@@ -64,7 +64,13 @@ public class Constants {
 	}
     
     public class IntakeConstants {
-        public static int INTAKE_MOTOR = 14;
+        public static int INTAKE_MOTOR = 11;
+        public static final int PROXIMITY_SENSOR_PORT_LEFT = 0; // Digital Input port for the proximity sensor TODO: Get actual port numbers
+        public static final int PROXIMITY_SENSOR_PORT_RIGHT = 1; // Digital Input port for the proximity sensor  TODO: Get actual port numbers
+
+        public static double kP = 0;
+        public static double kI = 0;
+        public static double kD = 0;
 
     public enum Mode {
       ON,
@@ -73,19 +79,21 @@ public class Constants {
     }
   }
 
-    public static final class FlywheelConstants {
-        public static final int leftMotorID = 1; //TODO: Get actual IDs
-        public static final int rightMotorID = 2;
-    }
+  public static final class FlywheelConstants {
+    public static final int leftMotorID = 1; // TODO: Get actual IDs
+    public static final int rightMotorID = 2;
+  }
 
-        public static final class ClimbConstants {
-        public static final int motor2ID = 3; //TODO: Get actual IDs
-        public static final int motor1ID = 4;
-    }
-    public static final int FlywheelBeamBreak = 5;
-    public static class OperatorConstants {
-    	public static final int kDriverControllerPort = 0;
-    }
+  public static final class ClimbConstants {
+    public static final int motor2ID = 3; // TODO: Get actual IDs
+    public static final int motor1ID = 4;
+  }
+
+  public static final int FlywheelBeamBreak = 5;
+
+  public static class OperatorConstants {
+    public static final int kDriverControllerPort = 0;
+  }
 
   public static final class LEDConstants {
     public static final int[] RED = {255, 0, 0, 0}; // RGB values
