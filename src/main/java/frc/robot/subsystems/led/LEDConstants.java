@@ -9,7 +9,7 @@ public final class LEDConstants {
   public static final int[] BLUE = {0, 0, 255}; // RGB values
   public static final int[] PURPLE = {255, 0, 255}; // RGB values
 
-  public static final int CANDLE_ID = 20; // CANdle ID
+  public static final int CANDLE_ID = 35; // CANdle ID
 
-  public static final int NUM_LEDS = 0; // TODO: Find
+  public static final int NUM_LEDS = 100; // TODO: Find
 }

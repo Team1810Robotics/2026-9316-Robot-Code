@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -15,26 +16,22 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
+// import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.climb.ClimbSubsystem;
-import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants.Mode;
-import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
-  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  // private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
@@ -83,9 +80,9 @@ public class RobotContainer {
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
     // spins the flywheel to feed when the X button is held
-    driverXbox.x().whileTrue(FlywheelCommand());
+    // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    driverXbox.rightBumper().whileTrue(intakeCommand());
+    //  driverXbox.rightBumper().whileTrue(intakeCommand());
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -114,7 +111,11 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+    // gamepadManipulator.b().onTrue(new InstantCommand(() -> LEDSubsystem.setSolidColor(255, 0, 0), LEDSubsystem)); 
+    // gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+
+    RGBWColor RED = new RGBWColor(255, 0, 0);
+    LEDSubsystem.setLEDColor(RED, false);
   }
 
   public Command getAutonomousCommand() {
@@ -122,19 +123,20 @@ public class RobotContainer {
   }
 
   // makes the flywheel command
-  public Command FlywheelCommand() {
-    return new Flywheel();
-  }
-
+  /*
+    public Command FlywheelCommand() {
+      return new Flywheel();
+    }
+  */
   public Command ClimbCommand() {
     return new Climb();
   }
-
+  /*/
   public Command intakeCommand() {
     if (intakeSubsystem.getMode() == Mode.OFF) {
       return new Intake(intakeSubsystem, Mode.ON);
     } else {
       return new Intake(intakeSubsystem, Mode.OFF);
     }
-  }
+  }*/
 }

@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.signals.RGBWColor;
-
 public class Constants {
   public static class GyroAndIMUConstants {
     // Placeholder; set to a sensible value for your robot (e.g. -50.0)
