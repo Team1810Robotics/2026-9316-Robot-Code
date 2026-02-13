@@ -8,8 +8,13 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 /** Flywheel command */
 public class Climb extends Command {
   // *private final TalonFX m_motor = new TalonFX(0);
-  public static ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  public static ClimbSubsystem climbSubsystem = new ClimbSubsystem(); // Do not create new subsystems in commands, create 1 in RobotContainer and pass it around
 
+  // Sam Notes
+  // Needs a constructor
+  // Main code should be in excecute
+
+  
   @Override
   public void initialize() {
     climbSubsystem.Extend();

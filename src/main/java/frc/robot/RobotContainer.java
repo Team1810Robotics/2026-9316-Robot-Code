@@ -121,6 +121,9 @@ public class RobotContainer {
     return new InstantCommand();
   }
 
+  // Sam Notes
+  //this is not how we do commands, just instantiate a new one when you call it
+
   // makes the flywheel command
   public Command FlywheelCommand() {
     return new Flywheel();

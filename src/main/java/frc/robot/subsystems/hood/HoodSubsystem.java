@@ -16,6 +16,11 @@ public class HoodSubsystem extends SubsystemBase {
      public void setMode(HoodConstants.Mode mode) {
         this.mode = mode;
     }
+
+    // Sam Notes
+    // Looks like this is still in progress
+
+
   /**
    * Example command factory method.
    *

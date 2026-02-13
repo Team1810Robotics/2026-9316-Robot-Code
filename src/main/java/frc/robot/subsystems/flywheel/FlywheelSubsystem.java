@@ -20,6 +20,11 @@ public class FlywheelSubsystem extends SubsystemBase {
   // set_parameter(hb, "FlywheelSub", "frc.robot.subsystems.FlywheelSub");
   // new.motorcontrol = "edu.wpi.first.wpilibj.motorcontrol.Kraken";
 
+  // Sam Notes
+  // Needs a constructor
+  // Needs a function to return the beambreak value
+  // Needs to be abe to set to a specific motor velocity, not just a set power
+
   public void runFlywheel() {
     leftMotor.set(1.0);
     rightMotor.set(1.0);

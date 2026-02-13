@@ -9,6 +9,9 @@ public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax motor1 = new SparkMax(ClimbConstants.motor1ID, MotorType.kBrushless);
   private final SparkMax motor2 = new SparkMax(ClimbConstants.motor2ID, MotorType.kBrushless);
 
+  // Sam Notes
+  // Needs a constructor
+
   // set_parameter(hb, "FlywheelSub", "frc.robot.subsystems.FlywheelSub");
   // new.motorcontrol = "edu.wpi.first.wpilibj.motorcontrol.Kraken";
 

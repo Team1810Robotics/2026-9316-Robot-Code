@@ -10,6 +10,9 @@ public class Indexer extends Command {
     this.indexer = indexer;
   }
 
+  //Sam Notes
+  // main code should be in execute, not initialize
+  
   @Override
   public void initialize() {
     indexer.RunIndexer();

@@ -13,6 +13,10 @@ public class IndexerSubsystem extends SubsystemBase {
   private final DigitalInput IndexBeamBreak =
       new DigitalInput(IndexerConstants.INDEXER_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
 
+  // Sam Notes
+  // Needs a constructor
+  // Looks good though
+
   public void RunIndexer() {
     indexerMotor1.set(IndexerConstants.INDEXER_SPEED);
     indexerMotor2.set(IndexerConstants.INDEXER_SPEED);

@@ -20,6 +20,9 @@ public class VisionSubsystem extends SubsystemBase {
     this.limelightName = name;
   }
 
+  // Sam Notes
+  // Replace this with vision file from Prog Test Bot Repo
+
   /**
    * @return AprilTag / fiducial ID (tid)
    */

@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.intake;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,6 +38,10 @@ public class IntakeSubsystem extends SubsystemBase {
         intakePIDController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
         
     }
+
+    // Sam Notes
+    // appears to still be in progress
+    // Get Payton's help
 
     public IntakeConstants.Mode getMode() { 
         return mode;
