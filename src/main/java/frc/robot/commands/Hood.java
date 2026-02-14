@@ -1,9 +1,20 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.hood.HoodSubsystem;
 
-/*
- * notes go here:
- * x44 motor
- */
-public class Hood extends Command {}
+
+
+public class Hood extends Command {
+    private static HoodSubsystem hoodSubsystem;
+
+
+
+
+
+
+
+
+
+    
+}
