@@ -3,45 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.55,
-        "y": 7.59
+        "x": 0.4580967741902454,
+        "y": 5.0736612903238845
       },
       "prevControl": null,
       "nextControl": {
-        "x": -1.1455516014234872,
-        "y": 7.515599051001588
+        "x": 1.9746397849462367,
+        "y": 5.098043010752689
       },
       "isLocked": false,
-      "linkedName": "StartPos1"
+      "linkedName": "After collect"
     },
     {
       "anchor": {
-        "x": 0.47358820710401306,
-        "y": 5.086318691777162
+        "x": 1.7,
+        "y": 4.0
       },
       "prevControl": {
-        "x": 0.6202135231279142,
-        "y": 6.956120996434371
-      },
-      "nextControl": {
-        "x": 0.3269628910801117,
-        "y": 3.2165163871199534
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
-        "x": 0.8461565836338041,
-        "y": 7.558635824436427
-      },
-      "prevControl": {
-        "x": 0.5865597373569578,
-        "y": 5.387576105778191
+        "x": 1.6717506066408014,
+        "y": 4.864209806100759
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "Shoot"
     }
   ],
   "rotationTargets": [],
@@ -64,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -90.0
   },
   "useDefaultConstraints": true
 }

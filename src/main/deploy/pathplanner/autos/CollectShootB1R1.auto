@@ -13,13 +13,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "collect to shoot 2"
+            "pathName": "collectshoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "shoot to climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "climb"
           }
         }
       ]
