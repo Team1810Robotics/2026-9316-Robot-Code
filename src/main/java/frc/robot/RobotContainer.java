@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 // import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -111,8 +110,10 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    // gamepadManipulator.b().onTrue(new InstantCommand(() -> LEDSubsystem.setSolidColor(255, 0, 0), LEDSubsystem)); 
-    // gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+    // gamepadManipulator.b().onTrue(new InstantCommand(() -> LEDSubsystem.setSolidColor(255, 0, 0),
+    // LEDSubsystem));
+    // gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null,
+    // true)));
 
     RGBWColor RED = new RGBWColor(255, 0, 0);
     LEDSubsystem.setLEDColor(RED, false);

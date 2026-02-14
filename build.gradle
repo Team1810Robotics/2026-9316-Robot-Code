@@ -70,7 +70,7 @@ dependencies {
     roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
     roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
 
-    implementation 'com.github.jonahsnider:doglog:2025.10.1'
+    //implementation 'com.github.jonahsnider:doglog:2025.10.1'
     
     nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
     nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
