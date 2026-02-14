@@ -9,34 +9,40 @@ public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   private IntakeConstants.Mode mode;
 
+
     /**
      * Intake command that runs the intake motor at a certain speed depending on
      * the {@link IntakeConstants.Mode} given.
      *
      * @param intakeSubsystem The IntakeSubsystem to run the command on.
-     * @param mode           The mode to run the command in        
+     * @param mode           The mode to run the command in          
      */
 
-     boolean pSensorL = intakeSubsystem.proximitySensorL.get();
-     boolean pSensorR = intakeSubsystem.proximitySensorR.get();
 
   public Intake(IntakeSubsystem intakeSubsystem, IntakeConstants.Mode mode) {
     this.intakeSubsystem = intakeSubsystem;
     this.mode = mode;
-
+    this.intakeSubsystem.setMode(mode);
     addRequirements(intakeSubsystem);
+
   }
 
   @Override
   public void execute() {
-    if (mode == Mode.ON && pSensor) {
+    if (mode == Mode.ON) {
       intakeSubsystem.intakeMotor.set(1.0); // Run intake at full speed
     } else if (mode == Mode.OFF) {
       intakeSubsystem.intakeMotor.set(0.0); // Stop the intake
     } else if (mode == Mode.STOP) {
       intakeSubsystem.intakeMotor.stopMotor(); // Stop the intake
     }
+    
+     
   }
+
+
+
+
 
   @Override
   public void end(boolean interrupted) {
