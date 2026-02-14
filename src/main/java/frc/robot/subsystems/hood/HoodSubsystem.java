@@ -1,4 +1,4 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.hood;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -13,8 +13,8 @@ public class HoodSubsystem extends SubsystemBase {
     public TalonFX hoodMotor;
     private HoodConstants.Mode mode;
 
-     public void setMode(HoodConstants.Mode mode) {
-        this.mode = mode;
+    public void setMode(HoodConstants.Mode mode) {
+      this.mode = mode;
     }
 
     // Sam Notes
@@ -29,10 +29,9 @@ public class HoodSubsystem extends SubsystemBase {
   public Command AimHood() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    //    hoodMotor = new SparkMax(Constants.HoodConstants.HOOD_MOTOR, null);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
-        hoodMotor.set(0);
-        this.mode = HoodConstants.Mode.OFF; // initialize default0
+    hoodMotor = new TalonFX(Constants.MotorIDs.HOOD_MOTOR);
+    hoodMotor.set(0);
+    this.mode = HoodConstants.Mode.OFF;
     return runOnce(
         () -> {
           /* one-time action goes here */

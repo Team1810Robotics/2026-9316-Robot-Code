@@ -18,13 +18,14 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants.Mode;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.Constants;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -42,9 +43,7 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public static Flywheel Flywheel = new Flywheel();
-  public static Climb Climb = new Climb();
-  // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
+  // Removed static command instances per Sam's note: instantiate fresh commands when called
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -130,14 +129,14 @@ public class RobotContainer {
   }
 
   public Command ClimbCommand() {
-    return new Climb();
+    return new Climb(climbSubsystem);
   }
 
   public Command intakeCommand() {
-    if (intakeSubsystem.getMode() == Mode.OFF) {
-      return new Intake(intakeSubsystem, Mode.ON);
+    if (intakeSubsystem.getMode() == IntakeConstants.Mode.OFF) {
+      return new Intake(intakeSubsystem, IntakeConstants.Mode.ON, 0.7, 0.8);
     } else {
-      return new Intake(intakeSubsystem, Mode.OFF);
+      return new Intake(intakeSubsystem, IntakeConstants.Mode.OFF, 0, 0);
     }
   }
 }
