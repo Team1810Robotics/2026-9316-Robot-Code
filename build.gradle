@@ -70,7 +70,9 @@ dependencies {
     roborioRelease wpi.java.deps.wpilibJniRelease(wpi.platforms.roborio)
     roborioRelease wpi.java.vendor.jniRelease(wpi.platforms.roborio)
 
-    implementation 'com.github.jonahsnider:doglog:2025.10.1'
+    // DogLog (fetched from JitPack) can fail to resolve on some networks due to SSL
+    // issues. Commented out temporarily to allow builds in restricted environments.
+   // implementation 'com.github.jonahsnider:doglog:2025.10.1'
     
     nativeDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.desktop)
     nativeDebug wpi.java.vendor.jniDebug(wpi.platforms.desktop)
