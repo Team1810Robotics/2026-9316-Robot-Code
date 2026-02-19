@@ -30,6 +30,8 @@ import frc.robot.Constants;
 @SuppressWarnings("unused")
 public class RobotContainer {
 
+  
+
   // The robot's subsystems and commands are defined here...
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
@@ -42,6 +44,11 @@ public class RobotContainer {
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+
+    private final SwerveRequest.FieldCentricFacingAngle faceAngle =
+        new SwerveRequest.FieldCentricFacingAngle()
+            .withDeadband(MaxSpeed * 0.1)
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   // Removed static command instances per Sam's note: instantiate fresh commands when called
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -59,6 +66,7 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+
 
   public RobotContainer() {
     configureBindings();
