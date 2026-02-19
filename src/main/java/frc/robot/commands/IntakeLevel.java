@@ -10,6 +10,12 @@ public class IntakeLevel extends Command{
   private static IntakeLevelSubsystem IntakeLevelSubsystem;
 
 
+  public IntakeLevel(IntakeLevelSubsystem intakeLevelSubsystem) {
+    this.IntakeLevelSubsystem = intakeLevelSubsystem;
+    addRequirements(intakeLevelSubsystem);
+
+  }
+
   @Override
   public void execute() {
         if (IntakeLevelSubsystem.isIntakeDown == false) {

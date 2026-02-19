@@ -3,31 +3,25 @@ package frc.robot.subsystems.hood;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.HoodConstants;
+import edu.wpi.first.wpilibj.Encoder;
 
 public class HoodSubsystem extends SubsystemBase {
   /** Creates a new HoodSubsystem. */
   public HoodSubsystem() {}
     public TalonFX hoodMotor;
-    private HoodConstants.Mode mode;
-    public DutyCycleEncoder hoodEncoder;
+    public Encoder hoodEncoder;
 
-     public void setMode(HoodConstants.Mode mode) {
-        this.mode = mode;
-          this.mode = HoodConstants.Mode.OFF; // initialize default0
-    }
   
   public Command AimHood() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    
+    hoodEncoder = new Encoder(0, 1);
     hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
         hoodMotor.set(0);
-        this.mode = HoodConstants.Mode.OFF; // initialize default0
     return runOnce(
         () -> {
           /* one-time action goes here */
@@ -40,6 +34,17 @@ public class HoodSubsystem extends SubsystemBase {
 
     public void stop() {
         hoodMotor.stopMotor(); // Stop the hood motor
+
+    }
+
+
+
+    public void setEncoder() {
+      hoodEncoder.getDistance();
+
+            //TODO: figure out pulses per rotation and set as denomenator should be 600 according to ai
+      hoodEncoder.setDistancePerPulse(360/600);
+
 
     }
   }
