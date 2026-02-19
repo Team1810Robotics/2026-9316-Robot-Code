@@ -117,11 +117,12 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); //TODO: add the control for the april tag lock thing that I added.;
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
     gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+
   }
 
   public Command getAutonomousCommand() {

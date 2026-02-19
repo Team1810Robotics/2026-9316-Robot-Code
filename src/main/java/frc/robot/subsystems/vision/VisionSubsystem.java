@@ -6,6 +6,8 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 
+import org.w3c.dom.ranges.DocumentRange;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -19,7 +21,7 @@ import edu.wpi.first.wpilibj.DriverStation;
  * for on-robot verification.
  */
 public class VisionSubsystem extends SubsystemBase {
-    private final String limelightName;
+    public final String limelightName;
 
     private final CommandSwerveDrivetrain drivetrain;
 
@@ -40,7 +42,12 @@ public class VisionSubsystem extends SubsystemBase {
             LimelightHelpers.SetIMUMode(limelightName, 4);
         }
 
-        LimelightHelpers.SetRobotOrientation(limelightName, drivetrain.getState().Pose.getRotation().getDegrees(), drivetrain.getState().Speeds.omegaRadiansPerSecond, 0, 0, 0, 0);
+        LimelightHelpers.SetRobotOrientation(
+            limelightName, 
+            drivetrain.getState().Pose.getRotation().getDegrees(), 
+            drivetrain.getState().Speeds.omegaRadiansPerSecond, 
+            drivetrain.getPigeon2().getPitch().getValueAsDouble(), 0, 
+            drivetrain.getPigeon2().getRoll().getValueAsDouble(), 0);
 
         if (!targetValid()) {
             DogLog.log("Vision/BotPose", new Pose2d());
@@ -64,6 +71,7 @@ public class VisionSubsystem extends SubsystemBase {
     public boolean targetValid() {
         return LimelightHelpers.getTV(limelightName);
     }
+
 
     public PoseEstimate getBotPoseMT1() {
         return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);

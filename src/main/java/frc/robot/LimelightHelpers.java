@@ -1153,6 +1153,10 @@ public class LimelightHelpers {
     return 1.0 == getLimelightNTDouble(limelightName, "tv");
   }
 
+  public int getLEDThing(String limelightName) {
+    return (int) getLimelightNTDouble(limelightName, "tv");
+  }
+
   /**
    * Gets the horizontal offset from the crosshair to the target in degrees.
    *
