@@ -9,12 +9,4 @@ public class IntakeConstants {
         public static double kI = 0;
         public static double kD = 0;
 
-    public enum Mode {
-      ON,
-      OFF,
-      STOP
-    }
-
-
-    
 }

@@ -22,7 +22,7 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants.Mode;
+// import frc.robot.subsystems.intake.IntakeConstants.Mode;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
@@ -86,6 +86,7 @@ public class RobotContainer {
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
     driverXbox.rightBumper().whileTrue(intakeCommand());
+    
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -131,10 +132,7 @@ public class RobotContainer {
   }
 
   public Command intakeCommand() {
-    if (intakeSubsystem.getMode() == Mode.OFF) {
-      return new Intake(intakeSubsystem, Mode.ON);
-    } else {
-      return new Intake(intakeSubsystem, Mode.OFF);
+    return new Intake(intakeSubsystem);
     }
   }
-}
+
