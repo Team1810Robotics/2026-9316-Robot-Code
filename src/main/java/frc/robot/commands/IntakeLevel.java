@@ -1,32 +1,38 @@
 package frc.robot.commands;
 
-
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeLevelSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 
 public class IntakeLevel extends Command{
- 
   private static IntakeLevelSubsystem IntakeLevelSubsystem;
-
+  public DigitalInput intakeLimitSwitch;
 
   public IntakeLevel(IntakeLevelSubsystem intakeLevelSubsystem) {
-    this.IntakeLevelSubsystem = intakeLevelSubsystem;
+    IntakeLevel.IntakeLevelSubsystem = intakeLevelSubsystem;
     addRequirements(intakeLevelSubsystem);
+    intakeLimitSwitch = new DigitalInput(IntakeConstants.INTAKE_LIMIT_SWITCH);
 
   }
 
   @Override
   public void execute() {
-    if (0 == 0) {
-      //TODO: change this 0 and 0 to some variable so it checks if the button x is being pressed or not
-      //location check of the intake needed (encoder???? or limit switch?)
+    if (intakeLimitSwitch.get() == true) {
+      //limit switch
+      
         if (IntakeLevelSubsystem.isIntakeDown == false) {
             IntakeLevelSubsystem.runDOWN();
-        } else {
+        } else if (IntakeLevelSubsystem.isIntakeDown == true) {
             IntakeLevelSubsystem.runUP();
+        } else {
+            IntakeLevelSubsystem.stop();
         }
-        
+    } else {
+      //not limit switch
+      IntakeLevelSubsystem.stop();
     }
   }
 }
