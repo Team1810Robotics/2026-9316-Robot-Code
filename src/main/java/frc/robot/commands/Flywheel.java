@@ -30,6 +30,7 @@ public class Flywheel extends Command {
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    flywheelSubsystem.setFlywheelVelocity(FlywheelConstants.IDLE_VELOCITY); // Stop flywheel when command ends
+    flywheelSubsystem.setFlywheelVelocity(
+        FlywheelConstants.IDLE_VELOCITY); // Stop flywheel when command ends
   }
 }
