@@ -103,7 +103,22 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-    // Run SysId routines when holding back/start and X/Y.
+            /*hypthetically, if some random prankster were to change the button bind so it was some crazy button combo, for example,
+             holding LB RT A B and right arrow, this would almost certainly be detrimental to our success in the competition. btw, the name of the
+            button is  | 
+                  here \/                                                       */
+            driverXbox.x().whileTrue( 
+            drivetrain.applyRequest(() ->
+                faceAngle
+                    .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                    .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                    .withTargetDirection(drivetrain.getAngleToHub())
+                    .withHeadingPID(5, 0, 0)
+            )
+        );
+
+
+    // Run SysId routines when holding back/start and X/Y. 
     // Note that each routine should be run exactly once in a single log.
     driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
     driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
@@ -117,7 +132,7 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); //TODO: add the control for the april tag lock thing that I added.;
+    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); 
 
     drivetrain.registerTelemetry(logger::telemeterize);
 

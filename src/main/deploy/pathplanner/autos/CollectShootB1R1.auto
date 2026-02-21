@@ -7,13 +7,25 @@
         {
           "type": "path",
           "data": {
-            "pathName": "B2 to shoot"
+            "pathName": "p1 collect"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Shoot"
+            "name": "Intake"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "collectshoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Flywheel"
           }
         },
         {

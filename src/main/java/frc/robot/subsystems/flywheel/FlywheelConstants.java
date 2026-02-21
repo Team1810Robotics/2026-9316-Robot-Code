@@ -1,12 +1,17 @@
 package frc.robot.subsystems.flywheel;
 
 public final class FlywheelConstants {
-  // Flywheel velocity targets (in rotations per second - RPS)
-  public static final double TARGET_VELOCITY_RPS = 80.0;  // Target flywheel speed
-  
-  // Velocity control tolerance
-  public static final double VELOCITY_TOLERANCE_RPS = 2.0;  // Within 2 RPS = at speed
-  
-  // Fallback power control (if velocity control unavailable)
-  public static final double POWER_PERCENTAGE = 0.8;  // 80% power
-}
+  public static final int leftMotorID = 13;
+  public static final int rightMotorID = 15;
+  public static final int FlywheelBeamBreak = 5;
+  public static final double IDLE_VELOCITY = 200.0; // Max velocity in rotations per second (RPS)
+
+  //TODO TUNE THIS: PID constants for velocity control 
+  public static final double kP = 0.0; // Proportional gain--current
+  public static final double kI = 0.0; // Integral gain--past
+  public static final double kD = 0.0; // Derivative gain--future
+    
+  }
+
+
+ 

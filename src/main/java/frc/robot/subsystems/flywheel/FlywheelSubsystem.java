@@ -2,21 +2,27 @@ package frc.robot.subsystems.flywheel;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-  private final TalonFX leftMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_LEFT);
-  private final TalonFX rightMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_RIGHT);
-  public final DigitalInput Flybreak = new DigitalInput(Constants.FlywheelConstants.BEAM_BREAK_PORT);
+  private final TalonFX leftMotor;
+  private final TalonFX rightMotor;
+  private final DigitalInput beamBreak;
 
   // VelocityVoltage controller for precise RPM control (TalonFX built-in)
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+  //PID stuff-- have sam check
+  private PIDController flywheelPIDController;
+  public double currentSetpoint;
 
+  
+ 
   // Target velocity in rotations per second (RPS)
-  private double targetVelocity = 0.0;
+  private double targetVelocity = 200.0;
+  private double CurrentVelocity;
 
   // Flywheel state tracking for diagnostics and control
   private enum FlywheelState {
@@ -25,14 +31,24 @@ public class FlywheelSubsystem extends SubsystemBase {
   private FlywheelState state = FlywheelState.STOPPED;
 
   public FlywheelSubsystem() {
-    // Initialize both motors to neutral/zero state
-    leftMotor.set(0.0);
-    rightMotor.set(0.0);
+    leftMotor = new TalonFX(FlywheelConstants.leftMotorID);
+    rightMotor = new TalonFX(FlywheelConstants.rightMotorID);
+
+    beamBreak = new DigitalInput(FlywheelConstants.FlywheelBeamBreak);
+    
+    //TODO : Tune PID constants for flywheel velocity control
+    flywheelPIDController = new PIDController(FlywheelConstants.kP, FlywheelConstants.kI, FlywheelConstants.kD);
+    // Calculates the output of the PID algorithm based on the sensor reading
+// and sends it to a motor
+leftMotor.set(flywheelPIDController.calculate(getCurrentVelocity(), targetVelocity));
+rightMotor.set(flywheelPIDController.calculate(getCurrentVelocity(), targetVelocity));
+
+    //TODO: Configure motor settings (inversions, PID gains) here
   }
 
   public boolean getBeamBreakTriggered() {
     // Beam break is triggered when FALSE (NPN sensor logic)
-    return !Flybreak.get();
+    return !beamBreak.get();
   }
 
   // Set flywheel to specific velocity in rotations per second (RPS)
@@ -45,18 +61,9 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-    // Convert percentage (0.0 to 1.0) to raw power command
+ 
     leftMotor.set(powerPercent);
     rightMotor.set(powerPercent);
-  }
-
-  // Legacy methods for compatibility
-  public void runFlywheel() {
-    setFlywheelPower(1.0);
-  }
-
-  public void stopThrowing() {
-    setFlywheelVelocity(0.0);
   }
 
   // Get current velocity in RPS (for diagnostics and feedback)
@@ -70,10 +77,11 @@ public class FlywheelSubsystem extends SubsystemBase {
   // Get target velocity
   public double getTargetVelocity() {
     return targetVelocity;
+   
   }
 
   // Check if flywheel is at target speed (within tolerance)
-  public boolean isAtTargetSpeed() {
+  public boolean isAtTargetVelocity() {
     double tolerance = 2.0; // RPS tolerance (adjust as needed)
     return Math.abs(getCurrentVelocity() - targetVelocity) < tolerance;
   }
@@ -85,13 +93,35 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // Update state machine based on current performance
+   CurrentVelocity = getCurrentVelocity();
     if (targetVelocity == 0.0) {
       state = FlywheelState.STOPPED;
-    } else if (isAtTargetSpeed()) {
+    } else if (isAtTargetVelocity()) {
       state = FlywheelState.AT_SPEED;
     } else {
       state = FlywheelState.SPINNING_UP;
     }
   }
+  
+    //not inverted motor-- TODO double check motor ID
+    public void run(double setPoint) {
+    if (currentSetpoint == setPoint) {
+      targetVelocity = setPoint;
+    }else if (getCurrentVelocity() != setPoint) {
+      rightMotor.set(clamp(flywheelPIDController.calculate(getMeasurment(), setPoint)));
+      if (flywheelPIDController.calculate(getMeasurment(), setPoint) > highestPower) {
+        highestPower = flywheelPIDController.calculate(getMeasurment(), setPoint);
+      }
+      
+ //inverted motor-- TODO double check motor ID
+    public void run(double setPoint) {
+    if (currentSetpoint == setPoint) {
+      targetVelocity = !setPoint;
+    }else if (getCurrentVelocity() != setPoint) {
+      pitchMotor.set(clamp(flywheelPIDController.calculate(getMeasurment(), setPoint)));
+      if (flywheelPIDController.calculate(getMeasurment(), setPoint) > highestPower) {
+        highestPower = flywheelPIDController.calculate(getMeasurment(), setPoint);
+      }
 }
+}
+    }
