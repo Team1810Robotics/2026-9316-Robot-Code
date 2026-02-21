@@ -5,27 +5,21 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
-  
-  public static float intakeSpeed;
-    private double buttonSpeed;
+  private double buttonSpeed;
 
     /**
-     * Intake command that runs the intake motor at a certain speed depending on
+     * Intake command to run the intake motor
      * @param intakeSubsystem The IntakeSubsystem to run the command on.
      */
-
 
   public Intake(IntakeSubsystem intakeSubsystem, double Speed) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
-
    buttonSpeed = Speed;
-
   }
 
   @Override
   public void execute() {
-    // intakeSubsystem.intakeMotor.set(intakeSpeed);
     intakeSubsystem.run(buttonSpeed);
   }
 

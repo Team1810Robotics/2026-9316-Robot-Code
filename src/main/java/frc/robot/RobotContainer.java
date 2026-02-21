@@ -88,6 +88,10 @@ public class RobotContainer {
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    //sucks ball in
+    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1)); 
+    //spits ball out
+
     // driverXbox.x().whileTrue(intakeLevelCommand());
     
 
@@ -134,9 +138,6 @@ public class RobotContainer {
     return new Climb();
   }
 
-  // public Command intakeCommand() {
-  //   return new Intake(intakeSubsystem);
-  //   }
 
 
   //  public Command intakeLevelCommand() {

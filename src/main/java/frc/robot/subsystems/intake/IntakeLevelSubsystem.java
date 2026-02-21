@@ -11,13 +11,11 @@ public class IntakeLevelSubsystem extends SubsystemBase {
 
     public SparkMax intakeMotorL;
     public SparkMax intakeMotorR;
-   
-
     public boolean isIntakeDown;
 
     public IntakeLevelSubsystem() {
-        this.intakeMotorL = new SparkMax(IntakeConstants.INTAKE_MOTOR_L, null);
-        this.intakeMotorR = new SparkMax(IntakeConstants.INTAKE_MOTOR_R, null);
+        intakeMotorL = new SparkMax(IntakeConstants.INTAKE_MOTOR_L, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+        intakeMotorR = new SparkMax(IntakeConstants.INTAKE_MOTOR_R, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
         this.isIntakeDown = false;
     }
