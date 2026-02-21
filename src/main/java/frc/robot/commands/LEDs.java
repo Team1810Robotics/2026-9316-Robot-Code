@@ -14,7 +14,7 @@ public class LEDs extends Command {
 
   @Override
   public void initialize() {
-    LEDsubsystem.StartLEDSubsystem();
+    LEDsubsystem.StartLEDSubsystem(LEDsubsystem.visionSubsystem);
   }
 
   @Override

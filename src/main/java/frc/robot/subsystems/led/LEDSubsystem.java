@@ -26,7 +26,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   private CANdle m_candle;
   
-  private VisionSubsystem visionSubsystem;
+  public VisionSubsystem visionSubsystem;
 
   public void StartLEDSubsystem(VisionSubsystem visionSubsystem) {
     m_candle = new CANdle(LEDConstants.CANDLE_ID);
