@@ -87,8 +87,8 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    driverXbox.rightBumper().whileTrue(intakeCommand());
-    driverXbox.x().whileTrue(intakeLevelCommand());
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    // driverXbox.x().whileTrue(intakeLevelCommand());
     
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
@@ -134,13 +134,13 @@ public class RobotContainer {
     return new Climb();
   }
 
-  public Command intakeCommand() {
-    return new Intake(intakeSubsystem);
-    }
+  // public Command intakeCommand() {
+  //   return new Intake(intakeSubsystem);
+  //   }
 
 
-   public Command intakeLevelCommand() {
-    return new IntakeLevel(intakeLevelSubsystem);
-    }
+  //  public Command intakeLevelCommand() {
+  //   return new IntakeLevel(intakeLevelSubsystem);
+  //   }
   }
 

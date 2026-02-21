@@ -6,7 +6,8 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   
-
+  public static float intakeSpeed;
+    private double buttonSpeed;
 
     /**
      * Intake command that runs the intake motor at a certain speed depending on
@@ -14,22 +15,19 @@ public class Intake extends Command {
      */
 
 
-  public Intake(IntakeSubsystem intakeSubsystem) {
+  public Intake(IntakeSubsystem intakeSubsystem, double Speed) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
+
+   buttonSpeed = Speed;
 
   }
 
   @Override
   public void execute() {
-    intakeSubsystem.intakeMotor.set(1);
+    // intakeSubsystem.intakeMotor.set(intakeSpeed);
+    intakeSubsystem.run(buttonSpeed);
   }
-
-
-
-
-
-
 
 
   @Override
