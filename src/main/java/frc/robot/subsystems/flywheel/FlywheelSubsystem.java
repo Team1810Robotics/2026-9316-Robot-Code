@@ -4,19 +4,18 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
-  private final TalonFX leftMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_LEFT);
-  private final TalonFX rightMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_RIGHT);
-  public final DigitalInput Flybreak = new DigitalInput(Constants.FlywheelConstants.BEAM_BREAK_PORT);
+  private final TalonFX leftMotor;
+  private final TalonFX rightMotor;
+  private final DigitalInput beamBreak;
 
   // VelocityVoltage controller for precise RPM control (TalonFX built-in)
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
   // Target velocity in rotations per second (RPS)
-  private double targetVelocity = 0.0;
+  private double targetVelocity = 200.0;
 
   // Flywheel state tracking for diagnostics and control
   private enum FlywheelState {
@@ -25,14 +24,17 @@ public class FlywheelSubsystem extends SubsystemBase {
   private FlywheelState state = FlywheelState.STOPPED;
 
   public FlywheelSubsystem() {
-    // Initialize both motors to neutral/zero state
-    leftMotor.set(0.0);
-    rightMotor.set(0.0);
+    leftMotor = new TalonFX(FlywheelConstants.leftMotorID);
+    rightMotor = new TalonFX(FlywheelConstants.rightMotorID);
+
+    beamBreak = new DigitalInput(FlywheelConstants.FlywheelBeamBreak);
+
+    //TODO: Configure motor settings (inversions, PID gains) here
   }
 
   public boolean getBeamBreakTriggered() {
     // Beam break is triggered when FALSE (NPN sensor logic)
-    return !Flybreak.get();
+    return !beamBreak.get();
   }
 
   // Set flywheel to specific velocity in rotations per second (RPS)
@@ -45,18 +47,9 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-    // Convert percentage (0.0 to 1.0) to raw power command
+   
     leftMotor.set(powerPercent);
     rightMotor.set(powerPercent);
-  }
-
-  // Legacy methods for compatibility
-  public void runFlywheel() {
-    setFlywheelPower(1.0);
-  }
-
-  public void stopThrowing() {
-    setFlywheelVelocity(0.0);
   }
 
   // Get current velocity in RPS (for diagnostics and feedback)

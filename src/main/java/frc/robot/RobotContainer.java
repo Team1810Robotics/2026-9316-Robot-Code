@@ -22,6 +22,7 @@ import frc.robot.commands.Flywheel;
 import frc.robot.generated.TunerConstants;
 // import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
@@ -32,7 +33,7 @@ public class RobotContainer {
   // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
-  // private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -41,7 +42,6 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public static Flywheel Flywheel = new Flywheel();
   public static Climb Climb = new Climb();
   // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -65,8 +65,10 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
+    autoChooser = AutoBuilder.buildAutoChooser();
+
     NamedCommands.registerCommand("climb", new Climb());
-    NamedCommands.registerCommand("Flywheel", new Flywheel());
+    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
   }
 
   private void configureBindings() {
