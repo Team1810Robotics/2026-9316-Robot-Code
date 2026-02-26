@@ -12,8 +12,8 @@ import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 public class Flywheel extends Command {
   private final FlywheelSubsystem flywheelSubsystem;
   private final double targetVelocity;
-
-    NamedCommands.registerCommand("Flywheel"); // Register command with PathPlanner for autonomous use
+  
+  NamedCommands.registerCommand("Flywheel"); // Register command with PathPlanner for autonomous use
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
