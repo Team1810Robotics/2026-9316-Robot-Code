@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
-import frc.robot.commands.IntakeLevel;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -24,7 +23,6 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.intake.IntakeLevelSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 @SuppressWarnings("unused")
@@ -32,7 +30,6 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  private final IntakeLevelSubsystem intakeLevelSubsystem = new IntakeLevelSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
@@ -85,12 +82,13 @@ public class RobotContainer {
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
     // spins the flywheel to feed when the X button is held
-    driverXbox.x().whileTrue(FlywheelCommand());
+    // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     //sucks ball in
-    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1)); 
+    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false)); 
     //spits ball out
+    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
 
     // driverXbox.x().whileTrue(intakeLevelCommand());
     
@@ -118,7 +116,7 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -137,11 +135,4 @@ public class RobotContainer {
   public Command ClimbCommand() {
     return new Climb();
   }
-
-
-
-  //  public Command intakeLevelCommand() {
-  //   return new IntakeLevel(intakeLevelSubsystem);
-  //   }
-  }
-
+}
