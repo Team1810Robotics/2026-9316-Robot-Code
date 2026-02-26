@@ -13,17 +13,17 @@ public class Flywheel extends Command {
   private final FlywheelSubsystem flywheelSubsystem;
   private final double targetVelocity;
 
-    NamedCommands.registerCommand("Flywheel"); // Register command with PathPlanner for autonomous use
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
 
+    NamedCommands.registerCommand("Flywheel", null); // Register command with PathPlanner for autonomous use
     addRequirements(flywheelSubsystem);
   }
 
   @Override
   public void initialize() {}
-
+   
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
