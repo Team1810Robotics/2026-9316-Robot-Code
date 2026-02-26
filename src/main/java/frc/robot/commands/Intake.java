@@ -1,18 +1,14 @@
 package frc.robot.commands;
 
-import java.util.logging.Level;
-
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+
 
 public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   private double buttonSpeed;
   private double levelSpeed;
-  private boolean isIntakeDown;
-  public DigitalInput intakeLimitSwitch;
+  double intakeLevelDegrees;
   LevelMode mode;
   
 
@@ -35,30 +31,34 @@ public class Intake extends Command {
     } else {
       buttonSpeed = Speed;
     }
-   intakeLimitSwitch = new DigitalInput(IntakeConstants.INTAKE_LIMIT_SWITCH);
+   
   }
 
   @Override
   public void execute() {
-
-    while (intakeLimitSwitch.get() == false) {
-      intakeSubsystem.runDOWN(levelSpeed);
-    }
-    
-     if (intakeLimitSwitch.get() == false) {
-      //up
-      mode = LevelMode.Up;
-    } else {
-      //down
-      mode = LevelMode.Down;
-    }
-
-    while (mode == LevelMode.Up) {
-            intakeSubsystem.runDOWN(levelSpeed);
-    }
-    while (mode == LevelMode.Down) {
-            intakeSubsystem.runUP(levelSpeed);
+    intakeLevelDegrees = intakeSubsystem.setIntakeEncoder();
+        if (intakeLevelDegrees <= 0) {
+          mode = LevelMode.Up;
+        } else if (intakeLevelDegrees >= 67) {
+          mode = LevelMode.Down;
         }
+    
+
+    if (mode == LevelMode.Down) {
+      while (intakeLevelDegrees >= 0) {
+        intakeSubsystem.runDOWN(levelSpeed);
+      }
+      mode = LevelMode.Imobile;
+      // tweak number
+    } else if (mode == LevelMode.Up) {
+      while (intakeLevelDegrees <= 67) {
+        intakeSubsystem.runUP(levelSpeed);
+      }
+      mode = LevelMode.Imobile;
+      // tweak number
+    } 
+
+
 
 
     if (buttonSpeed != 0) {
@@ -72,4 +72,6 @@ public class Intake extends Command {
     intakeSubsystem.stopIntakeLevel();
   }
 
-}
+  
+  }
+

@@ -8,6 +8,4 @@ public class IntakeConstants {
         //left motor for raising and lowering the intake
         public static int INTAKE_MOTOR_R = 16; // TODO: Get actual IDs
         //right motor for raising and lowering the intake
-        public static int INTAKE_LIMIT_SWITCH = 0; // TODO: Get actual IDs
-        //limit switch for the intake, so it doesn't go down too far and break
 }
