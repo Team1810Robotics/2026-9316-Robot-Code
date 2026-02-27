@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.flywheel.FlywheelConstants;
 // *import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -14,6 +15,8 @@ public class Flywheel extends Command {
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
+    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
 
     addRequirements(flywheelSubsystem);
   }
@@ -21,13 +24,13 @@ public class Flywheel extends Command {
   @Override
   public void initialize() {}
 
-  // Called every time the scheduler runs while the command is scheduled.
+  // Called every time the scheduler runs while the command is scheduled
   @Override
   public void execute() {
     flywheelSubsystem.setFlywheelVelocity(targetVelocity);
   }
 
-  // Called once the command ends or is interrupted.
+  // Called once the command ends or is interrupted
   @Override
   public void end(boolean interrupted) {
     flywheelSubsystem.setFlywheelVelocity(

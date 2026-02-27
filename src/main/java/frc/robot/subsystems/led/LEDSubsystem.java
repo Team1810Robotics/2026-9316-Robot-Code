@@ -19,18 +19,13 @@ import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.LEDConstants;
 
 public class LEDSubsystem extends SubsystemBase {
 
   private CANdle m_candle;
 
   public LEDSubsystem() {
-    m_candle = new CANdle(LEDConstants.CANDLE_ID);
-    m_anim0Chooser.setDefaultOption("None", AnimationType.None);
-    m_anim1Chooser.setDefaultOption("None", AnimationType.None);
-
+    m_candle = new CANdle(35);
     configureCANdle();
   }
 
@@ -40,8 +35,8 @@ public class LEDSubsystem extends SubsystemBase {
   private void configureCANdle() {
     CANdleConfiguration config = new CANdleConfiguration();
 
-    config.LED.BrightnessScalar = 1;
-    config.LED.StripType = StripTypeValue.RGB; // TODO: Figure out whch strip type we have
+    config.LED.BrightnessScalar = frc.robot.subsystems.led.LEDConstants.LED_Brightness;
+    config.LED.StripType = StripTypeValue.GRB;
     config.LED.LossOfSignalBehavior = LossOfSignalBehaviorValue.DisableLEDs;
 
     config.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Enabled;
@@ -49,12 +44,18 @@ public class LEDSubsystem extends SubsystemBase {
     m_candle.getConfigurator().apply(config);
   }
 
-  public void setSolidColor(int r, int g, int b) {
-    m_candle.setControl(new SolidColor(r, b).withColor(new RGBWColor(255, 0, 0)));
+  public void setSolidColor(int[] color) {
+    int r = color[0];
+    int g = color[1];
+    int b = color[2];
+
+    RGBWColor rgbwColor = new RGBWColor(g, r, b);
+
+    m_candle.setControl(new SolidColor(8, 999).withColor(rgbwColor));
   }
 
   public void initLEDColor() {
-    setSolidColor(255, 20, 147);
+    setSolidColor(new int[] {0, 255, 0});
   }
 
   // private static final RGBWColor kViolet = RGBWColor.fromHSV(Degrees.of(270), 0.9, 0.8);
@@ -83,12 +84,19 @@ public class LEDSubsystem extends SubsystemBase {
   private static final int kSlot0EndIdx = 37;
 
   private static final int kSlot1StartIdx = 38;
-  private static final int kSlot1EndIdx = 67;
+  private static final int kSlot1EndIdx = 67; // 67 OH MY GOD 67!!!!!! SO FUNNY
 
   private AnimationType m_anim0State = AnimationType.None;
   private AnimationType m_anim1State = AnimationType.None;
 
+  private static AnimationType animation = AnimationType.None;
+
+  private static AnimationType animation1 = AnimationType.None;
+
+  private static AnimationType animation2 = AnimationType.None;
+
   private int ColorCycle = 0;
+  private int AnimationCycle = 0;
 
   private final SendableChooser<AnimationType> m_anim0Chooser =
       new SendableChooser<AnimationType>();
@@ -98,6 +106,7 @@ public class LEDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     /* if the selection for slot 0 changes, change animations */
+
     final var anim0Selection = m_anim0Chooser.getSelected();
     if (m_anim0State != anim0Selection) {
       m_anim0State = anim0Selection;
@@ -135,7 +144,7 @@ public class LEDSubsystem extends SubsystemBase {
 
       switch (m_anim1State) {
         default:
-          strLEDAnimation = m_anim1State.toString();
+          strLEDAnimation = m_anim1State.toString() + ", " + m_anim0State.toString();
         case Larson:
           m_candle.setControl(
               new LarsonAnimation(kSlot1StartIdx, kSlot1EndIdx).withSlot(1).withColor(LEDColor));
@@ -167,7 +176,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public void setLEDColor(RGBWColor color, boolean Cycle) {
-    if (Cycle == true) {
+    if (Cycle) {
       ColorCycle += 1;
       if (ColorCycle > 7) {
         ColorCycle = 1;
@@ -176,56 +185,125 @@ public class LEDSubsystem extends SubsystemBase {
       if (ColorCycle == 1) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.RED[0],
-                Constants.LEDConstants.RED[1],
-                Constants.LEDConstants.RED[2],
-                Constants.LEDConstants.RED[3]); // Red
+                frc.robot.subsystems.led.LEDConstants.RED[0],
+                frc.robot.subsystems.led.LEDConstants.RED[1],
+                frc.robot.subsystems.led.LEDConstants.RED[2],
+                0); // Red
       } else if (ColorCycle == 2) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.YELLOW[0],
-                Constants.LEDConstants.YELLOW[1],
-                Constants.LEDConstants.YELLOW[2],
-                Constants.LEDConstants.YELLOW[3]); // Yellow
+                frc.robot.subsystems.led.LEDConstants.ORANGE[0],
+                frc.robot.subsystems.led.LEDConstants.ORANGE[1],
+                frc.robot.subsystems.led.LEDConstants.ORANGE[2],
+                0); // Orange
       } else if (ColorCycle == 3) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.WHITE[0],
-                Constants.LEDConstants.WHITE[1],
-                Constants.LEDConstants.WHITE[2],
-                Constants.LEDConstants.WHITE[3]); // White
+                frc.robot.subsystems.led.LEDConstants.YELLOW[0],
+                frc.robot.subsystems.led.LEDConstants.YELLOW[1],
+                frc.robot.subsystems.led.LEDConstants.YELLOW[2],
+                0); // Yellow
       } else if (ColorCycle == 4) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.ORANGE[0],
-                Constants.LEDConstants.ORANGE[1],
-                Constants.LEDConstants.ORANGE[2],
-                Constants.LEDConstants.ORANGE[3]); // Orange
+                frc.robot.subsystems.led.LEDConstants.GREEN[0],
+                frc.robot.subsystems.led.LEDConstants.GREEN[1],
+                frc.robot.subsystems.led.LEDConstants.GREEN[2],
+                0); // Green
       } else if (ColorCycle == 5) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.GREEN[0],
-                Constants.LEDConstants.GREEN[1],
-                Constants.LEDConstants.GREEN[2],
-                Constants.LEDConstants.GREEN[3]); // Green
+                frc.robot.subsystems.led.LEDConstants.BLUE[0],
+                frc.robot.subsystems.led.LEDConstants.BLUE[1],
+                frc.robot.subsystems.led.LEDConstants.BLUE[2],
+                0); // Blue
       } else if (ColorCycle == 6) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.BLUE[0],
-                Constants.LEDConstants.BLUE[1],
-                Constants.LEDConstants.BLUE[2],
-                Constants.LEDConstants.BLUE[3]); // Blue
+                frc.robot.subsystems.led.LEDConstants.PURPLE[0],
+                frc.robot.subsystems.led.LEDConstants.PURPLE[1],
+                frc.robot.subsystems.led.LEDConstants.PURPLE[2],
+                0); // Purple
       } else if (ColorCycle == 7) {
         color =
             new RGBWColor(
-                Constants.LEDConstants.PURPLE[0],
-                Constants.LEDConstants.PURPLE[1],
-                Constants.LEDConstants.PURPLE[2],
-                Constants.LEDConstants.PURPLE[3]); // Purple
+                frc.robot.subsystems.led.LEDConstants.WHITE[0],
+                frc.robot.subsystems.led.LEDConstants.WHITE[1],
+                frc.robot.subsystems.led.LEDConstants.WHITE[2],
+                0); // White
       }
     }
     LEDColor = color;
     m_candle.setControl(new SolidColor(255, 0).withColor(LEDColor));
+  }
+
+  public void setLEDAnimation(String animationString, boolean Cycle) {
+    if (Cycle) {
+      AnimationCycle += 1;
+      if (AnimationCycle > 10) {
+        AnimationCycle = 1;
+      }
+      if (AnimationCycle == 1) {
+        animation = AnimationType.ColorFlow;
+      } else if (AnimationCycle == 2) {
+        animation = AnimationType.Rainbow;
+      } else if (AnimationCycle == 3) {
+        animation = AnimationType.Twinkle;
+      } else if (AnimationCycle == 4) {
+        animation = AnimationType.TwinkleOff;
+      } else if (AnimationCycle == 5) {
+        animation = AnimationType.Fire;
+      } else if (AnimationCycle == 6) {
+        animation = AnimationType.Larson;
+      } else if (AnimationCycle == 7) {
+        animation = AnimationType.RgbFade;
+      } else if (AnimationCycle == 8) {
+        animation = AnimationType.SingleFade;
+      } else if (AnimationCycle == 9) {
+        animation = AnimationType.Strobe;
+      } else if (AnimationCycle == 10) {
+        animation = AnimationType.None;
+      } else {
+        if (animationString == "None") {
+          animation = AnimationType.None;
+        } else if (animationString == "ColorFlow") {
+          animation = AnimationType.ColorFlow;
+        } else if (animationString == "Rainbow") {
+          animation = AnimationType.Rainbow;
+        } else if (animationString == "Twinkle") {
+          animation = AnimationType.Twinkle;
+        } else if (animationString == "TwinkleOff") {
+          animation = AnimationType.TwinkleOff;
+        } else if (animationString == "Fire") {
+          animation = AnimationType.Fire;
+        } else if (animationString == "Larson") {
+          animation = AnimationType.Larson;
+        } else if (animationString == "RgbFade") {
+          animation = AnimationType.RgbFade;
+        } else if (animationString == "SingleFade") {
+          animation = AnimationType.SingleFade;
+        } else if (animationString == "Strobe") {
+          animation = AnimationType.Strobe;
+        }
+      }
+    }
+    if (animation == AnimationType.ColorFlow
+        || animation == AnimationType.Rainbow
+        || animation == AnimationType.Twinkle
+        || animation == AnimationType.TwinkleOff
+        || animation == AnimationType.Fire) {
+      animation1 = animation;
+    } else if (animation == AnimationType.Larson
+        || animation == AnimationType.RgbFade
+        || animation == AnimationType.SingleFade
+        || animation == AnimationType.Strobe) {
+      animation2 = animation;
+    } else {
+      animation1 = AnimationType.None;
+      animation2 = AnimationType.None;
+    } // I made two different animation values just to piss off who ever is working with this (Good
+    // luck its your problem now, also Sam Bowling made it GRB instead of RGB so have fun with
+    // that)
   }
 
   public void StopLEDSubsystem() {
@@ -235,10 +313,7 @@ public class LEDSubsystem extends SubsystemBase {
   public String getLEDStats() {
     return LEDSubsystem.strLEDAnimation + ", " + LEDSubsystem.LEDColor;
   }
-
-  public class setLEDColor {}
 }
-// gamepadManipulator.b().onTrue(new
-// LEDsCommand(m_LEDSubsystem.setLEDColor(RGBWColor.new(Constants.LEDConstants.WHITE[0],
-// Constants.LEDConstants.WHITE[1], Constants.LEDConstants.WHITE[2],
-// Constants.LEDConstants.WHITE[3]), true)));
+
+// Code made by Will Edwards(Freshman), help from Sam Bowling (Senior), Payton Gaultiey(Super Senior
+// Mentor), Special thanks to: Jordan Shaw (Junior) for being Jordan.

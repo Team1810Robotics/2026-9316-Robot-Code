@@ -5,9 +5,21 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "StartIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "p1 collect"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StartFlywheel"
           }
         },
         {
@@ -19,7 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "Flywheel"
+            "name": "StopFlywheel"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIntake"
           }
         },
         {
