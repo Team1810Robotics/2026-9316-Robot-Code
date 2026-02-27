@@ -7,28 +7,29 @@ package frc.robot;
 import com.ctre.phoenix6.signals.RGBWColor;
 
 public class Constants {
-    public static class GyroAndIMUConstants {
-		// Placeholder; set to a sensible value for your robot (e.g. -50.0)
-		public static final double GYRO_YAW_OFFSET_DEGREES = 0.0;
-	}
-	public static class HoodConstants {
-		// TODO: set to a sensible value for your robot (e.g. -50.0)
-    public static final int HOOD_MOTOR_ID = 14; 
-		public static final double FORWARD_HOOD_LIMIT = -1000.0;
+  public static class GyroAndIMUConstants {
+    // Placeholder; set to a sensible value for your robot (e.g. -50.0)
+    public static final double GYRO_YAW_OFFSET_DEGREES = 0.0;
+  }
+
+  public static class HoodConstants {
+    // TODO: set to a sensible value for your robot (e.g. -50.0)
+    public static final int HOOD_MOTOR_ID = 14;
+    public static final double FORWARD_HOOD_LIMIT = -1000.0;
     public static final double REVERSE_HOOD_LIMIT = 0.0;
 
     public enum Mode {
-            ON,
-            OFF,
-            STOP
-        }
+      ON,
+      OFF,
+      STOP
+    }
+  }
 
-	}
-	public static class VisionConstants {
-		// Public vision constants — set these to your measured camera offsets.
-		public static final double CAMERA_FORWARD_METERS = 0.20; // 20 cm forward
-		public static final double CAMERA_SIDE_METERS    = 0.0;  // centered
-		public static final double CAMERA_UP_METERS      = 0.45; // 45 cm above robot origin
+  public static class VisionConstants {
+    // Public vision constants — set these to your measured camera offsets.
+    public static final double CAMERA_FORWARD_METERS = 0.20; // 20 cm forward
+    public static final double CAMERA_SIDE_METERS = 0.0; // centered
+    public static final double CAMERA_UP_METERS = 0.45; // 45 cm above robot origin
 
     public static final double CAMERA_ROLL_DEG = 0.0;
     public static final double CAMERA_PITCH_DEG = 0.0;
@@ -60,19 +61,22 @@ public class Constants {
         9; // ID of the AprilTag on the far scoring area
     // add more as needed
 
-		// april tag locations visual https://drive.google.com/file/d/1Urb7EcdkFHfVp7dLyGpgPSgWiyvLkA06/view?usp=sharing
-	}
-    
-    public class IntakeConstants {
-        public static int INTAKE_MOTOR = 11;
-        public static int INTAKE_MOTOR_L = 000; // TODO: Get actual IDs
-        public static int INTAKE_MOTOR_R = 0000; // TODO: Get actual IDs
-        public static final int PROXIMITY_SENSOR_PORT_LEFT = 0; // Digital Input port for the proximity sensor TODO: Get actual port numbers
-        public static final int PROXIMITY_SENSOR_PORT_RIGHT = 1; // Digital Input port for the proximity sensor  TODO: Get actual port numbers
+    // april tag locations visual
+    // https://drive.google.com/file/d/1Urb7EcdkFHfVp7dLyGpgPSgWiyvLkA06/view?usp=sharing
+  }
 
-        public static double kP = 0;
-        public static double kI = 0;
-        public static double kD = 0;
+  public class IntakeConstants {
+    public static int INTAKE_MOTOR = 11;
+    public static int INTAKE_MOTOR_L = 000; // TODO: Get actual IDs
+    public static int INTAKE_MOTOR_R = 0000; // TODO: Get actual IDs
+    public static final int PROXIMITY_SENSOR_PORT_LEFT =
+        0; // Digital Input port for the proximity sensor TODO: Get actual port numbers
+    public static final int PROXIMITY_SENSOR_PORT_RIGHT =
+        1; // Digital Input port for the proximity sensor  TODO: Get actual port numbers
+
+    public static double kP = 0;
+    public static double kI = 0;
+    public static double kD = 0;
 
     public enum Mode {
       ON,
@@ -81,7 +85,6 @@ public class Constants {
       DOWN,
       STOP
     }
-
   }
 
   public static final class FlywheelConstants {
