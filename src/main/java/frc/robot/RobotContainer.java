@@ -15,10 +15,9 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
@@ -27,7 +26,7 @@ import frc.robot.subsystems.led.LEDSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   // private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
@@ -91,7 +90,6 @@ public class RobotContainer {
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
 
     // driverXbox.x().whileTrue(intakeLevelCommand());
-new_led
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
