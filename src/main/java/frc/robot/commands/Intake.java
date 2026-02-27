@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 
@@ -25,17 +24,17 @@ public class Intake extends Command {
   public Intake(IntakeSubsystem intakeSubsystem, double Speed, boolean isIntakeLevel) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
-
-    NamedCommands.registerCommand(
-        "StartIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.ON));
-    NamedCommands.registerCommand(
-        "StopIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.STOP));
-    /* Verify this isn't needed - from merge
-        if (isIntakeLevel) {
+    /*
+        NamedCommands.registerCommand(
+            "StartIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.ON));
+        NamedCommands.registerCommand(
+            "StopIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.STOP));
+    */
+    if (isIntakeLevel) {
       levelSpeed = Speed;
     } else {
       buttonSpeed = Speed;
-    }*/
+    }
   }
 
   @Override
