@@ -7,7 +7,12 @@ import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 
 /** Flywheel command */
 public class Flywheel extends Command {
-  private static FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+    private final FlywheelSubsystem flywheelSubsystem;
+
+    public Flywheel(FlywheelSubsystem flywheelSubsystem) {
+        this.flywheelSubsystem = flywheelSubsystem;
+        addRequirements(flywheelSubsystem);
+    }
 
   @Override
   public void initialize() {

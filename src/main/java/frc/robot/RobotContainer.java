@@ -10,7 +10,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
@@ -25,6 +24,8 @@ import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.auto.AutoSubsystem;
 import frc.robot.Constants;
 
 @SuppressWarnings("unused")
@@ -66,12 +67,11 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-
-
+  
   public RobotContainer() {
     configureBindings();
   }
-
+  
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
@@ -88,9 +88,10 @@ public class RobotContainer {
                     .withRotationalRate(
                         -driverXbox.getRightX()
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
+                            
             ));
     // spins the flywheel to feed when the X button is held
-    driverXbox.x().whileTrue(FlywheelCommand());
+    driverXbox.x().whileTrue(new Flywheel(flywheelSubsystem));
     driverXbox.y().whileTrue(ClimbCommand());
     driverXbox.rightBumper().whileTrue(intakeCommand());
 
@@ -112,7 +113,7 @@ public class RobotContainer {
                 faceAngle
                     .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
                     .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                    .withTargetDirection(drivetrain.getAngleToHub())
+                    .withTargetDirection(drivetrain.getAngleToHub()) // vision
                     .withHeadingPID(5, 0, 0)
             )
         );
@@ -132,24 +133,24 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); 
+    driverXbox.b().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric())); // center robot
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    gamepadManipulator.povUp().onTrue(new LEDs(LEDSubsystem)); 
 
   }
 
   public Command getAutonomousCommand() {
-    return new InstantCommand();
-  }
+    return AutoSubsystem.getAuto("SideScoreLeft");
+}
 
   // Sam Notes
   //this is not how we do commands, just instantiate a new one when you call it
 
   // makes the flywheel command
   public Command FlywheelCommand() {
-    return new Flywheel();
+    return new Flywheel(flywheelSubsystem);
   }
 
   public Command ClimbCommand() {
