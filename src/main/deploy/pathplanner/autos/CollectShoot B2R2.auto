@@ -23,15 +23,15 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "shoot to climb"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "StopFlywheel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot to climb"
           }
         },
         {
