@@ -22,14 +22,16 @@ public class HoodSubsystem extends SubsystemBase {
     hoodEncoder = new Encoder(0, 1);
     hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
         hoodMotor.set(0);
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+        return runOnce(
+            () -> {
+              // Use "this" here to run it on the subsystem
+              hoodEncoder.getDistance();
+              hoodEncoder.setDistancePerPulse(360/600);
+            });
   }
-
    public void run(double speed) {
         hoodMotor.set(speed);
+
     }
 
     public void stop() {
@@ -39,7 +41,7 @@ public class HoodSubsystem extends SubsystemBase {
 
 
 
-    public void setEncoder() {
+    public void setHoodEncoder() {
       hoodEncoder.getDistance();
 
             //TODO: figure out pulses per rotation and set as denomenator should be 600 according to ai
