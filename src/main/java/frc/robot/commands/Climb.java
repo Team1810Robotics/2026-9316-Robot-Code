@@ -7,21 +7,18 @@ import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 /** Flywheel command */
-
-
 public class Climb extends Command {
   public static ClimbSubsystem ClimbSub = new ClimbSubsystem();
 
-
-@Override
+  @Override
   public void initialize() {
-    if (ClimbSub.isExtended == false){
-      ClimbSub.Extend(); 
+    if (ClimbSub.isExtended == false) {
+      ClimbSub.Extend();
       this.withTimeout(ClimbConstants.time);
-    ClimbSub.Stop();
-    
-    ClimbSub.isExtended = true;
-      
+      ClimbSub.Stop();
+
+      ClimbSub.isExtended = true;
+
     } else {
       ClimbSub.Retract();
       this.withTimeout(ClimbConstants.time);
@@ -34,10 +31,7 @@ public class Climb extends Command {
   @Override
   public void execute() {}
 
-  // Called once the command ends or is interrupted. 
+  // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {}
-
-
-
 }

@@ -4,9 +4,9 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ClimbSubsystem extends SubsystemBase {
-private SparkMax motor1;
+  private SparkMax motor1;
 
-public boolean isExtended = false;
+  public boolean isExtended = false;
 
   public void Extend() {
     motor1.set(0.25);
