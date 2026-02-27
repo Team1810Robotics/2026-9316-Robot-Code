@@ -18,6 +18,12 @@ public class Intake extends Command {
    */
   boolean pSensor = intakeSubsystem.proximitySensor.get();
 
+NamedCommands.registerCommand("Flywheel", null);
+ 
+
+
+NamedCommands.registerCommand(name: "StopIntake", null); 
+
   public Intake(IntakeSubsystem intakeSubsystem, IntakeConstants.Mode mode) {
     this.intakeSubsystem = intakeSubsystem;
     this.mode = mode;
@@ -41,3 +47,4 @@ public class Intake extends Command {
     intakeSubsystem.intakeMotor.stopMotor();
   }
 }
+
