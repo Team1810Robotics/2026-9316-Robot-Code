@@ -17,6 +17,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "StartFlywheel"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "collectshoot"
@@ -25,13 +31,13 @@
         {
           "type": "named",
           "data": {
-            "name": "StopIntake"
+            "name": "StopFlywheel"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "Flywheel"
+            "name": "StopIntake"
           }
         },
         {

@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeConstants.Mode;
@@ -18,17 +20,16 @@ public class Intake extends Command {
    */
   boolean pSensor = intakeSubsystem.proximitySensor.get();
 
-NamedCommands.registerCommand("Flywheel", null);
- 
-
-
-NamedCommands.registerCommand(name: "StopIntake", null); 
 
   public Intake(IntakeSubsystem intakeSubsystem, IntakeConstants.Mode mode) {
     this.intakeSubsystem = intakeSubsystem;
     this.mode = mode;
 
     addRequirements(intakeSubsystem);
+
+   
+NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.ON)); 
+NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.STOP)); 
   }
 
   @Override

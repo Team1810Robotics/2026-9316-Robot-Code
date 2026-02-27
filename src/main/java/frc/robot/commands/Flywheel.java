@@ -7,15 +7,20 @@ import frc.robot.subsystems.flywheel.FlywheelConstants;
 // *import com.ctre.phoenix6.configs.TalonFXConfigurator;
 // import frc.robot.Constants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 /** Flywheel command */
 public class Flywheel extends Command {
   private final FlywheelSubsystem flywheelSubsystem;
   private final double targetVelocity;
+ 
+
 
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
+    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200)); 
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0)); 
 
     addRequirements(flywheelSubsystem);
   }
@@ -23,13 +28,13 @@ public class Flywheel extends Command {
   @Override
   public void initialize() {}
    
-  // Called every time the scheduler runs while the command is scheduled.
+  // Called every time the scheduler runs while the command is scheduled
   @Override
   public void execute() {
     flywheelSubsystem.setFlywheelVelocity(targetVelocity);
   }
 
-  // Called once the command ends or is interrupted.
+  // Called once the command ends or is interrupted
   @Override
   public void end(boolean interrupted) {
     flywheelSubsystem.setFlywheelVelocity(FlywheelConstants.IDLE_VELOCITY); // Stop flywheel when command ends

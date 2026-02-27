@@ -17,21 +17,27 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "StartFlywheel"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Collect to shoot"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "Flywheel"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "shoot to climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopFlywheel"
           }
         },
         {
