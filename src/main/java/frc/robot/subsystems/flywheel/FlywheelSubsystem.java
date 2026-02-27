@@ -1,7 +1,7 @@
 package frc.robot.subsystems.flywheel;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -19,8 +19,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Flywheel state tracking for diagnostics and control
   private enum FlywheelState {
-    STOPPED, SPINNING_UP, AT_SPEED
+    STOPPED,
+    SPINNING_UP,
+    AT_SPEED
   }
+
   private FlywheelState state = FlywheelState.STOPPED;
 
   public FlywheelSubsystem() {
@@ -29,7 +32,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     beamBreak = new DigitalInput(FlywheelConstants.FlywheelBeamBreak);
 
-    //TODO: Configure motor settings (inversions, PID gains) here
+    // TODO: Configure motor settings (inversions, PID gains) here
   }
 
   public boolean getBeamBreakTriggered() {
@@ -47,7 +50,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-   
+
     leftMotor.set(powerPercent);
     rightMotor.set(powerPercent);
   }

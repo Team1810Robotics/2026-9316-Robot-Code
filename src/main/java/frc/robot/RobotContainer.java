@@ -8,9 +8,9 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
-import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -68,7 +68,8 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
 
     NamedCommands.registerCommand("climb", new Climb());
-    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand(
+        "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
   }
 
   private void configureBindings() {
