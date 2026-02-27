@@ -18,8 +18,8 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -85,13 +85,12 @@ public class RobotContainer {
     // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
-    //sucks ball in
-    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false)); 
-    //spits ball out
+    // sucks ball in
+    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    // spits ball out
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
 
     // driverXbox.x().whileTrue(intakeLevelCommand());
-    
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
