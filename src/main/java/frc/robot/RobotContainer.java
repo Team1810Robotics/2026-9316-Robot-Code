@@ -16,9 +16,11 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.generated.TunerConstants;
-// import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 @SuppressWarnings("unused")
@@ -81,7 +83,15 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    //  driverXbox.rightBumper().whileTrue(intakeCommand());
+
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
+    // sucks ball in
+    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    // spits ball out
+    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
+
+    // driverXbox.x().whileTrue(intakeLevelCommand());
+new_led
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -106,7 +116,7 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -129,12 +139,4 @@ public class RobotContainer {
   public Command ClimbCommand() {
     return new Climb();
   }
-  /*/
-  public Command intakeCommand() {
-    if (intakeSubsystem.getMode() == Mode.OFF) {
-      return new Intake(intakeSubsystem, Mode.ON);
-    } else {
-      return new Intake(intakeSubsystem, Mode.OFF);
-    }
-  }*/
 }

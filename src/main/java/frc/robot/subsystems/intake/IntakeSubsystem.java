@@ -1,41 +1,57 @@
 package frc.robot.subsystems.intake;
 
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
   public SparkMax intakeMotor;
-  public DigitalInput proximitySensor;
-  private IntakeConstants.Mode mode;
-
-  public void setMode(IntakeConstants.Mode mode) {
-    this.mode = mode;
-  }
+  public SparkMax intakeMotorL;
+  public SparkMax intakeMotorR;
+  public Encoder intakeEncoder;
 
   public IntakeSubsystem() {
-    intakeMotor = new SparkMax(0, null);
-    proximitySensor = new DigitalInput(0);
-    // very important... change the id number to test!!!!!!
+    intakeMotor =
+        new SparkMax(
+            IntakeConstants.INTAKE_MOTOR, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     intakeMotor.set(0);
-    this.mode = IntakeConstants.Mode.OFF; // initialize default0
-  }
-
-  public IntakeConstants.Mode getMode() {
-    return mode;
+    intakeMotorL =
+        new SparkMax(
+            IntakeConstants.INTAKE_MOTOR_L,
+            com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    intakeMotorR =
+        new SparkMax(
+            IntakeConstants.INTAKE_MOTOR_R,
+            com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    intakeEncoder = new Encoder(0, 1);
   }
 
   public void run(double speed) {
     intakeMotor.set(speed);
   }
 
-  public void stop() {
+  public void stopIntake() {
     intakeMotor.stopMotor(); // Stop the intake motor
   }
 
-  private final DigitalInput m_proximitySensor = new DigitalInput(0);
+  public void stopIntakeLevel() {
+    intakeMotorL.stopMotor();
+    intakeMotorR.stopMotor();
+  }
 
-  public boolean isObjectDetected() {
-    return !m_proximitySensor.get(); // NPN logic: true when object is present
+  public void runUP(double speed) {
+    intakeMotorL.set(speed);
+    intakeMotorR.set(-speed);
+  }
+
+  public void runDOWN(double speed) {
+    intakeMotorL.set(-speed);
+    intakeMotorR.set(speed);
+  }
+
+  public double setIntakeEncoder() {
+    intakeEncoder.getDistance();
+    intakeEncoder.setDistancePerPulse(360 / 8192);
+    return intakeEncoder.getDistance();
   }
 }
