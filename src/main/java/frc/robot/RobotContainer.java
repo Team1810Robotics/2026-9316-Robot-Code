@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,7 +15,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 // import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -57,6 +55,7 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
   public RobotContainer() {
     configureBindings();
@@ -111,11 +110,10 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    // gamepadManipulator.b().onTrue(new InstantCommand(() -> LEDSubsystem.setSolidColor(255, 0, 0), LEDSubsystem)); 
-    // gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
-
-    RGBWColor RED = new RGBWColor(255, 0, 0);
-    LEDSubsystem.setLEDColor(RED, false);
+    gamepadManipulator
+        .x()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
   }
 
   public Command getAutonomousCommand() {
