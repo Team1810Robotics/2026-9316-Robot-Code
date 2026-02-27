@@ -24,6 +24,12 @@ public class Intake extends Command {
   public Intake(IntakeSubsystem intakeSubsystem, double Speed, boolean isIntakeLevel) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
+    /*
+        NamedCommands.registerCommand(
+            "StartIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.ON));
+        NamedCommands.registerCommand(
+            "StopIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.STOP));
+    */
     if (isIntakeLevel) {
       levelSpeed = Speed;
     } else {
