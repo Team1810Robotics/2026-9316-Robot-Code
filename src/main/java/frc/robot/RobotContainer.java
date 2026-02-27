@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,18 +18,19 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
-// import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
@@ -59,6 +59,7 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
   private final SendableChooser<Command> autoChooser;
 
@@ -92,7 +93,14 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    //  driverXbox.rightBumper().whileTrue(intakeCommand());
+
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
+    // sucks ball in
+    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    // spits ball out
+    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
+
+    // driverXbox.x().whileTrue(intakeLevelCommand());
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -117,17 +125,14 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    // gamepadManipulator.b().onTrue(new InstantCommand(() -> LEDSubsystem.setSolidColor(255, 0, 0),
-    // LEDSubsystem));
-    // gamepadManipulator.b().onTrue(LEDSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null,
-    // true)));
-
-    RGBWColor RED = new RGBWColor(255, 0, 0);
-    LEDSubsystem.setLEDColor(RED, false);
+    gamepadManipulator
+        .x()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
   }
 
   public Command getAutonomousCommand() {
@@ -143,12 +148,4 @@ public class RobotContainer {
   public Command ClimbCommand() {
     return new Climb();
   }
-  /*/
-  public Command intakeCommand() {
-    if (intakeSubsystem.getMode() == Mode.OFF) {
-      return new Intake(intakeSubsystem, Mode.ON);
-    } else {
-      return new Intake(intakeSubsystem, Mode.OFF);
-    }
-  }*/
 }
