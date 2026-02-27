@@ -25,20 +25,13 @@ public class HoodSubsystem extends SubsystemBase {
               hoodEncoder.getDistance();
               hoodEncoder.setDistancePerPulse(360/600);
             });
-    hoodMotor.set(0);
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+  
   }
    public void run(double speed) {
         hoodMotor.set(speed);
 
     }
 
-  public void run(double speed) {
-    hoodMotor.set(speed);
-  }
 
   public void stop() {
     hoodMotor.stopMotor(); // Stop the hood motor
