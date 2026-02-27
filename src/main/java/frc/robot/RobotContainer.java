@@ -15,8 +15,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.Intake;
-import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -29,11 +27,11 @@ import frc.robot.subsystems.led.LEDSubsystem;
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
-  private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  // private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
@@ -59,6 +57,7 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
   public RobotContainer() {
     configureBindings();
@@ -84,6 +83,7 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
+
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
     driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
@@ -91,6 +91,7 @@ public class RobotContainer {
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
 
     // driverXbox.x().whileTrue(intakeLevelCommand());
+new_led
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -119,7 +120,10 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    gamepadManipulator
+        .x()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
   }
 
   public Command getAutonomousCommand() {
@@ -127,10 +131,11 @@ public class RobotContainer {
   }
 
   // makes the flywheel command
-  public Command FlywheelCommand() {
-    return new Flywheel();
-  }
-
+  /*
+    public Command FlywheelCommand() {
+      return new Flywheel();
+    }
+  */
   public Command ClimbCommand() {
     return new Climb();
   }
