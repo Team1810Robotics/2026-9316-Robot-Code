@@ -6,23 +6,20 @@ import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
+
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
 
 public class HoodSubsystem extends SubsystemBase {
   public TalonFX hoodMotor;
   public Encoder hoodEncoder;
 
-  public enum Mode { CALIBRATING, RUNNING }
-
-  // ------------------ STATE ------------------
-  private Mode mode = Mode.CALIBRATING;
-
   public HoodSubsystem() {
     hoodEncoder = new Encoder(0, 1);
     hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
-    configureMotor();
     hoodMotor.set(0);
   }
 
@@ -55,13 +52,11 @@ private void configureMotor() {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
-  public double setHoodEncoder() {
-    hoodEncoder.getDistance();
-    hoodEncoder.setDistancePerPulse(360 / 1000);
-    // figured out pulses per second (1 khz)
-    return hoodEncoder.getDistance();
+    public double getHoodEncoder() {
+    
+      //figured out pulses per second (1 khz)
+      return hoodEncoder.get();
   }
-
   public void runUP(double speed) {
     hoodMotor.set(speed);
   }
@@ -72,3 +67,4 @@ private void configureMotor() {
 }
 
   // this code sucks
+

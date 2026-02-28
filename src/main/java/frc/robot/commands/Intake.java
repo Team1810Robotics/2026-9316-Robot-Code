@@ -33,7 +33,7 @@ public class Intake extends Command {
 
   @Override
   public void execute() {
-    intakeLevelDegrees = intakeSubsystem.setIntakeEncoder();
+    intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
     if (intakeLevelDegrees <= 0) {
       mode = LevelMode.Up;
     } else if (intakeLevelDegrees >= 67) {
