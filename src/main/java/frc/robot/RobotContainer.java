@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
@@ -23,6 +24,7 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -103,12 +105,15 @@ private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
+    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
-    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
     // spits ball out
-    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
+    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, true));
+    //levels the intake up and down
+    gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
-    // driverXbox.x().whileTrue(intakeLevelCommand());
+    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
