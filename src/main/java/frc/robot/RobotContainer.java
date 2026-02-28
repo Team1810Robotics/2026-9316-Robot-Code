@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -19,6 +20,7 @@ import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -33,6 +35,7 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -41,7 +44,7 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public static Climb Climb = new Climb();
+  public Climb Climb = new Climb(climbSubsystem);
   // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
@@ -67,7 +70,7 @@ public class RobotContainer {
 
     autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("climb", new Climb());
+    //  NamedCommands.registerCommand("climb", new Climb());
     NamedCommands.registerCommand(
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
   }
@@ -91,7 +94,7 @@ public class RobotContainer {
             ));
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.y().whileTrue(ClimbCommand());
+    // driverXbox.y().whileTrue(ClimbCommand());
 
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
@@ -128,10 +131,17 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-        gamepadManipulator.leftTrigger().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false)));
-        gamepadManipulator.rightTrigger().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false)));
-        gamepadManipulator.rightBumper().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false)));
-        
+    gamepadManipulator
+        .leftTrigger()
+        .onTrue(
+            ledSubsystem.runOnce(
+                () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false)));
+    gamepadManipulator
+        .rightTrigger()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false)));
+    gamepadManipulator
+        .rightBumper()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false)));
   }
 
   public Command getAutonomousCommand() {
@@ -143,8 +153,9 @@ public class RobotContainer {
     public Command FlywheelCommand() {
       return new Flywheel();
     }
-  */
+
   public Command ClimbCommand() {
     return new Climb();
   }
+      */
 }
