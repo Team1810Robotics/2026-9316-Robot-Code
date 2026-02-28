@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
@@ -83,14 +84,16 @@ public class RobotContainer {
             ));
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.y().whileTrue(ClimbCommand());
+    // driverXbox.y().whileTrue(ClimbCommand());
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
     driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
     // spits ball out
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
+    //levels the intake up and down
+    driverXbox.y().onTrue(new Hood(hoodSubsystem, 1, false));
 
-    // driverXbox.x().whileTrue(intakeLevelCommand());
+    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox

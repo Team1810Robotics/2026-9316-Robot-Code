@@ -16,6 +16,93 @@ import frc.robot.subsystems.hood.HoodSubsystem;
  */
 
 public class Hood extends Command {
-   
+   private HoodSubsystem hoodSubsystem;
+   private double hoodSpeed;
+   private double otherHoodSpeed;
+    double hoodDegrees;
+    HoodMode mode;
 
+  enum HoodMode {
+    Up,
+    Down,
+    Imobile,
+    goToPos1,
+    goToPos2,
+    goToPos3
+  }
+
+public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
+  this.hoodSubsystem = hoodSubsystem;
+  addRequirements(hoodSubsystem);
+  
+  if (isGoToPos) {  
+    otherHoodSpeed = Speed;
+    } else {
+    hoodSpeed = Speed;
+    }
+}
+
+    @Override
+    public void execute() {
+        hoodDegrees = hoodSubsystem.setHoodEncoder();
+        if (hoodDegrees <= 0) {
+          mode = HoodMode.Up;
+        } else if (hoodDegrees >= 67) {
+          mode = HoodMode.Down;
+        }
+        
+    if (mode == HoodMode.Down) {
+      while (hoodDegrees >= 0) {
+        hoodSubsystem.runDOWN(hoodSpeed);
+      }
+      mode = HoodMode.Imobile;
+      // tweak number
+    } else if (mode == HoodMode.Up) {
+      while (hoodDegrees <= 67) {
+        hoodSubsystem.runUP(hoodSpeed);
+      }
+      mode = HoodMode.Imobile;
+      // tweak number
+    }
+
+    if (hoodSpeed != 0) {
+      while (mode == HoodMode.goToPos1 && hoodDegrees <= 20) {
+          hoodSubsystem.runUP(otherHoodSpeed);
+          if (hoodDegrees >= 20) {
+            mode = HoodMode.Imobile;
+          }
+        } while (mode == HoodMode.goToPos1 && hoodDegrees >= 20) {
+          hoodSubsystem.runDOWN(otherHoodSpeed);
+          if (hoodDegrees <= 20) {
+            mode = HoodMode.Imobile;
+          }
+        } while (mode == HoodMode.goToPos2 && hoodDegrees <= 40) {
+          hoodSubsystem.runUP(otherHoodSpeed);
+          if (hoodDegrees >= 40) {
+            mode = HoodMode.Imobile;
+          }
+        } while (mode == HoodMode.goToPos2 && hoodDegrees >= 40) {
+          hoodSubsystem.runDOWN(otherHoodSpeed);
+          if (hoodDegrees <= 40) {
+            mode = HoodMode.Imobile;
+          }
+        } while (mode == HoodMode.goToPos3 && hoodDegrees <= 60) {
+          hoodSubsystem.runUP(otherHoodSpeed);
+          if (hoodDegrees >= 60) {
+            mode = HoodMode.Imobile;
+          }
+        } while (mode == HoodMode.goToPos3 && hoodDegrees >= 60) {
+          hoodSubsystem.runDOWN(otherHoodSpeed);
+            if (hoodDegrees <= 60) {
+                mode = HoodMode.Imobile;
+            }
+        } 
+    }
+    //tweak all numbers for positions
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+      hoodSubsystem.stopHood();
+    }
 }

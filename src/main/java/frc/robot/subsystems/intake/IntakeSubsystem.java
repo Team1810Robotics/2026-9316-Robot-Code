@@ -51,7 +51,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public double setIntakeEncoder() {
     intakeEncoder.getDistance();
-    intakeEncoder.setDistancePerPulse(360 / 8192);
+    intakeEncoder.setDistancePerPulse(360 / 1000);
     return intakeEncoder.getDistance();
   }
 }
