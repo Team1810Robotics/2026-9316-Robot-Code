@@ -1,45 +1,43 @@
 package frc.robot.subsystems.indexer;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * IndexerSubsystem - Single conveyor belt motor for indexing game pieces Similar to luggage
+ * conveyor at airport - moves pieces through the robot
+ */
 public class IndexerSubsystem extends SubsystemBase {
-  private final SparkMax indexerMotor1 = new SparkMax(0, null); // The Left roller mot
-  private final SparkMax indexerMotor2 = new SparkMax(0, null); // The right roller motor
-  private final SparkMax indexerMotor3 = new SparkMax(0, null); // The left orange wheel motor
-  private final SparkMax indexerMotor4 = new SparkMax(0, null); // The right orange wheel motor
+  // Single conveyor belt motor
+  private final SparkMax indexerMotor =
+      new SparkMax(IndexerConstants.INDEXER_MOTOR, MotorType.kBrushless);
 
-  private final DigitalInput IndexBeamBreak =
-      new DigitalInput(IndexerConstants.INDEXER_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
+  // Beam break sensor - detects when something is in the indexer
+  private final DigitalInput beamBreak =
+      new DigitalInput(IndexerConstants.INDEXER_BEAM_BREAK_SENSOR_PORT);
 
+  /** Constructor - initializes motor to stopped state */
+  public IndexerSubsystem() {
+    indexerMotor.set(0);
+  }
+
+  /** Run the conveyor belt at configured speed */
   public void RunIndexer() {
-    indexerMotor1.set(IndexerConstants.INDEXER_SPEED);
-    indexerMotor2.set(IndexerConstants.INDEXER_SPEED);
-    indexerMotor3.set(IndexerConstants.INDEXER_SPEED);
-    indexerMotor4.set(IndexerConstants.INDEXER_SPEED);
+    indexerMotor.set(IndexerConstants.INDEXER_SPEED);
   }
 
+  /** Stop the conveyor belt */
   public void StopIndexer() {
-    indexerMotor1.set(0);
-    indexerMotor2.set(0);
-    indexerMotor3.set(0);
-    indexerMotor4.set(0);
+    indexerMotor.set(0);
   }
 
-  public void BeamBreakStop() {
-    indexerMotor3.set(0);
-    indexerMotor4.set(0);
-  }
-
-  @Override
-  public void periodic() {
-    boolean indexBroken = !IndexBeamBreak.get();
-
-    if (indexBroken) {
-      BeamBreakStop();
-    } else {
-      RunIndexer();
-    }
+  /**
+   * Check if beam break is triggered (piece detected in indexer) NPN logic: returns true when
+   * blocked (no signal)
+   */
+  public boolean isBeamBroken() {
+    return !beamBreak.get();
   }
 }
