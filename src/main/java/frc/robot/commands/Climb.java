@@ -12,8 +12,6 @@ public class Climb extends Command {
 
   public Climb(ClimbSubsystem climbSubsystem) {
     this.ClimbSubsystem = climbSubsystem;
-    // TODO: Review/Reintegrate
-    // NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem, ClimbConstants.time));
   }
 
   @Override
