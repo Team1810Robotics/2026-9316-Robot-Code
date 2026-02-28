@@ -14,12 +14,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 
 public class HoodSubsystem extends SubsystemBase {
-  public TalonFX hoodMotor;
-  public Encoder hoodEncoder;
+  private TalonFX hoodMotor;
+  private DutyCycleEncoder hoodEncoder;
+
+  public enum Mode { CALIBRATING, RUNNING }
+
+  // ------------------ STATE ------------------
+  private Mode mode = Mode.CALIBRATING;
 
   public HoodSubsystem() {
-    hoodEncoder = new Encoder(0, 1);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
+    hoodEncoder = new DutyCycleEncoder(0);
+    hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
   }
 
