@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.hood.HoodConstants;
 
 /*
  * notes go here:
@@ -44,7 +45,7 @@ public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
 
     @Override
     public void execute() {
-        hoodDegrees = hoodSubsystem.setHoodEncoder();
+        hoodDegrees = hoodSubsystem.getHoodEncoder();
         if (hoodDegrees <= 0) {
           mode = HoodMode.Up;
         } else if (hoodDegrees >= 67) {
@@ -66,34 +67,34 @@ public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
     }
 
     if (hoodSpeed != 0) {
-      while (mode == HoodMode.goToPos1 && hoodDegrees <= 20) {
+      while (mode == HoodMode.goToPos1 && hoodDegrees <= HoodConstants.POSITION1) {
           hoodSubsystem.runUP(otherHoodSpeed);
-          if (hoodDegrees >= 20) {
+          if (hoodDegrees >= HoodConstants.POSITION1) {
             mode = HoodMode.Immobile;
           }
-        } while (mode == HoodMode.goToPos1 && hoodDegrees >= 20) {
+        } while (mode == HoodMode.goToPos1 && hoodDegrees >= HoodConstants.POSITION1) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
-          if (hoodDegrees <= 20) {
+          if (hoodDegrees <= HoodConstants.POSITION1) {
             mode = HoodMode.Immobile;
           }
-        } while (mode == HoodMode.goToPos2 && hoodDegrees <= 40) {
+        } while (mode == HoodMode.goToPos2 && hoodDegrees <= HoodConstants.POSITION2) {
           hoodSubsystem.runUP(otherHoodSpeed);
-          if (hoodDegrees >= 40) {
+          if (hoodDegrees >= HoodConstants.POSITION2) {
             mode = HoodMode.Immobile;
           }
-        } while (mode == HoodMode.goToPos2 && hoodDegrees >= 40) {
+        } while (mode == HoodMode.goToPos2 && hoodDegrees >= HoodConstants.POSITION2) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
-          if (hoodDegrees <= 40) {
+          if (hoodDegrees <= HoodConstants.POSITION2) {
             mode = HoodMode.Immobile;
           }
-        } while (mode == HoodMode.goToPos3 && hoodDegrees <= 60) {
+        } while (mode == HoodMode.goToPos3 && hoodDegrees <= HoodConstants.POSITION3) {
           hoodSubsystem.runUP(otherHoodSpeed);
-          if (hoodDegrees >= 60) {
+          if (hoodDegrees >= HoodConstants.POSITION3) {
             mode = HoodMode.Immobile;
           }
-        } while (mode == HoodMode.goToPos3 && hoodDegrees >= 60) {
+        } while (mode == HoodMode.goToPos3 && hoodDegrees >= HoodConstants.POSITION3) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
-            if (hoodDegrees <= 60) {
+            if (hoodDegrees <= HoodConstants.POSITION3) {
                 mode = HoodMode.Immobile;
             }
         } 

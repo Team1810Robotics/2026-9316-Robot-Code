@@ -1,23 +1,25 @@
 package frc.robot.subsystems.hood;
 
 import com.ctre.phoenix6.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj.DutyCycle;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+
 
 public class HoodSubsystem extends SubsystemBase {
-  public TalonFX hoodMotor;
-  public Encoder hoodEncoder;
+  private TalonFX hoodMotor;
+  private DutyCycleEncoder hoodEncoder;
 
   public HoodSubsystem() {
-    hoodEncoder = new Encoder(0, 1);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
+    hoodEncoder = new DutyCycleEncoder(0);
+    hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
   }
 
    public void run(double speed) {
         hoodMotor.set(speed);
-
     }
 
 
@@ -25,13 +27,11 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
-    public double setHoodEncoder() {
-      hoodEncoder.getDistance();
-      hoodEncoder.setDistancePerPulse(360 / 1000);
+    public double getHoodEncoder() {
+    
       //figured out pulses per second (1 khz)
-      return hoodEncoder.getDistance();
+      return hoodEncoder.get();
   }
-
   public void runUP(double speed) {
     hoodMotor.set(speed);
   }
@@ -43,4 +43,4 @@ public class HoodSubsystem extends SubsystemBase {
 }
 
   // this code sucks
-  
+

@@ -49,7 +49,7 @@ public class IntakeSubsystem extends SubsystemBase {
     intakeMotorR.set(speed);
   }
 
-  public double setIntakeEncoder() {
+  public double getIntakeEncoder() {
     intakeEncoder.getDistance();
     intakeEncoder.setDistancePerPulse(360 / 1000);
     return intakeEncoder.getDistance();
