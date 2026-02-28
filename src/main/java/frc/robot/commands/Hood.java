@@ -45,7 +45,7 @@ public class Hood extends Command {
 
   @Override
   public void execute() {
-    hoodDegrees = hoodSubsystem.setHoodEncoder();
+    hoodDegrees = hoodSubsystem.getHoodEncoder();
     if (hoodDegrees <= 0) {
       mode = HoodMode.Up;
     } else if (hoodDegrees >= 67) {
