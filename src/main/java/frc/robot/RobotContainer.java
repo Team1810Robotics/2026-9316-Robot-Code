@@ -18,15 +18,13 @@ import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
-import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
-import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
+import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
-import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
 
 @SuppressWarnings("unused")
@@ -46,7 +44,6 @@ public class RobotContainer {
           .withDeadband(MaxSpeed * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -63,7 +60,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem("", drivetrain);
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
 
@@ -110,7 +107,7 @@ private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
     gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
     // spits ball out
     gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, true));
-    //levels the intake up and down
+    // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
@@ -124,10 +121,6 @@ private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-    /*hypthetically, if some random prankster were to change the button bind so it was some crazy button combo, for example,
-     holding LB RT A B and right arrow, this would almost certainly be detrimental to our success in the competition. btw, the name of the
-    button is  |
-          here \/                                                       */
     driverXbox
         .x()
         .whileTrue(

@@ -5,19 +5,17 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
-
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 
 public class HoodSubsystem extends SubsystemBase {
   private TalonFX hoodMotor;
   private DutyCycleEncoder hoodEncoder;
 
-  public enum Mode { CALIBRATING, RUNNING }
+  public enum Mode {
+    CALIBRATING,
+    RUNNING
+  }
 
   // ------------------ STATE ------------------
   private Mode mode = Mode.CALIBRATING;
@@ -28,26 +26,25 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(0);
   }
 
-   // Safe starter config; tune as you learn the mechanism.
-private void configureMotor() {
-   
-    var outCfg = new MotorOutputConfigs()
-        .withNeutralMode(NeutralModeValue.Brake);
+  // Safe starter config; tune as you learn the mechanism.
+  private void configureMotor() {
 
-    var ramps = new OpenLoopRampsConfigs()
-        .withDutyCycleOpenLoopRampPeriod(0.25); // smooth starts/stops
+    var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 
-    var current = new CurrentLimitsConfigs()
-        .withStatorCurrentLimitEnable(true)
-        .withStatorCurrentLimit(40)  // start conservative
-        .withSupplyCurrentLimitEnable(true)
-        .withSupplyCurrentLimit(35); // start conservative
+    var ramps =
+        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25); // smooth starts/stops
+
+    var current =
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimitEnable(true)
+            .withStatorCurrentLimit(40) // start conservative
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(35); // start conservative
 
     hoodMotor.getConfigurator().apply(outCfg);
     hoodMotor.getConfigurator().apply(ramps);
     hoodMotor.getConfigurator().apply(current);
   }
-
 
   public void run(double speed) {
     hoodMotor.set(speed);
@@ -57,11 +54,12 @@ private void configureMotor() {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
-    public double getHoodEncoder() {
-    
-      //figured out pulses per second (1 khz)
-      return hoodEncoder.get();
+  public double getHoodEncoder() {
+
+    // figured out pulses per second (1 khz)
+    return hoodEncoder.get();
   }
+
   public void runUP(double speed) {
     hoodMotor.set(speed);
   }
@@ -72,4 +70,3 @@ private void configureMotor() {
 }
 
   // this code sucks
-

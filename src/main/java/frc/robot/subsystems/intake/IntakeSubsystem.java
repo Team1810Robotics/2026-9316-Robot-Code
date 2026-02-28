@@ -1,5 +1,6 @@
 package frc.robot.subsystems.intake;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,18 +12,10 @@ public class IntakeSubsystem extends SubsystemBase {
   public Encoder intakeEncoder;
 
   public IntakeSubsystem() {
-    intakeMotor =
-        new SparkMax(
-            IntakeConstants.INTAKE_MOTOR, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    intakeMotor = new SparkMax(IntakeConstants.INTAKE_MOTOR, MotorType.kBrushless);
     intakeMotor.set(0);
-    intakeMotorL =
-        new SparkMax(
-            IntakeConstants.INTAKE_MOTOR_L,
-            com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    intakeMotorR =
-        new SparkMax(
-            IntakeConstants.INTAKE_MOTOR_R,
-            com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+    intakeMotorL = new SparkMax(IntakeConstants.INTAKE_MOTOR_L, MotorType.kBrushless);
+    intakeMotorR = new SparkMax(IntakeConstants.INTAKE_MOTOR_R, MotorType.kBrushless);
     intakeEncoder = new Encoder(0, 1);
   }
 

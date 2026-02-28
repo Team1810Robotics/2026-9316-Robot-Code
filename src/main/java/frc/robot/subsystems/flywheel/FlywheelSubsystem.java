@@ -35,11 +35,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     // TODO: Configure motor settings (inversions, PID gains) here
   }
 
-  public boolean getBeamBreakTriggered() {
-    // Beam break is triggered when FALSE (NPN sensor logic)
-    return !beamBreak.get();
-  }
-
   // Set flywheel to specific velocity in rotations per second (RPS)
   public void setFlywheelVelocity(double velocityRPS) {
     this.targetVelocity = velocityRPS;
@@ -50,9 +45,18 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-
+    // Convert percentage (0.0 to 1.0) to raw power command
     leftMotor.set(powerPercent);
     rightMotor.set(powerPercent);
+  }
+
+  // Legacy methods for compatibility
+  public void runFlywheel() {
+    setFlywheelPower(1.0);
+  }
+
+  public void stopThrowing() {
+    setFlywheelVelocity(0.0);
   }
 
   // Get current velocity in RPS (for diagnostics and feedback)
