@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.NamedCommands;
-
 // import org.opencv.features2d.FlannBasedMatcher;
 
 import edu.wpi.first.wpilibj2.command.Command;
@@ -14,12 +12,11 @@ public class Climb extends Command {
 
   public Climb(ClimbSubsystem climbSubsystem) {
     this.ClimbSubsystem = climbSubsystem;
-     NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem, ClimbConstants.time));
   }
 
   @Override
   public void initialize() {
-    
+
     if (ClimbSubsystem.isExtended == false) {
       ClimbSubsystem.Extend();
       this.withTimeout(ClimbConstants.time);

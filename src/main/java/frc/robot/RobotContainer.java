@@ -8,17 +8,17 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -41,7 +41,6 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public static Climb Climb = new Climb();
   // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
@@ -53,23 +52,27 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-  private final Telemetry logger = new Telemetry(MaxSpeed);
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 
-  private final SendableChooser<Command> autoChooser;
+  //   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
     configureBindings();
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("climb", new Climb());
-    NamedCommands.registerCommand(
-        "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
+    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
+    // NamedCommands.registerCommand( "StartIntake", new Intake(intakeSubsystem,
+    // IntakeConstants.Mode.ON));
+    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem,
+    // IntakeConstants.Mode.STOP));
   }
 
   private void configureBindings() {
@@ -91,8 +94,6 @@ public class RobotContainer {
             ));
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.y().whileTrue(ClimbCommand());
-
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
     driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
@@ -126,8 +127,6 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    drivetrain.registerTelemetry(logger::telemeterize);
-
     gamepadManipulator
         .x()
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
@@ -135,7 +134,8 @@ public class RobotContainer {
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    // return autoChooser.getSelected();
+    return Commands.print("Payton is love. Payton is life.");
   }
 
   // makes the flywheel command
@@ -144,7 +144,4 @@ public class RobotContainer {
       return new Flywheel();
     }
   */
-  public Command ClimbCommand() {
-    return new Climb();
-  }
 }

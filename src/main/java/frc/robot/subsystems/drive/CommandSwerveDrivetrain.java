@@ -7,19 +7,28 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.TunerConstants.TunerSwerveDrivetrain;
+import frc.robot.subsystems.vision.VisionConstants;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -51,6 +60,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   private final SwerveRequest.SysIdSwerveRotation m_rotationCharacterization =
       new SwerveRequest.SysIdSwerveRotation();
 
+  private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds =
+      new SwerveRequest.ApplyRobotSpeeds();
+
   /* SysId routine for characterizing translation. This is used to find PID gains for the drive motors. */
   private final SysIdRoutine m_sysIdRoutineTranslation =
       new SysIdRoutine(
@@ -70,8 +82,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               null, // Use default ramp rate (1 V/s)
               Volts.of(7), // Use dynamic voltage of 7 V
               null, // Use default timeout (10 s)
-              // Log state with SignalLogger class
-              state -> SignalLogger.writeString("SysIdSteer_State", state.toString())),
+              state -> DogLog.log("SysIdSteer_State", state.toString())),
           new SysIdRoutine.Mechanism(
               volts -> setControl(m_steerCharacterization.withVolts(volts)), null, this));
 
@@ -89,16 +100,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               Volts.of(Math.PI),
               null, // Use default timeout (10 s)
               // Log state with SignalLogger class
-              state -> SignalLogger.writeString("SysIdRotation_State", state.toString())),
+              state -> DogLog.log("SysIdRotation_State", state.toString())),
           new SysIdRoutine.Mechanism(
               output -> {
                 /* output is actually radians per second, but SysId only supports "volts" */
                 setControl(m_rotationCharacterization.withRotationalRate(output.in(Volts)));
                 /* also log the requested output for SysId */
-                SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
+                DogLog.log("Rotational_Rate", output.in(Volts), Volts);
               },
               null,
               this));
+
+  private final Field2d field2d;
 
   /* The SysId routine to test */
   private SysIdRoutine m_sysIdRoutineToApply = m_sysIdRoutineTranslation;
@@ -118,6 +131,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
       startSimThread();
     }
+
+    // configureAutoBuilder();
+    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
+
+    field2d = new Field2d();
+    SmartDashboard.putData("Field", field2d);
   }
 
   /**
@@ -139,6 +158,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
       startSimThread();
     }
+
+    // configureAutoBuilder();
+    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
+
+    field2d = new Field2d();
+    SmartDashboard.putData("Field", field2d);
   }
 
   /**
@@ -171,6 +196,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     if (Utils.isSimulation()) {
       startSimThread();
     }
+
+    // configureAutoBuilder();
+    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
+
+    field2d = new Field2d();
+    SmartDashboard.putData("Field", field2d);
   }
 
   /**
@@ -225,6 +256,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 m_hasAppliedOperatorPerspective = true;
               });
     }
+
+    SwerveDriveState state = getState();
+
+    DogLog.log("Drive/DriveState/Pose", state.Pose);
+    DogLog.log("Drive/DriveState/Speeds", state.Speeds);
+    DogLog.log("Drive/DriveState/ModuleStates", state.ModuleStates);
+    DogLog.log("Drive/DriveState/ModuleTargets", state.ModuleTargets);
+    DogLog.log("Drive/DriveState/ModulePositions", state.ModulePositions);
+    DogLog.log("Drive/DriveState/OdometryPeriod", state.OdometryPeriod, Seconds);
+
+    DogLog.log("Drive/Pigeon/Yaw", getPigeon2().getYaw().getValueAsDouble());
+    DogLog.log("Drive/Pigeon/Pitch", getPigeon2().getPitch().getValueAsDouble());
+    DogLog.log("Drive/Pigeon/Roll", getPigeon2().getRoll().getValueAsDouble());
+
+    field2d.setRobotPose(state.Pose);
   }
 
   private void startSimThread() {
@@ -287,5 +333,37 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
     return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
+  }
+
+  private void configureAutoBuilder() {
+    try {
+      var config = RobotConfig.fromGUISettings();
+      AutoBuilder.configure(
+          () -> getState().Pose, // Supplier of current robot pose
+          this::resetPose, // Consumer for seeding pose against auto
+          () -> getState().Speeds, // Supplier of current robot speeds
+          (speeds, feedforwards) ->
+              setControl(
+                  m_pathApplyRobotSpeeds
+                      .withSpeeds(speeds.times(-1))
+                      .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                      .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+          new PPHolonomicDriveController(
+              new PIDConstants(0.25, 0, 0), new PIDConstants(.25, 0, 0.01)),
+          config,
+          () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+          this // Subsystem for requirements
+          );
+    } catch (Exception e) {
+      DriverStation.reportError("Auto Builder Exception", e.getStackTrace());
+    }
+  }
+
+  public Pose2d getPose() {
+    return getState().Pose;
+  }
+
+  public ChassisSpeeds getSpeeds() {
+    return getState().Speeds;
   }
 }
