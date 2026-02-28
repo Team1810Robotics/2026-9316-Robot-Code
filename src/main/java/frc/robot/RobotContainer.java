@@ -91,9 +91,9 @@ public class RobotContainer {
     // spits ball out
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
     // levels the intake up and down
-    driverXbox.y().onTrue(new Hood(hoodSubsystem, 1, false));
+    gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, 1, false));
 
-    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
+    gamepadManipulator.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
