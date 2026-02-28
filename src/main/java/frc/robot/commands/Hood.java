@@ -25,7 +25,7 @@ public class Hood extends Command {
   enum HoodMode {
     Up,
     Down,
-    Imobile,
+    Immobile,
     goToPos1,
     goToPos2,
     goToPos3
@@ -55,13 +55,13 @@ public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
       while (hoodDegrees >= 0) {
         hoodSubsystem.runDOWN(hoodSpeed);
       }
-      mode = HoodMode.Imobile;
+      mode = HoodMode.Immobile;
       // tweak number
     } else if (mode == HoodMode.Up) {
       while (hoodDegrees <= 67) {
         hoodSubsystem.runUP(hoodSpeed);
       }
-      mode = HoodMode.Imobile;
+      mode = HoodMode.Immobile;
       // tweak number
     }
 
@@ -69,32 +69,32 @@ public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
       while (mode == HoodMode.goToPos1 && hoodDegrees <= 20) {
           hoodSubsystem.runUP(otherHoodSpeed);
           if (hoodDegrees >= 20) {
-            mode = HoodMode.Imobile;
+            mode = HoodMode.Immobile;
           }
         } while (mode == HoodMode.goToPos1 && hoodDegrees >= 20) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
           if (hoodDegrees <= 20) {
-            mode = HoodMode.Imobile;
+            mode = HoodMode.Immobile;
           }
         } while (mode == HoodMode.goToPos2 && hoodDegrees <= 40) {
           hoodSubsystem.runUP(otherHoodSpeed);
           if (hoodDegrees >= 40) {
-            mode = HoodMode.Imobile;
+            mode = HoodMode.Immobile;
           }
         } while (mode == HoodMode.goToPos2 && hoodDegrees >= 40) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
           if (hoodDegrees <= 40) {
-            mode = HoodMode.Imobile;
+            mode = HoodMode.Immobile;
           }
         } while (mode == HoodMode.goToPos3 && hoodDegrees <= 60) {
           hoodSubsystem.runUP(otherHoodSpeed);
           if (hoodDegrees >= 60) {
-            mode = HoodMode.Imobile;
+            mode = HoodMode.Immobile;
           }
         } while (mode == HoodMode.goToPos3 && hoodDegrees >= 60) {
           hoodSubsystem.runDOWN(otherHoodSpeed);
             if (hoodDegrees <= 60) {
-                mode = HoodMode.Imobile;
+                mode = HoodMode.Immobile;
             }
         } 
     }

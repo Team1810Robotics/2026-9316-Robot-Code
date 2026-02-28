@@ -13,7 +13,7 @@ public class Intake extends Command {
   enum LevelMode {
     Up,
     Down,
-    Imobile
+    Immobile
   }
 
   /**
@@ -44,13 +44,13 @@ public class Intake extends Command {
       while (intakeLevelDegrees >= 0) {
         intakeSubsystem.runDOWN(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     } else if (mode == LevelMode.Up) {
       while (intakeLevelDegrees <= 67) {
         intakeSubsystem.runUP(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     }
 
