@@ -1,7 +1,6 @@
 package frc.robot.subsystems.hood;
 
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -10,16 +9,16 @@ import frc.robot.Constants.HoodConstants;
 public class HoodSubsystem extends SubsystemBase {
   /** Creates a new HoodSubsystem. */
   public HoodSubsystem() {}
-    public TalonFX hoodMotor;
-    private HoodConstants.Mode mode;
 
-    public void setMode(HoodConstants.Mode mode) {
-      this.mode = mode;
-    }
+  public TalonFX hoodMotor;
+  private HoodConstants.Mode mode;
 
-    // Sam Notes
-    // Looks like this is still in progress
+  public void setMode(HoodConstants.Mode mode) {
+    this.mode = mode;
+  }
 
+  // Sam Notes
+  // Looks like this is still in progress
 
   /**
    * Example command factory method.
@@ -38,14 +37,14 @@ public class HoodSubsystem extends SubsystemBase {
         });
   }
 
-   public void run(double speed) {
-        hoodMotor.set(speed);
-    }
+  public void run(double speed) {
+    hoodMotor.set(speed);
+  }
 
-    public void stop() {
-        hoodMotor.stopMotor(); // Stop the hood motor
+  public void stop() {
+    hoodMotor.stopMotor(); // Stop the hood motor
+  }
 
-    }
   /**
    * An example method querying a boolean state of the subsystem (for example, a digital sensor).
    *

@@ -10,9 +10,9 @@ public class Indexer extends Command {
     this.indexer = indexer;
   }
 
-  //Sam Notes
+  // Sam Notes
   // main code should be in execute, not initialize
-  
+
   // Sam's Fix: Moved RunIndexer from initialize() to execute() (per Sam's note)
   // Main command logic should run in execute(), not initialize()
   @Override

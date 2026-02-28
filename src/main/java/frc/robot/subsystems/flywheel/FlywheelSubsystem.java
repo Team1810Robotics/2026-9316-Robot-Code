@@ -1,7 +1,7 @@
 package frc.robot.subsystems.flywheel;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -10,7 +10,8 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   private final TalonFX leftMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_LEFT);
   private final TalonFX rightMotor = new TalonFX(Constants.MotorIDs.FLYWHEEL_MOTOR_RIGHT);
-  public final DigitalInput Flybreak = new DigitalInput(Constants.FlywheelConstants.BEAM_BREAK_PORT);
+  public final DigitalInput Flybreak =
+      new DigitalInput(Constants.FlywheelConstants.BEAM_BREAK_PORT);
 
   // VelocityVoltage controller for precise RPM control (TalonFX built-in)
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
@@ -20,8 +21,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   // Flywheel state tracking for diagnostics and control
   private enum FlywheelState {
-    STOPPED, SPINNING_UP, AT_SPEED
+    STOPPED,
+    SPINNING_UP,
+    AT_SPEED
   }
+
   private FlywheelState state = FlywheelState.STOPPED;
 
   public FlywheelSubsystem() {
