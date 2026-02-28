@@ -90,7 +90,7 @@ public class RobotContainer {
     driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
     // spits ball out
     driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
-    //levels the intake up and down
+    // levels the intake up and down
     driverXbox.y().onTrue(new Hood(hoodSubsystem, 1, false));
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
@@ -136,5 +136,5 @@ public class RobotContainer {
 
   public Command ClimbCommand() {
     return new Climb();
-  }
+   }
 }

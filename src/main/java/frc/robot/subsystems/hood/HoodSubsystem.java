@@ -15,21 +15,19 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(0);
   }
 
-   public void run(double speed) {
-        hoodMotor.set(speed);
-
-    }
-
+  public void run(double speed) {
+    hoodMotor.set(speed);
+  }
 
   public void stopHood() {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
-    public double setHoodEncoder() {
-      hoodEncoder.getDistance();
-      hoodEncoder.setDistancePerPulse(360 / 1000);
-      //figured out pulses per second (1 khz)
-      return hoodEncoder.getDistance();
+  public double setHoodEncoder() {
+    hoodEncoder.getDistance();
+    hoodEncoder.setDistancePerPulse(360 / 1000);
+    // figured out pulses per second (1 khz)
+    return hoodEncoder.getDistance();
   }
 
   public void runUP(double speed) {
@@ -39,8 +37,6 @@ public class HoodSubsystem extends SubsystemBase {
   public void runDOWN(double speed) {
     hoodMotor.set(-speed);
   }
-
 }
 
   // this code sucks
-  
