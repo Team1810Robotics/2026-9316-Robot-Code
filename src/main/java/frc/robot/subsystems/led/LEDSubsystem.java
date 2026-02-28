@@ -27,6 +27,26 @@ public class LEDSubsystem extends SubsystemBase {
   public LEDSubsystem() {
     m_candle = new CANdle(35);
     configureCANdle();
+
+    // Slot 0 chooser
+    m_anim0Chooser.setDefaultOption("None", AnimationType.None);
+    m_anim0Chooser.addOption("ColorFlow", AnimationType.ColorFlow);
+    m_anim0Chooser.addOption("Rainbow", AnimationType.Rainbow);
+    m_anim0Chooser.addOption("Twinkle", AnimationType.Twinkle);
+    m_anim0Chooser.addOption("TwinkleOff", AnimationType.TwinkleOff);
+    m_anim0Chooser.addOption("Fire", AnimationType.Fire);
+
+    // Slot 1 chooser
+    m_anim1Chooser.setDefaultOption("None", AnimationType.None);
+    m_anim1Chooser.addOption("Larson", AnimationType.Larson);
+    m_anim1Chooser.addOption("RgbFade", AnimationType.RgbFade);
+    m_anim1Chooser.addOption("SingleFade", AnimationType.SingleFade);
+    m_anim1Chooser.addOption("Strobe", AnimationType.Strobe);
+    m_anim1Chooser.addOption("Fire", AnimationType.Fire);
+
+    // Publish to dashboard so it exists and can be selected
+    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("LED Anim Slot 0", m_anim0Chooser);
+    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("LED Anim Slot 1", m_anim1Chooser);
   }
 
   public static RGBWColor LEDColor =
