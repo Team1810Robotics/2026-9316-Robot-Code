@@ -11,10 +11,10 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 /** Flywheel command */
 public class Climb extends Command {
   private final ClimbSubsystem ClimbSubsystem;
-
   public Climb(ClimbSubsystem climbSubsystem) {
     this.ClimbSubsystem = climbSubsystem;
-     NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem, ClimbConstants.time));
+    //TODO: Review/Reintegrate
+    // NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem, ClimbConstants.time));
   }
 
   @Override

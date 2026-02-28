@@ -19,13 +19,15 @@ import com.ctre.phoenix6.signals.StatusLedWhenActiveValue;
 import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 public class LEDSubsystem extends SubsystemBase {
 
   private CANdle m_candle;
-
-  public LEDSubsystem() {
-    m_candle = new CANdle(35);
+ public VisionSubsystem visionSubsystem;
+  public LEDSubsystem(VisionSubsystem visionSubsystem) {
+    m_candle = new CANdle(LEDConstants.CANDLE_ID);
+    this.visionSubsystem = visionSubsystem;
     configureCANdle();
 
     // Slot 0 chooser
@@ -325,6 +327,15 @@ public class LEDSubsystem extends SubsystemBase {
     // luck its your problem now, also Sam Bowling made it GRB instead of RGB so have fun with
     // that)
   }
+
+  public void aprilTagLED() {
+    if (visionSubsystem.targetValid()) {
+      setLEDColor(new RGBWColor(0, 255, 0, 0), false); // Green for AprilTag detected
+    } else {
+      setLEDColor(new RGBWColor(255, 0, 0, 0), false); // Red for no target
+    }
+  }
+
 
   public void StopLEDSubsystem() {
     setLEDColor(new RGBWColor(0, 0, 0, 0), false);
