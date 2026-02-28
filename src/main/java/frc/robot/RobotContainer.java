@@ -59,7 +59,7 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+
 
   //   private final SendableChooser<Command> autoChooser;
 
@@ -125,11 +125,12 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    drivetrain.registerTelemetry(logger::telemeterize);
+    //drivetrain.registerTelemetry(logger::telemeterize);
 
     gamepadManipulator
-        .rightBumper()
-        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false)));
+        .x()
+        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
   }
 
   public Command getAutonomousCommand() {
