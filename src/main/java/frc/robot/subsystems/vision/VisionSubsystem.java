@@ -21,6 +21,9 @@ public class VisionSubsystem extends SubsystemBase {
 
   private final CommandSwerveDrivetrain drivetrain;
 
+  // TODO: At some point come by and grab the logging changes I (sam) made in 1810, works a lil
+  // better
+
   public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
     this.limelightName = name;
     this.drivetrain = drivetrain;
@@ -31,6 +34,10 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // TODO: From 1810 testing, this will need to be slightly different. Probably applying mode 1 in
+    // auto and/or the early part of teleop, then switching to mode 4 after the match starts. This
+    // is because the botpose MT2 entries are very noisy when the robot is stationary, which is most
+    // of auto and the early part of teleop.
     if (DriverStation.isDisabled()) {
       LimelightHelpers.SetIMUMode(limelightName, 1);
     } else {

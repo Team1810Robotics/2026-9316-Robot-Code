@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
-/** Flywheel command */
 public class Climb extends Command {
   private final ClimbSubsystem climbSubsystem;
 
@@ -15,8 +14,6 @@ public class Climb extends Command {
     addRequirements(climbSubsystem);
   }
 
-  // Sam's Fix: Moved Extend() from initialize() to execute() (per Sam's note: "Main code should be
-  // in execute")
   @Override
   public void initialize() {
     if (climbSubsystem.isExtended == false) {

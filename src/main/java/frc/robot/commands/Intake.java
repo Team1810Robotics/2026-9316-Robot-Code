@@ -5,12 +5,11 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 
 public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
-  private double buttonSpeed;
   private double levelSpeed;
-  double intakeLevelDegrees;
-  LevelMode mode;
+  private double intakeLevelDegrees;
+  private LevelState mode;
 
-  enum LevelMode {
+  enum LevelState {
     Up,
     Down,
     Immobile
@@ -21,15 +20,9 @@ public class Intake extends Command {
    *
    * @param intakeSubsystem The IntakeSubsystem to run the command on.
    */
-  public Intake(IntakeSubsystem intakeSubsystem, double Speed, boolean isIntakeLevel) {
+  public Intake(IntakeSubsystem intakeSubsystem, double Speed) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
-
-    if (isIntakeLevel) {
-      levelSpeed = Speed;
-    } else {
-      buttonSpeed = Speed;
-    }
   }
 
   @Override
@@ -38,28 +31,26 @@ public class Intake extends Command {
   @Override
   public void execute() {
     intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
+
+    // TODO: Gut this, use a PID controller instead. Ask Payton.
     if (intakeLevelDegrees <= 0) {
-      mode = LevelMode.Up;
+      mode = LevelState.Up;
     } else if (intakeLevelDegrees >= 67) {
-      mode = LevelMode.Down;
+      mode = LevelState.Down;
     }
 
-    if (mode == LevelMode.Down) {
+    if (mode == LevelState.Down) {
       while (intakeLevelDegrees >= 0) {
         intakeSubsystem.runDOWN(levelSpeed);
       }
-      mode = LevelMode.Immobile;
+      mode = LevelState.Immobile;
       // tweak number
-    } else if (mode == LevelMode.Up) {
+    } else if (mode == LevelState.Up) {
       while (intakeLevelDegrees <= 67) {
         intakeSubsystem.runUP(levelSpeed);
       }
-      mode = LevelMode.Immobile;
+      mode = LevelState.Immobile;
       // tweak number
-    }
-
-    if (buttonSpeed != 0) {
-      intakeSubsystem.run(buttonSpeed);
     }
   }
 

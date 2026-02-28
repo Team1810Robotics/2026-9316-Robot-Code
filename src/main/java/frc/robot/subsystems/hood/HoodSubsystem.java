@@ -9,26 +9,17 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class HoodSubsystem extends SubsystemBase {
-  private TalonFX hoodMotor;
-  private DutyCycleEncoder hoodEncoder;
-
-  public enum Mode {
-    CALIBRATING,
-    RUNNING
-  }
-
-  // ------------------ STATE ------------------
-  private Mode mode = Mode.CALIBRATING;
+  private final TalonFX hoodMotor;
+  private final DutyCycleEncoder hoodEncoder; // This should probably just be a reltaive encoder
 
   public HoodSubsystem() {
     hoodEncoder = new DutyCycleEncoder(0);
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
-    hoodMotor.set(0);
+
+    configureMotor();
   }
 
-  // Safe starter config; tune as you learn the mechanism.
   private void configureMotor() {
-
     var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 
     var ramps =

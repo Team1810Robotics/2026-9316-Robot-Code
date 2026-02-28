@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import java.util.Map;
 
+/** Utility class to determine the current "hub state" based on match time and auto results. */
 public class HubStateUtil {
   public enum Shift {
     AUTO,

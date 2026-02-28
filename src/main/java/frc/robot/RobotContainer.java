@@ -18,9 +18,9 @@ import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -51,6 +51,7 @@ public class RobotContainer {
           .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
           .withDriveRequestType(
               DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
@@ -76,10 +77,8 @@ public class RobotContainer {
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    // NamedCommands.registerCommand( "StartIntake", new Intake(intakeSubsystem,
-    // IntakeConstants.Mode.ON));
-    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem,
-    // IntakeConstants.Mode.STOP));
+    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
+    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
   }
 
   private void configureBindings() {
@@ -99,14 +98,13 @@ public class RobotContainer {
                         -driverXbox.getRightX()
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
-    // spins the flywheel to feed when the X button is held
-    // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
+
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
     // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1));
     // spits ball out
-    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, true));
+    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1));
     // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
