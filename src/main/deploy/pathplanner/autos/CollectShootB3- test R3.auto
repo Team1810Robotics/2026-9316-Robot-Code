@@ -17,15 +17,21 @@
           }
         },
         {
+          "type": "path",
+          "data": {
+            "pathName": "Collect to shoot"
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "StartFlywheel"
           }
         },
         {
-          "type": "path",
+          "type": "wait",
           "data": {
-            "pathName": "Collect to shoot"
+            "waitTime": 5.0
           }
         },
         {

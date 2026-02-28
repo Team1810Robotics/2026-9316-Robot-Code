@@ -1,18 +1,38 @@
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.NamedCommands;
+
+// import org.opencv.features2d.FlannBasedMatcher;
+
 import edu.wpi.first.wpilibj2.command.Command;
-// *import com.ctre.phoenix6.configs.TalonFXConfigurator;
-// *import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 /** Flywheel command */
 public class Climb extends Command {
-  // *private final TalonFX m_motor = new TalonFX(0);
-  public static ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private final ClimbSubsystem ClimbSubsystem;
+
+  public Climb(ClimbSubsystem climbSubsystem) {
+    this.ClimbSubsystem = climbSubsystem;
+     NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem, ClimbConstants.time));
+  }
 
   @Override
   public void initialize() {
-    climbSubsystem.Extend();
+    
+    if (ClimbSubsystem.isExtended == false) {
+      ClimbSubsystem.Extend();
+      this.withTimeout(ClimbConstants.time);
+      ClimbSubsystem.Stop();
+
+      ClimbSubsystem.isExtended = true;
+
+    } else {
+      ClimbSubsystem.Retract();
+      this.withTimeout(ClimbConstants.time);
+      ClimbSubsystem.Stop();
+      ClimbSubsystem.isExtended = false;
+    }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -21,13 +41,5 @@ public class Climb extends Command {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-    climbSubsystem.Retract();
-  }
-
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+  public void end(boolean interrupted) {}
 }
