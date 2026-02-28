@@ -9,11 +9,10 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
@@ -44,7 +43,6 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public Climb Climb = new Climb(climbSubsystem);
   // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
@@ -56,19 +54,19 @@ public class RobotContainer {
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
-  private final Telemetry logger = new Telemetry(MaxSpeed);
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 
-  private final SendableChooser<Command> autoChooser;
+  //   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
     configureBindings();
 
-    autoChooser = AutoBuilder.buildAutoChooser();
+    // autoChooser = AutoBuilder.buildAutoChooser();
 
     //  NamedCommands.registerCommand("climb", new Climb());
     NamedCommands.registerCommand(
@@ -94,8 +92,6 @@ public class RobotContainer {
             ));
     // spins the flywheel to feed when the X button is held
     // driverXbox.x().whileTrue(FlywheelCommand());
-    // driverXbox.y().whileTrue(ClimbCommand());
-
     driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
     // sucks ball in
     driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
@@ -132,20 +128,13 @@ public class RobotContainer {
     drivetrain.registerTelemetry(logger::telemeterize);
 
     gamepadManipulator
-        .leftTrigger()
-        .onTrue(
-            ledSubsystem.runOnce(
-                () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false)));
-    gamepadManipulator
-        .rightTrigger()
-        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false)));
-    gamepadManipulator
         .rightBumper()
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false)));
   }
 
   public Command getAutonomousCommand() {
-    return autoChooser.getSelected();
+    // return autoChooser.getSelected();
+    return Commands.print("Payton is love. Payton is life.");
   }
 
   // makes the flywheel command
@@ -153,9 +142,5 @@ public class RobotContainer {
     public Command FlywheelCommand() {
       return new Flywheel();
     }
-
-  public Command ClimbCommand() {
-    return new Climb();
-  }
-      */
+  */
 }
