@@ -13,7 +13,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
@@ -25,11 +24,9 @@ import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -37,7 +34,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
-  
+
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private double MaxSpeed =
@@ -46,10 +43,10 @@ public class RobotContainer {
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
-//TODO:reintegrate
- // public static Climb Climb = new Climb();
+  // TODO:reintegrate
+  // public static Climb Climb = new Climb();
 
- private final SwerveRequest.FieldCentricFacingAngle faceAngle =
+  private final SwerveRequest.FieldCentricFacingAngle faceAngle =
       new SwerveRequest.FieldCentricFacingAngle()
           .withDeadband(MaxSpeed * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
@@ -126,8 +123,13 @@ public class RobotContainer {
      holding LB RT A B and right arrow, this would almost certainly be detrimental to our success in the competition. btw, the name of the
     button is  |
           here \/                                                       */
-    driverXbox.x().whileTrue(drivetrain.applyRequest(() -> faceAngle
-                       .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+    driverXbox
+        .x()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    faceAngle
+                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
                         .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
                         .withTargetDirection(drivetrain.getAngleToHub())
                         .withHeadingPID(5, 0, 0)));
@@ -150,14 +152,14 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-  gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
-//TODO: Review/Reintegrate
-/*
-    gamepadManipulator
-        .x()
-        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
-    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
-	*/
+    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    // TODO: Review/Reintegrate
+    /*
+       gamepadManipulator
+           .x()
+           .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+       gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+    */
   }
 
   public Command getAutonomousCommand() {

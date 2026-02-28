@@ -24,7 +24,8 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 public class LEDSubsystem extends SubsystemBase {
 
   private CANdle m_candle;
- public VisionSubsystem visionSubsystem;
+  public VisionSubsystem visionSubsystem;
+
   public LEDSubsystem(VisionSubsystem visionSubsystem) {
     m_candle = new CANdle(LEDConstants.CANDLE_ID);
     this.visionSubsystem = visionSubsystem;
@@ -335,7 +336,6 @@ public class LEDSubsystem extends SubsystemBase {
       setLEDColor(new RGBWColor(255, 0, 0, 0), false); // Red for no target
     }
   }
-
 
   public void StopLEDSubsystem() {
     setLEDColor(new RGBWColor(0, 0, 0, 0), false);
