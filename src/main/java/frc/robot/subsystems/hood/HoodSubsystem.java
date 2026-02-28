@@ -18,10 +18,9 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(0);
   }
 
-   public void run(double speed) {
-        hoodMotor.set(speed);
-    }
-
+  public void run(double speed) {
+    hoodMotor.set(speed);
+  }
 
   public void stopHood() {
     hoodMotor.stopMotor(); // Stop the hood motor
@@ -39,7 +38,6 @@ public class HoodSubsystem extends SubsystemBase {
   public void runDOWN(double speed) {
     hoodMotor.set(-speed);
   }
-
 }
 
   // this code sucks

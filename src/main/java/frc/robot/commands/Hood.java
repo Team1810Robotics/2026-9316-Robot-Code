@@ -17,11 +17,11 @@ import frc.robot.subsystems.hood.HoodConstants;
  */
 
 public class Hood extends Command {
-   private HoodSubsystem hoodSubsystem;
-   private double hoodSpeed;
-   private double otherHoodSpeed;
-    double hoodDegrees;
-    HoodMode mode;
+  private HoodSubsystem hoodSubsystem;
+  private double hoodSpeed;
+  private double otherHoodSpeed;
+  double hoodDegrees;
+  HoodMode mode;
 
   enum HoodMode {
     Up,
@@ -32,26 +32,26 @@ public class Hood extends Command {
     goToPos3
   }
 
-public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
-  this.hoodSubsystem = hoodSubsystem;
-  addRequirements(hoodSubsystem);
-  
-  if (isGoToPos) {  
-    otherHoodSpeed = Speed;
-    } else {
-    hoodSpeed = Speed;
-    }
-}
+  public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
+    this.hoodSubsystem = hoodSubsystem;
+    addRequirements(hoodSubsystem);
 
-    @Override
-    public void execute() {
-        hoodDegrees = hoodSubsystem.getHoodEncoder();
-        if (hoodDegrees <= 0) {
-          mode = HoodMode.Up;
-        } else if (hoodDegrees >= 67) {
-          mode = HoodMode.Down;
-        }
-        
+    if (isGoToPos) {
+      otherHoodSpeed = Speed;
+    } else {
+      hoodSpeed = Speed;
+    }
+  }
+
+  @Override
+  public void execute() {
+    hoodDegrees = hoodSubsystem.setHoodEncoder();
+    if (hoodDegrees <= 0) {
+      mode = HoodMode.Up;
+    } else if (hoodDegrees >= 67) {
+      mode = HoodMode.Down;
+    }
+
     if (mode == HoodMode.Down) {
       while (hoodDegrees >= 0) {
         hoodSubsystem.runDOWN(hoodSpeed);
@@ -99,11 +99,11 @@ public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
             }
         } 
     }
-    //tweak all numbers for positions
-    }
+    // tweak all numbers for positions
+  }
 
-    @Override
-    public void end(boolean interrupted) {
-      hoodSubsystem.stopHood();
-    }
+  @Override
+  public void end(boolean interrupted) {
+    hoodSubsystem.stopHood();
+  }
 }
