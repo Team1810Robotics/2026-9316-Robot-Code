@@ -30,6 +30,7 @@ public class Hood extends Command {
     goToPos2,
     goToPos3
   }
+
   public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
     this.hoodSubsystem = hoodSubsystem;
     addRequirements(hoodSubsystem);
@@ -40,6 +41,7 @@ public class Hood extends Command {
       hoodSpeed = Speed;
     }
   }
+
   @Override
   public void end(boolean interrupted) {
     hoodSubsystem.stopHood();

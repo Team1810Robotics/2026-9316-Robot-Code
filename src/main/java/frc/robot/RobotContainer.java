@@ -27,6 +27,7 @@ import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+
 @SuppressWarnings("unused")
 public class RobotContainer {
 
@@ -64,8 +65,6 @@ public class RobotContainer {
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
- 
-
   //   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
@@ -74,7 +73,8 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
 
     NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
-    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand(
+        "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
     NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));

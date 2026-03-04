@@ -10,7 +10,7 @@ public class Intake extends Command {
   private double intakeLevelDegrees;
   private LevelMode mode;
   private boolean isIntakeLevel;
-  
+
   enum LevelMode {
     Up,
     Down,
