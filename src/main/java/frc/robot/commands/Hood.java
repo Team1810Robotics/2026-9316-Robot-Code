@@ -17,4 +17,33 @@ import frc.robot.subsystems.hood.HoodSubsystem;
 
 public class Hood extends Command {
   private static HoodSubsystem hoodSubsystem;
+  private double hoodSpeed;
+  private double otherHoodSpeed;
+  double hoodDegrees;
+  HoodMode mode;
+
+  enum HoodMode {
+    Up,
+    Down,
+    Immobile,
+    goToPos1,
+    goToPos2,
+    goToPos3
+  }
+
+  public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
+    this.hoodSubsystem = hoodSubsystem;
+    addRequirements(hoodSubsystem);
+
+    if (isGoToPos) {
+      otherHoodSpeed = Speed;
+    } else {
+      hoodSpeed = Speed;
+    }
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    hoodSubsystem.stopHood();
+  }
 }

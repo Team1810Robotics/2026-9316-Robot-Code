@@ -1,40 +1,39 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
-/** Flywheel command */
 public class Climb extends Command {
-  private final ClimbSubsystem ClimbSubsystem;
+  private final ClimbSubsystem climbSubsystem;
 
   public Climb(ClimbSubsystem climbSubsystem) {
-    this.ClimbSubsystem = climbSubsystem;
-    NamedCommands.registerCommand("climb", new Climb(ClimbSubsystem));
+    this.climbSubsystem = climbSubsystem;
+    addRequirements(climbSubsystem);
   }
 
   @Override
   public void initialize() {
-
-    if (ClimbSubsystem.isExtended == false) {
-      ClimbSubsystem.Extend();
+    if (climbSubsystem.isExtended == false) {
+      climbSubsystem.Extend();
       this.withTimeout(ClimbConstants.time);
-      ClimbSubsystem.Stop();
+      climbSubsystem.Stop();
 
-      ClimbSubsystem.isExtended = true;
+      climbSubsystem.isExtended = true;
 
     } else {
-      ClimbSubsystem.Retract();
+      climbSubsystem.Retract();
       this.withTimeout(ClimbConstants.time);
-      ClimbSubsystem.Stop();
-      ClimbSubsystem.isExtended = false;
+      climbSubsystem.Stop();
+      climbSubsystem.isExtended = false;
     }
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    climbSubsystem.Extend();
+  }
 
   // Called once the command ends or is interrupted.
   @Override
