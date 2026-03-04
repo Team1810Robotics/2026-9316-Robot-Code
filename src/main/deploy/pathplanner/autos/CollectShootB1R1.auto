@@ -5,9 +5,15 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "StartIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
-            "pathName": "B2 to shoot"
+            "pathName": "p1 collect"
           }
         },
         {
@@ -17,21 +23,27 @@
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 5.0
+            "pathName": "collectshoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopFlywheel"
+            "name": "StopIntake"
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "shoot to climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopFlywheel"
           }
         },
         {
