@@ -10,12 +10,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class HoodSubsystem extends SubsystemBase {
-  /** Creates a new HoodSubsystem. */
-  public HoodSubsystem() {}
+ 
 
   public TalonFX hoodMotor;
   public DutyCycleEncoder hoodEncoder;
+ /** Creates a new HoodSubsystem. */
+  public HoodSubsystem() {
+    hoodEncoder = new DutyCycleEncoder(0);
+    hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
 
+    configureMotor();
+  }
+/*
   public Command AimHood() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
@@ -24,8 +30,13 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(0);
     return runOnce(
         () -> {
-          /* one-time action goes here */
+          // one-time action goes here 
         });
+  }
+  */
+  private void configureMotor() {
+     var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
+	 hoodMotor.getConfigurator().apply(outCfg);
   }
 
   public void run(double speed) {
@@ -40,7 +51,7 @@ public class HoodSubsystem extends SubsystemBase {
     hoodEncoder.getDistance();
 
     // TODO: figure out pulses per rotation and set as denomenator should be 600 according to ai
-    hoodEncoder.setDistancePerPulse(360 / 600);
+    hoodEncoder.getDistancePerPulse(360 / 600);
   }
 }
 
