@@ -7,4 +7,3 @@ public final class FlywheelConstants {
 
   public static final double IDLE_VELOCITY = 200.0; // Max velocity in rotations per second (RPS)
 }
-

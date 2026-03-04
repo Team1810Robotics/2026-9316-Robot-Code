@@ -23,7 +23,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.util.FieldConstants;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -293,17 +292,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
   }
 
-   public Rotation2d getAngleToHub() {
-        Translation2d robot = getState().Pose.getTranslation();
-        Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
-        
-        return hub.minus(robot).getAngle();
-    }
+  public Rotation2d getAngleToHub() {
+    Translation2d robot = getState().Pose.getTranslation();
+    Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
 
-    public Distance getDistanceToHub() {
-        Translation2d robot = getState().Pose.getTranslation();
-        Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
+    return hub.minus(robot).getAngle();
+  }
 
-        return Meters.of(robot.getDistance(hub));
-    }
+  public Distance getDistanceToHub() {
+    Translation2d robot = getState().Pose.getTranslation();
+    Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
+
+    return Meters.of(robot.getDistance(hub));
+  }
 }

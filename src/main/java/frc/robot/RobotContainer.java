@@ -17,21 +17,17 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.intake.IntakeConstants;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.auto.AutoSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
-import frc.robot.subsystems.auto.AutoSubsystem;
-import frc.robot.Constants;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
-
-  
 
   // The robot's subsystems and commands are defined here...
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -46,10 +42,10 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-    private final SwerveRequest.FieldCentricFacingAngle faceAngle =
-        new SwerveRequest.FieldCentricFacingAngle()
-            .withDeadband(MaxSpeed * 0.1)
-            .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+  private final SwerveRequest.FieldCentricFacingAngle faceAngle =
+      new SwerveRequest.FieldCentricFacingAngle()
+          .withDeadband(MaxSpeed * 0.1)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
   // Removed static command instances per Sam's note: instantiate fresh commands when called
   /* Setting up bindings for necessary control of the swerve drive platform */
@@ -67,11 +63,11 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  
+
   public RobotContainer() {
     configureBindings();
   }
-  
+
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
@@ -88,7 +84,6 @@ public class RobotContainer {
                     .withRotationalRate(
                         -driverXbox.getRightX()
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
-                            
             ));
     // spins the flywheel to feed when the X button is held
     driverXbox.x().whileTrue(new Flywheel(flywheelSubsystem));
@@ -104,22 +99,22 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-            /*hypthetically, if some random prankster were to change the button bind so it was some crazy button combo, for example,
-             holding LB RT A B and right arrow, this would almost certainly be detrimental to our success in the competition. btw, the name of the
-            button is  | 
-                  here \/                                                       */
-            driverXbox.x().whileTrue( 
-            drivetrain.applyRequest(() ->
-                faceAngle
-                    .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                    .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                    .withTargetDirection(drivetrain.getAngleToHub()) // vision
-                    .withHeadingPID(5, 0, 0)
-            )
-        );
+    /*hypthetically, if some random prankster were to change the button bind so it was some crazy button combo, for example,
+     holding LB RT A B and right arrow, this would almost certainly be detrimental to our success in the competition. btw, the name of the
+    button is  |
+          here \/                                                       */
+    driverXbox
+        .x()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    faceAngle
+                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                        .withTargetDirection(drivetrain.getAngleToHub()) // vision
+                        .withHeadingPID(5, 0, 0)));
 
-
-    // Run SysId routines when holding back/start and X/Y. 
+    // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
     driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
     driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
@@ -137,16 +132,15 @@ public class RobotContainer {
 
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.povUp().onTrue(new LEDs(LEDSubsystem)); 
-
+    gamepadManipulator.povUp().onTrue(new LEDs(LEDSubsystem));
   }
 
   public Command getAutonomousCommand() {
     return AutoSubsystem.getAuto("SideScoreLeft");
-}
+  }
 
   // Sam Notes
-  //this is not how we do commands, just instantiate a new one when you call it
+  // this is not how we do commands, just instantiate a new one when you call it
 
   // makes the flywheel command
   public Command FlywheelCommand() {

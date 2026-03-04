@@ -6,8 +6,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ClimbSubsystem extends SubsystemBase {
-  private final SparkMax motor1 = new SparkMax(Constants.MotorIDs.CLIMB_MOTOR_1, MotorType.kBrushless);
-  private final SparkMax motor2 = new SparkMax(Constants.MotorIDs.CLIMB_MOTOR_2, MotorType.kBrushless);
+  private final SparkMax motor1 =
+      new SparkMax(Constants.MotorIDs.CLIMB_MOTOR_1, MotorType.kBrushless);
+  private final SparkMax motor2 =
+      new SparkMax(Constants.MotorIDs.CLIMB_MOTOR_2, MotorType.kBrushless);
 
   // Sam Notes
   // Needs a constructor
