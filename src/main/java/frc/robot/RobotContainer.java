@@ -6,7 +6,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -15,7 +14,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.generated.TunerConstants;
@@ -59,7 +57,6 @@ public class RobotContainer {
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
-
 
   //   private final SendableChooser<Command> autoChooser;
 
@@ -125,7 +122,7 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    //drivetrain.registerTelemetry(logger::telemeterize);
+    // drivetrain.registerTelemetry(logger::telemeterize);
 
     gamepadManipulator
         .x()
