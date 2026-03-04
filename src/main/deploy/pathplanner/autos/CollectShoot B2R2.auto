@@ -19,19 +19,37 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 5.0
+            "waitTime": 1.5
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StopFlywheel"
+            "name": "StartIndexer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "shoot to climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIndexer"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopFlywheel"
           }
         },
         {

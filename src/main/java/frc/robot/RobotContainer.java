@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
+import frc.robot.commands.Indexer;
 import frc.robot.commands.Intake;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -24,6 +25,7 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -39,6 +41,7 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+  private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
 
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
@@ -77,13 +80,22 @@ public class RobotContainer {
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
+    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));//Fix speeds
     NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
+    NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
+    NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
   }
 
   private void configureBindings() {
-    // Note that X is defined as forward according to WPILib convention,
-    // and Y is defined as to the left according to WPILib convention.
+     driverXbox
+        .a()
+        .onTrue(new Intake(intakeSubsystem, 200)); // Example: Run intake at full speed when A is pressed
+    driverXbox
+        .y()
+        .onTrue(new Flywheel(flywheelSubsystem, 200));
+     driverXbox
+        .x()
+        .onTrue(new Indexer(indexerSubsystem)); // Example: Run indexer at full speed when X is pressed
     drivetrain.setDefaultCommand(
         // Drivetrain will execute this command periodically
         drivetrain.applyRequest(
