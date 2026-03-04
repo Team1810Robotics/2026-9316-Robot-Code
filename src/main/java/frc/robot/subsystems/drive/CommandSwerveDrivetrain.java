@@ -15,9 +15,11 @@ import dev.doglog.DogLog;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
@@ -29,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.TunerConstants.TunerSwerveDrivetrain;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.util.FieldConstants;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -137,6 +140,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
+
+    configureAutoBuilder();
   }
 
   /**
@@ -164,6 +169,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
+
+    configureAutoBuilder();
   }
 
   /**
@@ -202,6 +209,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
+
+    configureAutoBuilder();
   }
 
   /**
@@ -333,6 +342,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
   @Override
   public Optional<Pose2d> samplePoseAt(double timestampSeconds) {
     return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
+  }
+
+  public Rotation2d getAngleToHub() {
+    Translation2d robot = getState().Pose.getTranslation();
+    Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
+
+    return hub.minus(robot).getAngle();
+  }
+
+  public Distance getDistanceToHub() {
+    Translation2d robot = getState().Pose.getTranslation();
+    Translation2d hub = FieldConstants.Hub.topCenterPoint.toTranslation2d();
+
+    return Meters.of(robot.getDistance(hub));
   }
 
   private void configureAutoBuilder() {

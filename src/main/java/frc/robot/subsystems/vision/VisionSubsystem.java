@@ -1,9 +1,13 @@
 package frc.robot.subsystems.vision;
 
 // DriverStation not used in this subsystem
+import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.util.LimelightHelpers;
+import frc.robot.util.LimelightHelpers.PoseEstimate;
 
 /**
  * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting the appropriate
@@ -13,8 +17,7 @@ import frc.robot.util.LimelightHelpers;
  * on-robot verification.
  */
 public class VisionSubsystem extends SubsystemBase {
-  // Limelight identifier ("" for default 'limelight' table, or the hostname if using multiple)
-  private final String limelightName;
+  public final String limelightName;
 
   public VisionSubsystem(String name) {
     this.limelightName = name;
@@ -27,6 +30,17 @@ public class VisionSubsystem extends SubsystemBase {
     return (int) LimelightHelpers.getFiducialID(limelightName);
   }
 
+ public boolean targetValid() {
+    return LimelightHelpers.getTV(limelightName);
+  }
+
+  public PoseEstimate getBotPoseMT1() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+  }
+  
+    public PoseEstimate getBotPoseMT2() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  }
   /**
    * this is the one that matters ;)
    * 676676767676676767676767676767676767676767676767676767676767676767676767676767676767676 CALL

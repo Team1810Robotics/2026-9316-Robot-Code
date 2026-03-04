@@ -14,26 +14,31 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
+import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
-import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
+import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
-
+import frc.robot.subsystems.vision.VisionSubsystem;
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
+  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
+  private final VisionSubsystem visionSubsystem = new VisionSubsystem("", drivetrain);
+  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
-  private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-  // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
@@ -41,7 +46,11 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
+  private final SwerveRequest.FieldCentricFacingAngle faceAngle =
+      new SwerveRequest.FieldCentricFacingAngle()
+          .withDeadband(MaxSpeed * 0.1)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -55,8 +64,7 @@ public class RobotContainer {
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
-  public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+ 
 
   //   private final SendableChooser<Command> autoChooser;
 
@@ -65,9 +73,12 @@ public class RobotContainer {
 
     // autoChooser = AutoBuilder.buildAutoChooser();
 
-    //  NamedCommands.registerCommand("climb", new Climb());
-    NamedCommands.registerCommand(
-        "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
+    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
+    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
+    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
   }
 
   private void configureBindings() {
@@ -87,15 +98,17 @@ public class RobotContainer {
                         -driverXbox.getRightX()
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
-    // spins the flywheel to feed when the X button is held
-    // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
-    // sucks ball in
-    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
-    // spits ball out
-    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
 
-    // driverXbox.x().whileTrue(intakeLevelCommand());
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    // sucks ball in
+    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1));
+    // spits ball out
+    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1));
+    // levels the intake up and down
+    gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+
+    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -105,6 +118,17 @@ public class RobotContainer {
                 () ->
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
+
+    driverXbox
+        .x()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    faceAngle
+                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                        .withTargetDirection(drivetrain.getAngleToHub())
+                        .withHeadingPID(5, 0, 0)));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.
@@ -120,7 +144,7 @@ public class RobotContainer {
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
     // reset the field-centric heading on left bumper press
-    // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // drivetrain.registerTelemetry(logger::telemeterize);
 
@@ -134,11 +158,4 @@ public class RobotContainer {
     // return autoChooser.getSelected();
     return Commands.print("Payton is love. Payton is life.");
   }
-
-  // makes the flywheel command
-  /*
-    public Command FlywheelCommand() {
-      return new Flywheel();
-    }
-  */
 }

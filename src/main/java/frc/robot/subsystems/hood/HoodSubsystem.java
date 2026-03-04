@@ -1,8 +1,11 @@
 package frc.robot.subsystems.hood;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.Command;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -11,12 +14,12 @@ public class HoodSubsystem extends SubsystemBase {
   public HoodSubsystem() {}
 
   public TalonFX hoodMotor;
-  public Encoder hoodEncoder;
+  public DutyCycleEncoder hoodEncoder;
 
   public Command AimHood() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    hoodEncoder = new Encoder(0, 1);
+    hoodEncoder = new DutyCycleEncoder(0);
     hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     return runOnce(

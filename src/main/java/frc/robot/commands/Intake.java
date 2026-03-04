@@ -7,13 +7,13 @@ public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   private double buttonSpeed;
   private double levelSpeed;
-  double intakeLevelDegrees;
-  LevelMode mode;
+  private double intakeLevelDegrees;
+  private LevelMode mode;
 
   enum LevelMode {
     Up,
     Down,
-    Imobile
+    Immobile
   }
 
   /**
@@ -34,7 +34,7 @@ public class Intake extends Command {
 
   @Override
   public void execute() {
-    intakeLevelDegrees = intakeSubsystem.setIntakeEncoder();
+    intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
     if (intakeLevelDegrees <= 0) {
       mode = LevelMode.Up;
     } else if (intakeLevelDegrees >= 67) {
@@ -45,13 +45,13 @@ public class Intake extends Command {
       while (intakeLevelDegrees >= 0) {
         intakeSubsystem.runDOWN(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     } else if (mode == LevelMode.Up) {
       while (intakeLevelDegrees <= 67) {
         intakeSubsystem.runUP(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     }
 
