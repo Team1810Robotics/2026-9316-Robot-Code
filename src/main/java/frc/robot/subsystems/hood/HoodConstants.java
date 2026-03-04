@@ -1,7 +1,7 @@
 package frc.robot.subsystems.hood; 
 
 public final class HoodConstants {
-  public static final int HOOD_MOTOR_ID = 0; // Example CAN ID for the hood motor
+  public static final int HOOD_MOTOR_ID = 14; // Example CAN ID for the hood motor
   public static final int MINDEGREE_HOOD_ANGLE = 0; // Minimum angle for the hood
   public static final int MAXDEGREE_HOOD_ANGLE = 30; // Maximum angle
   public static final double POSITION1 = 10;
