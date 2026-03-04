@@ -12,13 +12,13 @@ import frc.robot.Constants;
 public class HoodSubsystem extends SubsystemBase {
  
 
-  public TalonFX hoodMotor;
-  public DutyCycleEncoder hoodEncoder;
+  private final TalonFX hoodMotor;
+  private final DutyCycleEncoder hoodEncoder;
  /** Creates a new HoodSubsystem. */
   public HoodSubsystem() {
     hoodEncoder = new DutyCycleEncoder(0);
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
-
+    hoodMotor.set(0);
     configureMotor();
   }
 /*
@@ -43,7 +43,7 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(speed);
   }
 
-  public void stop() {
+  public void stopHood() {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 

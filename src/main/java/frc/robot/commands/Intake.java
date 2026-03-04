@@ -9,7 +9,8 @@ public class Intake extends Command {
   private double levelSpeed;
   private double intakeLevelDegrees;
   private LevelMode mode;
-
+  private boolean isIntakeLevel;
+  
   enum LevelMode {
     Up,
     Down,
@@ -21,7 +22,7 @@ public class Intake extends Command {
    *
    * @param intakeSubsystem The IntakeSubsystem to run the command on.
    */
-  public Intake(IntakeSubsystem intakeSubsystem, double Speed, boolean isIntakeLevel) {
+  public Intake(IntakeSubsystem intakeSubsystem, double Speed) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
 
