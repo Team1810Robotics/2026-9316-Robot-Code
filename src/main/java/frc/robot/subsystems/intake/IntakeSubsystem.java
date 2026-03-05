@@ -11,8 +11,13 @@ public class IntakeSubsystem extends SubsystemBase {
   public SparkMax intakeMotorL;
   public SparkMax intakeMotorR;
   public DutyCycleEncoder intakeEncoder;
+  public double targetPosition;
   private final PIDController intakePIDController;
   private double currentSetPoint = 0;
+  private double kP;
+  private double kI;
+  private double kD;
+
 
   public IntakeSubsystem() {
     intakeMotor =
@@ -77,6 +82,8 @@ public class IntakeSubsystem extends SubsystemBase {
    */
   public void setPosition(double position) {
     targetPosition = position;
+    //TODO:Address
+    /* 
     double currentPosition = intakeEncoder.getDistance();
     double error = targetPosition - currentPosition;
     
@@ -87,5 +94,6 @@ public class IntakeSubsystem extends SubsystemBase {
     // Run both motors in opposite directions for linear actuation
     intakeMotorL.set(output);
     intakeMotorR.set(-output);
+    */
   }
 }
