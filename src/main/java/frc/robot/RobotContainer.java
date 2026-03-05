@@ -8,15 +8,18 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Intake;
 import frc.robot.commands.LEDs;
+import frc.robot.commands.VisionLock;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -24,6 +27,8 @@ import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -34,16 +39,21 @@ public class RobotContainer {
   private final LEDSubsystem LEDSubsystem = new LEDSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  // VisionSubsystem requires limelight name and drivetrain
+  private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", TunerConstants.createDrivetrain());
+
+  // Speed modes
   private double MaxSpeed =
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  private double slowModeSpeed = MaxSpeed * 0.35; // 35% speed for slow mode
 
   private double MaxAngularRate =
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
-  public static Flywheel Flywheel = new Flywheel();
-  public static Climb Climb = new Climb();
-  // public static Intake intake = new Intake(intakeSubsystem, intakeSubsystem.Mode.ON);
+  public static Flywheel FlywheelCommand = new Flywheel();
+  public static Climb ClimbCommand = new Climb();
+
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
@@ -56,82 +66,113 @@ public class RobotContainer {
 
   private final Telemetry logger = new Telemetry(MaxSpeed);
   private final CommandXboxController driverXbox = new CommandXboxController(0);
-  private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
+  private final CommandXboxController manipulatorXbox = new CommandXboxController(1);
 
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 
   public RobotContainer() {
+    // Initialize LED subsystem
+    LEDSubsystem.StartLEDSubsystem();
+    
     configureBindings();
   }
 
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
+    
+    // Default drivetrain command - field centric drive
+    // Uses left stick for translation, right stick X for rotation
     drivetrain.setDefaultCommand(
-        // Drivetrain will execute this command periodically
         drivetrain.applyRequest(
             () ->
                 drive
-                    .withVelocityX(
-                        -driverXbox.getLeftY()
-                            * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(
-                        -driverXbox.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(
-                        -driverXbox.getRightX()
-                            * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            ));
-    // spins the flywheel to feed when the X button is held
-    // driverXbox.x().whileTrue(FlywheelCommand());
-    driverXbox.y().whileTrue(ClimbCommand());
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
-    // sucks ball in
-    driverXbox.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
-    // spits ball out
-    driverXbox.x().onTrue(new Intake(intakeSubsystem, 1, true));
+                    .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                    .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                    .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate)));
 
-    // driverXbox.x().whileTrue(intakeLevelCommand());
+    // =====================================================
+    // DRIVER CONTROLLER (Xbox Controller 0 - White)
+    // =====================================================
 
-    driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverXbox
-        .b()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
+    // Right Bumper: Reset field-centric heading
+    driverXbox.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Run SysId routines when holding back/start and X/Y.
-    // Note that each routine should be run exactly once in a single log.
-    driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    driverXbox
-        .start()
-        .and(driverXbox.y())
-        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    driverXbox
-        .start()
-        .and(driverXbox.x())
-        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+    // X (hold): Vision lock - PID rotation onto AprilTag, driver keeps translation
+    driverXbox.x().whileTrue(new VisionLock(
+        drivetrain,
+        visionSubsystem,
+        () -> -driverXbox.getLeftY() * MaxSpeed,
+        () -> -driverXbox.getLeftX() * MaxSpeed,
+        MaxSpeed,
+        MaxAngularRate));
 
-    // reset the field-centric heading on left bumper press
-    // driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // B: Deploy intake out (arm to OUT_POSITION)
+    driverXbox.b().onTrue(new InstantCommand(() -> intakeSubsystem.setPosition(IntakeConstants.OUT_POSITION)));
 
+    // A: Retract intake in (arm to IN_POSITION)
+    driverXbox.a().onTrue(new InstantCommand(() -> intakeSubsystem.setPosition(IntakeConstants.IN_POSITION)));
+
+    // Left Trigger (hold): Intake IN + LEDs orange
+    // Note: Left trigger value ranges from 0 to 1
+    Trigger leftTrigger = driverXbox.leftTrigger(0.5);
+    leftTrigger.whileTrue(new Intake(intakeSubsystem, 1, false));
+    leftTrigger.onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
+
+    // Right Trigger (hold): Full shoot sequence
+    // flywheel + white rollers + wait + full indexer
+    Trigger rightTrigger = driverXbox.rightTrigger(0.5);
+    rightTrigger.whileTrue(new Flywheel());
+    rightTrigger.onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
+    rightTrigger.onFalse(new InstantCommand(() -> {
+      // On release: stop flywheel, stop indexer, LEDs green
+      flywheelSubsystem.stopThrowing();
+      LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
+    }));
+
+    // D-Pad Down: Intake eject (reverse wheels)
+    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, false));
+
+    // D-Pad Right: Hood up (stops at upper hardware limit switch)
+    driverXbox.povRight().whileTrue(new InstantCommand(() -> hoodSubsystem.moveUp()));
+
+    // D-Pad Left: Hood down (stops at lower hardware limit switch)
+    driverXbox.povLeft().whileTrue(new InstantCommand(() -> hoodSubsystem.moveDown()));
+
+    // Back (small left button): Slow mode (~35% speed) + LEDs blue
+    driverXbox.back().onTrue(new InstantCommand(() -> {
+      MaxSpeed = slowModeSpeed;
+      LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 255, 0), false);
+    }));
+
+    // Start (small right button): Fast mode (full speed) + LEDs green
+    driverXbox.start().onTrue(new InstantCommand(() -> {
+      MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+      LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
+    }));
+
+    // Y: Climb command (for testing/sysid)
+    driverXbox.y().whileTrue(ClimbCommand);
+
+    // Register telemetry
     drivetrain.registerTelemetry(logger::telemeterize);
 
-    gamepadManipulator.b().onTrue(new LEDs(LEDSubsystem));
+    // =====================================================
+    // MANIPULATOR CONTROLLER (Xbox Controller 1)
+    // =====================================================
+
+    // Right Trigger (hold): Climb up (Extend)
+    manipulatorXbox.rightTrigger(0.5).whileTrue(new InstantCommand(() -> climbSubsystem.Extend()));
+
+    // Left Trigger (hold): Climb down (Retract)
+    manipulatorXbox.leftTrigger(0.5).whileTrue(new InstantCommand(() -> climbSubsystem.Retract()));
+
+    // B: Cycle LED animation
+    manipulatorXbox.b().onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 0, 0), true)));
   }
 
   public Command getAutonomousCommand() {
     return new InstantCommand();
   }
-
-  // makes the flywheel command
-  public Command FlywheelCommand() {
-    return new Flywheel();
-  }
-
-  public Command ClimbCommand() {
-    return new Climb();
-  }
 }
+

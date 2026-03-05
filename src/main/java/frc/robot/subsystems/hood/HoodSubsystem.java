@@ -8,17 +8,22 @@ import frc.robot.Constants;
 
 public class HoodSubsystem extends SubsystemBase {
   /** Creates a new HoodSubsystem. */
-  public HoodSubsystem() {}
-
+  
   public TalonFX hoodMotor;
   public Encoder hoodEncoder;
+  
+  // Hood speed constant
+  public static final double HOOD_SPEED = 0.5;
+
+  public HoodSubsystem() {
+    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
+    hoodEncoder = new Encoder(0, 1);
+    hoodEncoder.setDistancePerPulse(360.0 / 600.0);
+  }
 
   public Command AimHood() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
-    hoodEncoder = new Encoder(0, 1);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
-    hoodMotor.set(0);
     return runOnce(
         () -> {
           /* one-time action goes here */
@@ -33,12 +38,20 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
+  public void stopHood() {
+    hoodMotor.stopMotor();
+  }
+
+  public void moveUp() {
+    hoodMotor.set(HOOD_SPEED);
+  }
+
+  public void moveDown() {
+    hoodMotor.set(-HOOD_SPEED);
+  }
+
   public void setEncoder() {
     hoodEncoder.getDistance();
-
-    // TODO: figure out pulses per rotation and set as denomenator should be 600 according to ai
     hoodEncoder.setDistancePerPulse(360 / 600);
   }
 }
-
-  // this code sucks
