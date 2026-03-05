@@ -1,12 +1,9 @@
 package frc.robot.subsystems.intake;
 
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkFlex;
-
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
@@ -32,8 +29,8 @@ public class IntakeSubsystem extends SubsystemBase {
             com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
     intakeEncoder = new DutyCycleEncoder(0);
 
-    intakePIDController = new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
-    
+    intakePIDController =
+        new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
   }
 
   public void run(double speed) {
@@ -42,13 +39,13 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setPoint(double setpoint) {
     currentSetPoint = setpoint;
-    if (intakeEncoder.isConnected()){
-            double output = intakePIDController.calculate(intakeEncoder.get(), setpoint);
-            intakeMotorL.set(output);
-            intakeMotorR.set(-output);
-        } else {
-            stopIntakeLevel();
-        }
+    if (intakeEncoder.isConnected()) {
+      double output = intakePIDController.calculate(intakeEncoder.get(), setpoint);
+      intakeMotorL.set(output);
+      intakeMotorR.set(-output);
+    } else {
+      stopIntakeLevel();
+    }
   }
 
   public void stopIntake() {

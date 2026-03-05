@@ -22,8 +22,8 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
-import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
+import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
@@ -86,14 +86,18 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.Intake));
+    gamepadManipulator
+        .rightBumper()
+        .whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.Intake));
     // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.Intake));
+    gamepadManipulator
+        .leftBumper()
+        .whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.Intake));
     // spits ball out
     gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
-    //levels the intake up and down (manual)
+    // levels the intake up and down (manual)
     gamepadManipulator.a().onTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UsePID));
-    //PID cool
+    // PID cool
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
@@ -139,5 +143,5 @@ public class RobotContainer {
 
   public Command ClimbCommand() {
     return new Climb();
-   }
+  }
 }
