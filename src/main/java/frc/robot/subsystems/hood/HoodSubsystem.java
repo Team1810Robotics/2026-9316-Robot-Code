@@ -68,5 +68,3 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(-speed);
   }
 }
-
-  // this code sucks
