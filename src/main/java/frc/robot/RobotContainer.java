@@ -86,17 +86,19 @@ public class RobotContainer {
     // spins the flywheel to feed when the X button is held
     driverXbox.x().whileTrue(FlywheelCommand());
     driverXbox.y().whileTrue(ClimbCommand());
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, false));
+    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.Intake));
     // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, false));
+    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.Intake));
     // spits ball out
-    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, true));
-    //levels the intake up and down
+    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
+    //levels the intake up and down (manual)
+    gamepadManipulator.a().onTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UsePID));
+    //PID cool
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
-    driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
+    // driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
         .b()
         .whileTrue(
