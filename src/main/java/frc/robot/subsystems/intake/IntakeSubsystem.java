@@ -8,7 +8,11 @@ public class IntakeSubsystem extends SubsystemBase {
   public SparkMax intakeMotor; // Because this is a vortex motor, this needs to be a SparkFlex
   public SparkMax intakeMotorL;
   public SparkMax intakeMotorR;
-  public Encoder intakeEncoder;
+  public DutyCycleEncoder intakeEncoder;
+  public double targetPosition;
+  private final PIDController intakePIDController;
+  private double currentSetPoint = 0;
+
 
   public IntakeSubsystem() {
     intakeMotor =
