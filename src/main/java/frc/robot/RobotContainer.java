@@ -79,9 +79,10 @@ public class RobotContainer {
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    // NamedCommands.registerCommand(
-     //   "StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
+    // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
     // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
+    // NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
+    // NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
   }
 
   private void configureBindings() {
