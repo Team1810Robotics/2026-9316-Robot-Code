@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.climb.ClimbConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class Climb extends Command {
@@ -12,22 +11,22 @@ public class Climb extends Command {
     addRequirements(climbSubsystem);
   }
 
-  @Override
-  public void initialize() {
-    if (climbSubsystem.isExtended == false) {
-      climbSubsystem.Extend();
-      this.withTimeout(ClimbConstants.time);
-      climbSubsystem.Stop();
+  // @Override
+  //  public void initialize() {
+  //   if (climbSubsystem.isExtended == false) {
+  //     climbSubsystem.Extend();
+  //     this.withTimeout(ClimbConstants.time);
+  //     climbSubsystem.Stop();
 
-      climbSubsystem.isExtended = true;
+  //     climbSubsystem.isExtended = true;
 
-    } else {
-      climbSubsystem.Retract();
-      this.withTimeout(ClimbConstants.time);
-      climbSubsystem.Stop();
-      climbSubsystem.isExtended = false;
-    }
-  }
+  //   } else {
+  //     climbSubsystem.Retract();
+  //     this.withTimeout(ClimbConstants.time);
+  //     climbSubsystem.Stop();
+  //     climbSubsystem.isExtended = false;
+  //   }
+  // }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

@@ -16,12 +16,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Intake.RunType;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
@@ -37,9 +35,9 @@ public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  private final VisionSubsystem visionSubsystem = new VisionSubsystem("", drivetrain);
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+//   private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", drivetrain);
+  // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
@@ -76,14 +74,14 @@ public class RobotContainer {
 
     // autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
+    // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand(
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand(
-        "StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
-    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
+    // NamedCommands.registerCommand(
+     //   "StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
+    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
   }
 
   private void configureBindings() {
@@ -118,17 +116,19 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
+    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.5));
+
     // B: Deploy intake out (arm to OUT_POSITION)
-    driverXbox
-        .b()
-        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+    // driverXbox
+    //     .b()
+    //     .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
-    driverXbox
-        .a()
-        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
+    // driverXbox
+    //     .a()
+    //     .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
     // D-Pad Down: Intake eject (reverse wheels)
-    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
+    // driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
     driverXbox
         .x()
         .whileTrue(
