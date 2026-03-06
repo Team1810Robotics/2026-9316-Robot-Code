@@ -1,8 +1,15 @@
 package frc.robot.subsystems.flywheel;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FlywheelSubsystem extends SubsystemBase {
@@ -33,6 +40,14 @@ public class FlywheelSubsystem extends SubsystemBase {
     beamBreak = new DigitalInput(FlywheelConstants.FlywheelBeamBreak);
 
     // TODO: Configure motor settings (inversions, PID gains) here
+
+    TalonFXConfiguration cfg = new TalonFXConfiguration();
+
+    cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    rightMotor.getConfigurator().apply(cfg);
+
+    leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
   }
 
   public boolean getBeamBreakTriggered() {
@@ -46,6 +61,10 @@ public class FlywheelSubsystem extends SubsystemBase {
     // Use VelocityVoltage control for precise speed management
     leftMotor.setControl(velocityControl.withVelocity(velocityRPS));
     rightMotor.setControl(velocityControl.withVelocity(velocityRPS));
+  }
+
+  public Command setDutyCycleCommand(double dutyCycle) {
+    return Commands.startEnd(() -> rightMotor.set(dutyCycle), () -> rightMotor.stopMotor(), this);
   }
 
   // Set flywheel to percentage power (legacy method for simple control)
