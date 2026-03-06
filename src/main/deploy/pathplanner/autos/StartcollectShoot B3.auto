@@ -5,21 +5,15 @@
     "data": {
       "commands": [
         {
-          "type": "path",
-          "data": {
-            "pathName": "B2 to shoot"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "StartFlywheel"
           }
         },
         {
-          "type": "wait",
+          "type": "path",
           "data": {
-            "waitTime": 1.5
+            "pathName": "Start to collect"
           }
         },
         {
@@ -35,12 +29,6 @@
           }
         },
         {
-          "type": "path",
-          "data": {
-            "pathName": "shoot to climb"
-          }
-        },
-        {
           "type": "named",
           "data": {
             "name": "StopIndexer"
@@ -50,12 +38,6 @@
           "type": "named",
           "data": {
             "name": "StopFlywheel"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "climb"
           }
         }
       ]
