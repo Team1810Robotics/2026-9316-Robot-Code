@@ -7,39 +7,44 @@ public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   private double buttonSpeed;
   private double levelSpeed;
+  private double PIDSetpoint;
   double intakeLevelDegrees;
   LevelMode mode;
 
   enum LevelMode {
     Up,
     Down,
-    Imobile
+    Immobile
   }
+
+  public enum RunType {
+    Intake,
+    UsePID,
+    UseManual
+  }
+
+  RunType runType;
 
   /**
    * Intake command to run the intake motor
    *
    * @param intakeSubsystem The IntakeSubsystem to run the command on.
    */
-  public Intake(IntakeSubsystem intakeSubsystem, double Speed, boolean isIntakeLevel) {
+  public Intake(IntakeSubsystem intakeSubsystem, double SpeedOrSetPoint, RunType runType) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
-    /* this section may need to be re-examined - commented out post merge
-        NamedCommands.registerCommand(
-            "StartIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.ON));
-        NamedCommands.registerCommand(
-            "StopIntake", new Intake(intakeSubsystem, IntakeConstants.Mode.STOP));
-    */
-    if (isIntakeLevel) {
-      levelSpeed = Speed;
-    } else {
-      buttonSpeed = Speed;
+    if (this.runType == RunType.UseManual) {
+      levelSpeed = SpeedOrSetPoint;
+    } else if (this.runType == RunType.Intake) {
+      buttonSpeed = SpeedOrSetPoint;
+    } else if (this.runType == RunType.UsePID) {
+      PIDSetpoint = SpeedOrSetPoint;
     }
   }
 
   @Override
   public void execute() {
-    intakeLevelDegrees = intakeSubsystem.setIntakeEncoder();
+    intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
     if (intakeLevelDegrees <= 0) {
       mode = LevelMode.Up;
     } else if (intakeLevelDegrees >= 67) {
@@ -50,18 +55,22 @@ public class Intake extends Command {
       while (intakeLevelDegrees >= 0) {
         intakeSubsystem.runDOWN(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     } else if (mode == LevelMode.Up) {
       while (intakeLevelDegrees <= 67) {
         intakeSubsystem.runUP(levelSpeed);
       }
-      mode = LevelMode.Imobile;
+      mode = LevelMode.Immobile;
       // tweak number
     }
 
     if (buttonSpeed != 0) {
       intakeSubsystem.run(buttonSpeed);
+    }
+
+    if (PIDSetpoint != 0) {
+      intakeSubsystem.setPoint(PIDSetpoint);
     }
   }
 

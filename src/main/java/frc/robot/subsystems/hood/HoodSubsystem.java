@@ -1,44 +1,70 @@
 package frc.robot.subsystems.hood;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.Command;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
 
 public class HoodSubsystem extends SubsystemBase {
-  /** Creates a new HoodSubsystem. */
-  public HoodSubsystem() {}
+  private TalonFX hoodMotor;
+  private DutyCycleEncoder hoodEncoder;
 
-  public TalonFX hoodMotor;
-  public Encoder hoodEncoder;
+  public enum Mode {
+    CALIBRATING,
+    RUNNING
+  }
 
-  public Command AimHood() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    hoodEncoder = new Encoder(0, 1);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
+  // ------------------ STATE ------------------
+  private Mode mode = Mode.CALIBRATING;
+
+  public HoodSubsystem() {
+    hoodEncoder = new DutyCycleEncoder(0);
+    hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
-    return runOnce(
-        () -> {
-          /* one-time action goes here */
-        });
+  }
+
+  // Safe starter config; tune as you learn the mechanism.
+  private void configureMotor() {
+
+    var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
+
+    var ramps =
+        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25); // smooth starts/stops
+
+    var current =
+        new CurrentLimitsConfigs()
+            .withStatorCurrentLimitEnable(true)
+            .withStatorCurrentLimit(40) // start conservative
+            .withSupplyCurrentLimitEnable(true)
+            .withSupplyCurrentLimit(35); // start conservative
+
+    hoodMotor.getConfigurator().apply(outCfg);
+    hoodMotor.getConfigurator().apply(ramps);
+    hoodMotor.getConfigurator().apply(current);
   }
 
   public void run(double speed) {
     hoodMotor.set(speed);
   }
 
-  public void stop() {
+  public void stopHood() {
     hoodMotor.stopMotor(); // Stop the hood motor
   }
 
-  public void setEncoder() {
-    hoodEncoder.getDistance();
+  public double getHoodEncoder() {
 
-    // TODO: figure out pulses per rotation and set as denomenator should be 600 according to ai
-    hoodEncoder.setDistancePerPulse(360 / 600);
+    // figured out pulses per second (1 khz)
+    return hoodEncoder.get();
+  }
+
+  public void runUP(double speed) {
+    hoodMotor.set(speed);
+  }
+
+  public void runDOWN(double speed) {
+    hoodMotor.set(-speed);
   }
 }
-
-  // this code sucks

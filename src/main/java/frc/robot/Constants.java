@@ -63,10 +63,15 @@ public class Constants {
     // https://drive.google.com/file/d/1Urb7EcdkFHfVp7dLyGpgPSgWiyvLkA06/view?usp=sharing
   }
 
-  public class IntakeConstants {
+  public static class IntakeConstants {
     public static int INTAKE_MOTOR = 11;
     public static int INTAKE_MOTOR_L = 000; // TODO: Get actual IDs
     public static int INTAKE_MOTOR_R = 0000; // TODO: Get actual IDs
+    
+    // Intake arm positions (in encoder units, TODO: tune with actual values)
+    public static final double IN_POSITION = 0.0;
+    public static final double OUT_POSITION = 67.0;
+    
     public static final int PROXIMITY_SENSOR_PORT_LEFT =
         0; // Digital Input port for the proximity sensor TODO: Get actual port numbers
     public static final int PROXIMITY_SENSOR_PORT_RIGHT =
