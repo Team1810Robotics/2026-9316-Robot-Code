@@ -116,7 +116,7 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.5));
+    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
 
     // B: Deploy intake out (arm to OUT_POSITION)
     // driverXbox
