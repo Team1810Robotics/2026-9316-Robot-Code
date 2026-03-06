@@ -7,9 +7,9 @@ public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
   private double buttonSpeed;
   private double levelSpeed;
-  private double intakeLevelDegrees;
-  private LevelMode mode;
-  private boolean isIntakeLevel;
+  private double PIDSetpoint;
+  double intakeLevelDegrees;
+  LevelMode mode;
 
   enum LevelMode {
     Up,
@@ -17,19 +17,28 @@ public class Intake extends Command {
     Immobile
   }
 
+  public enum RunType {
+    Intake,
+    UsePID,
+    UseManual
+  }
+
+  RunType runType;
+
   /**
    * Intake command to run the intake motor
    *
    * @param intakeSubsystem The IntakeSubsystem to run the command on.
    */
-  public Intake(IntakeSubsystem intakeSubsystem, double Speed) {
+  public Intake(IntakeSubsystem intakeSubsystem, double SpeedOrSetPoint, RunType runType) {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
-
-    if (isIntakeLevel) {
-      levelSpeed = Speed;
-    } else {
-      buttonSpeed = Speed;
+    if (this.runType == RunType.UseManual) {
+      levelSpeed = SpeedOrSetPoint;
+    } else if (this.runType == RunType.Intake) {
+      buttonSpeed = SpeedOrSetPoint;
+    } else if (this.runType == RunType.UsePID) {
+      PIDSetpoint = SpeedOrSetPoint;
     }
   }
 
@@ -58,6 +67,10 @@ public class Intake extends Command {
 
     if (buttonSpeed != 0) {
       intakeSubsystem.run(buttonSpeed);
+    }
+
+    if (PIDSetpoint != 0) {
+      intakeSubsystem.setPoint(PIDSetpoint);
     }
   }
 
