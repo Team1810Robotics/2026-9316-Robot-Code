@@ -1,14 +1,19 @@
 package frc.robot.subsystems.indexer;
 
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IndexerSubsystem extends SubsystemBase {
-  private final SparkMax indexerMotor1 = new SparkMax(0, null); // The Left roller mot
-  private final SparkMax indexerMotor2 = new SparkMax(0, null); // The right roller motor
-  private final SparkMax indexerMotor3 = new SparkMax(0, null); // The left orange wheel motor
-  private final SparkMax indexerMotor4 = new SparkMax(0, null); // The right orange wheel motor
+  private final SparkMax indexerMotor1 =
+      new SparkMax(0, MotorType.kBrushless); // The Left roller mot
+  private final SparkMax indexerMotor2 =
+      new SparkMax(1, MotorType.kBrushless); // The right roller motor
+  private final SparkMax indexerMotor3 =
+      new SparkMax(2, MotorType.kBrushless); // The left orange wheel motor
+  private final SparkMax indexerMotor4 =
+      new SparkMax(3, MotorType.kBrushless); // The right orange wheel motor
 
   private final DigitalInput IndexBeamBreak =
       new DigitalInput(IndexerConstants.INDEXER_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
