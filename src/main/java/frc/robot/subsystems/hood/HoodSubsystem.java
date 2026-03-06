@@ -15,7 +15,7 @@ public class HoodSubsystem extends SubsystemBase {
 
   /** Creates a new HoodSubsystem. */
   public HoodSubsystem() {
-    hoodEncoder = new DutyCycleEncoder(0);
+    hoodEncoder = new DutyCycleEncoder(1);
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     configureMotor();

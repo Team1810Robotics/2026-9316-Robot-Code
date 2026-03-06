@@ -31,7 +31,7 @@ public class IntakeSubsystem extends SubsystemBase {
         new SparkMax(
             IntakeConstants.INTAKE_MOTOR_R,
             com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    intakeEncoder = new DutyCycleEncoder(0);
+    intakeEncoder = new DutyCycleEncoder(2);
 
     intakePIDController =
         new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);

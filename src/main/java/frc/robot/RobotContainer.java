@@ -37,7 +37,7 @@ public class RobotContainer {
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
 //   private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", drivetrain);
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
-  // private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
@@ -125,11 +125,10 @@ public class RobotContainer {
     //     .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
-    // driverXbox
-    //     .a()
-    //     .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
-    // D-Pad Down: Intake eject (reverse wheels)
-    // driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
+    //driverXbox.a().onTrue(new InstantCommand(() -> IntakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
+    //D-Pad Down: Intake eject (reverse wheels)
+    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
+    driverXbox.povUp().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
     driverXbox
         .x()
         .whileTrue(
