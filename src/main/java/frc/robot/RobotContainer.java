@@ -111,12 +111,12 @@ public class RobotContainer {
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
 
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
+    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, RunType.Intake));
+    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1, RunType.Intake));
     // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1));
+    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1, RunType.Intake));
     // spits ball out
-    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1));
+    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1, RunType.Intake));
     // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
