@@ -6,6 +6,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -154,12 +155,25 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // drivetrain.registerTelemetry(logger::telemeterize);
-
-    gamepadManipulator
-        .x()
+    // Cycle
+    driverXbox
+        .povRight()
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
-    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+    driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+
+    driverXbox
+        .rightTrigger()
+        .onTrue(
+            ledSubsystem.runOnce(
+                () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false))); // Green
+    driverXbox
+        .leftTrigger()
+        .onTrue(
+            ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false))); // Rainbow
+    driverXbox
+        .povDown()
+        .onTrue(
+            ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false))); // None (off)
   }
 
   public Command getAutonomousCommand() {
