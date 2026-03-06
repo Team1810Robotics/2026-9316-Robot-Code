@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
@@ -24,6 +25,7 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
@@ -77,8 +79,8 @@ public class RobotContainer {
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
-    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
+    // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
+    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
   }
 
   private void configureBindings() {
@@ -99,12 +101,6 @@ public class RobotContainer {
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
 
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
-    // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1));
-    // spits ball out
-    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1));
     // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
@@ -119,6 +115,18 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
+    // B: Deploy intake out (arm to OUT_POSITION)
+    driverXbox
+        .b()
+        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+
+    // A: Retract intake in (arm to IN_POSITION)
+    driverXbox
+        .a()
+        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
+    // D-Pad Down: Intake eject (reverse wheels)
+    // TODO: Address
+    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
     driverXbox
         .x()
         .whileTrue(
