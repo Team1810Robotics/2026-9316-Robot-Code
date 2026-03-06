@@ -19,6 +19,7 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Indexer;
 import frc.robot.commands.Intake;
+import frc.robot.commands.Intake.RunType;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
@@ -78,8 +79,8 @@ public class RobotContainer {
     NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1)); // Fix speeds
-    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
+    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
+    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
     NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
     NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
   }
@@ -89,7 +90,7 @@ public class RobotContainer {
         .a()
         .onTrue(
             new Intake(
-                intakeSubsystem, 200)); // Example: Run intake at full speed when A is pressed
+                intakeSubsystem, 1,RunType.Intake)); // Example: Run intake at full speed when A is pressed
     driverXbox.y().onTrue(new Flywheel(flywheelSubsystem, 200));
     driverXbox
         .x()
