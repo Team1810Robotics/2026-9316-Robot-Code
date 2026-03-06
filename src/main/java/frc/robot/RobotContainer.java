@@ -5,7 +5,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-
+import com.pathplanner.lib.auto.NamedCommands;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.signals.RGBWColor;
@@ -110,15 +110,16 @@ public class RobotContainer {
         MaxAngularRate));
 
     // B: Deploy intake out (arm to OUT_POSITION)
-    driverXbox.b().onTrue(new InstantCommand(() -> intakeSubsystem.setPosition(IntakeConstants.OUT_POSITION)));
+    driverXbox.b().onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
-    driverXbox.a().onTrue(new InstantCommand(() -> intakeSubsystem.setPosition(IntakeConstants.IN_POSITION)));
+    driverXbox.a().onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
 
     // Left Trigger (hold): Intake IN + LEDs orange
     // Note: Left trigger value ranges from 0 to 1
     Trigger leftTrigger = driverXbox.leftTrigger(0.5);
-    leftTrigger.whileTrue(new Intake(intakeSubsystem, 1, false));
+    //TODO: this needs to be addressed
+    //leftTrigger.whileTrue(new Intake(intakeSubsystem, 1, false));
     leftTrigger.onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
 
     // Right Trigger (hold): Full shoot sequence
@@ -133,13 +134,16 @@ public class RobotContainer {
     }));
 
     // D-Pad Down: Intake eject (reverse wheels)
-    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, false));
+    //TODO: Address
+    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
 
     // D-Pad Right: Hood up (stops at upper hardware limit switch)
-    driverXbox.povRight().whileTrue(new InstantCommand(() -> hoodSubsystem.moveUp()));
+    //TODO: Address
+    driverXbox.povRight().whileTrue(new InstantCommand(() -> hoodSubsystem.runUP(HoodConstants.HOOD_SPEED))); //TODO: dunno if this speed is right
 
     // D-Pad Left: Hood down (stops at lower hardware limit switch)
-    driverXbox.povLeft().whileTrue(new InstantCommand(() -> hoodSubsystem.moveDown()));
+    //TODO: Address
+    driverXbox.povLeft().whileTrue(new InstantCommand(() -> hoodSubsystem.runDOWN(HoodConstants.HOOD_SPEED)));
 
     // Back (small left button): Slow mode (~35% speed) + LEDs blue
     driverXbox.back().onTrue(new InstantCommand(() -> {
