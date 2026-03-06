@@ -18,7 +18,6 @@ public class IntakeSubsystem extends SubsystemBase {
   private double kI;
   private double kD;
 
-
   public IntakeSubsystem() {
     intakeMotor =
         new SparkFlex(
@@ -75,25 +74,24 @@ public class IntakeSubsystem extends SubsystemBase {
   public double getIntakeEncoder() {
     return intakeEncoder.get();
   }
-  
+
   /**
    * Set the intake arm to a target position using simple P control
+   *
    * @param position Target position in encoder units
    */
   // public void setPosition(double position) {
   //   targetPosition = position;
   //   //TODO:Address
-    
+
   //   double currentPosition = intakeEncoder.getDistance();
   //   double error = targetPosition - currentPosition;
-    
+
   //   // Simple P control - adjust speed based on error
   //   double output = error * kP;
   //   output = Math.max(-0.5, Math.min(0.5, output)); // Clamp to max 50% speed
-    
+
   //   // Run both motors in opposite directions for linear actuation
   //   intakeMotorL.set(output);
   //   intakeMotorR.set(-output);
-  }
-
-
+}

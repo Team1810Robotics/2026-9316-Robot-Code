@@ -1,78 +1,81 @@
 package frc.robot.subsystems.vision;
 
 // DriverStation not used in this subsystem
+import dev.doglog.DogLog;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
-import frc.robot.subsystems.led.LEDSubsystem;
 
-import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
-
- 
 /**
- * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting
- * the appropriate alliance botpose entries (wpiblue / wpired) based on DriverStation.
+ * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting the appropriate
+ * alliance botpose entries (wpiblue / wpired) based on DriverStation.
  *
- * Includes a small runtime validator to log raw Limelight arrays and converted poses
- * for on-robot verification.
+ * <p>Includes a small runtime validator to log raw Limelight arrays and converted poses for
+ * on-robot verification.
  */
 public class VisionSubsystem extends SubsystemBase {
-    private final String limelightName;
+  private final String limelightName;
 
-    private final CommandSwerveDrivetrain drivetrain;
+  private final CommandSwerveDrivetrain drivetrain;
 
+  public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
+    this.limelightName = name;
+    this.drivetrain = drivetrain;
 
-    public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
-        this.limelightName = name;
-        this.drivetrain = drivetrain;
+    LimelightHelpers.setPipelineIndex(limelightName, 0);
+    LimelightHelpers.SetIMUAssistAlpha(limelightName, .001);
+  }
 
-        LimelightHelpers.setPipelineIndex(limelightName, 0);
-        LimelightHelpers.SetIMUAssistAlpha(limelightName, .001);
+  @Override
+  public void periodic() {
+    if (DriverStation.isDisabled()) {
+      LimelightHelpers.SetIMUMode(limelightName, 1);
+    } else {
+      LimelightHelpers.SetIMUMode(limelightName, 4);
     }
 
+    LimelightHelpers.SetRobotOrientation(
+        limelightName,
+        drivetrain.getState().Pose.getRotation().getDegrees(),
+        drivetrain.getState().Speeds.omegaRadiansPerSecond,
+        0,
+        0,
+        0,
+        0);
 
-    @Override
-    public void periodic() { 
-        if (DriverStation.isDisabled()) {
-            LimelightHelpers.SetIMUMode(limelightName, 1);
-        } else {
-            LimelightHelpers.SetIMUMode(limelightName, 4);
-        }
+    if (!targetValid()) {
+      DogLog.log("Vision/BotPose", new Pose2d());
 
-        LimelightHelpers.SetRobotOrientation(limelightName, drivetrain.getState().Pose.getRotation().getDegrees(), drivetrain.getState().Speeds.omegaRadiansPerSecond, 0, 0, 0, 0);
-
-        if (!targetValid()) {
-            DogLog.log("Vision/BotPose", new Pose2d());
-            
-            return;
-        }
-            
-        PoseEstimate botPoseMT2 = getBotPoseMT2();
-
-        drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
-
-        DogLog.log("Vision/BotPose", getBotPoseMT2().pose);
+      return;
     }
 
-    //gets the april tag ID
-    /** @return AprilTag / fiducial ID (tid) */
-    public int getTargetID() {
-        return (int) LimelightHelpers.getFiducialID(limelightName);
-    }
+    PoseEstimate botPoseMT2 = getBotPoseMT2();
 
-    public boolean targetValid() {
-        return LimelightHelpers.getTV(limelightName);
-    }
+    drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
-    public PoseEstimate getBotPoseMT1() {
-        return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
-    }
+    DogLog.log("Vision/BotPose", getBotPoseMT2().pose);
+  }
 
-    public PoseEstimate getBotPoseMT2() {
-        return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-    }
+  // gets the april tag ID
+  /**
+   * @return AprilTag / fiducial ID (tid)
+   */
+  public int getTargetID() {
+    return (int) LimelightHelpers.getFiducialID(limelightName);
+  }
 
+  public boolean targetValid() {
+    return LimelightHelpers.getTV(limelightName);
+  }
+
+  public PoseEstimate getBotPoseMT1() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+  }
+
+  public PoseEstimate getBotPoseMT2() {
+    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  }
 }

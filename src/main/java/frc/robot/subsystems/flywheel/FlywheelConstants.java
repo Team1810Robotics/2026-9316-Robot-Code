@@ -6,5 +6,6 @@ public final class FlywheelConstants {
 
   public static final int FlywheelBeamBreak = 5;
 
-    //Ben, a message for when you return: https://drive.google.com/file/d/1Vtd1qg0rjIUbH5wNlo6q7Ic0yKvxqvpo/view?usp=drive_link
+  // Ben, a message for when you return:
+  // https://drive.google.com/file/d/1Vtd1qg0rjIUbH5wNlo6q7Ic0yKvxqvpo/view?usp=drive_link
 }

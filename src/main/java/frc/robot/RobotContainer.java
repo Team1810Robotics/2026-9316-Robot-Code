@@ -5,21 +5,17 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import com.pathplanner.lib.auto.NamedCommands;
+
+import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import com.ctre.phoenix6.signals.RGBWColor;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
-import frc.robot.commands.LEDs;
 import frc.robot.commands.VisionLock;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -27,10 +23,10 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import frc.robot.subsystems.intake.IntakeConstants;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -42,7 +38,8 @@ public class RobotContainer {
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   // VisionSubsystem requires limelight name and drivetrain
-  private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", TunerConstants.createDrivetrain());
+  private final VisionSubsystem visionSubsystem =
+      new VisionSubsystem("limelight", TunerConstants.createDrivetrain());
 
   // Speed modes
   private double MaxSpeed =
@@ -75,14 +72,14 @@ public class RobotContainer {
   public RobotContainer() {
     // Initialize LED subsystem
     LEDSubsystem.StartLEDSubsystem();
-    
+
     configureBindings();
   }
 
   private void configureBindings() {
     // Note that X is defined as forward according to WPILib convention,
     // and Y is defined as to the left according to WPILib convention.
-    
+
     // Default drivetrain command - field centric drive
     // Uses left stick for translation, right stick X for rotation
     drivetrain.setDefaultCommand(
@@ -101,61 +98,91 @@ public class RobotContainer {
     driverXbox.rightBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // X (hold): Vision lock - PID rotation onto AprilTag, driver keeps translation
-    driverXbox.x().whileTrue(new VisionLock(
-        drivetrain,
-        visionSubsystem,
-        () -> -driverXbox.getLeftY() * MaxSpeed,
-        () -> -driverXbox.getLeftX() * MaxSpeed,
-        MaxSpeed,
-        MaxAngularRate));
+    driverXbox
+        .x()
+        .whileTrue(
+            new VisionLock(
+                drivetrain,
+                visionSubsystem,
+                () -> -driverXbox.getLeftY() * MaxSpeed,
+                () -> -driverXbox.getLeftX() * MaxSpeed,
+                MaxSpeed,
+                MaxAngularRate));
 
     // B: Deploy intake out (arm to OUT_POSITION)
-    driverXbox.b().onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+    driverXbox
+        .b()
+        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
-    driverXbox.a().onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
+    driverXbox
+        .a()
+        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
 
     // Left Trigger (hold): Intake IN + LEDs orange
     // Note: Left trigger value ranges from 0 to 1
     Trigger leftTrigger = driverXbox.leftTrigger(0.5);
-    //TODO: this needs to be addressed
-    //leftTrigger.whileTrue(new Intake(intakeSubsystem, 1, false));
-    leftTrigger.onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
+    // TODO: this needs to be addressed
+    // leftTrigger.whileTrue(new Intake(intakeSubsystem, 1, false));
+    leftTrigger.onTrue(
+        new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
 
     // Right Trigger (hold): Full shoot sequence
     // flywheel + white rollers + wait + full indexer
     Trigger rightTrigger = driverXbox.rightTrigger(0.5);
     rightTrigger.whileTrue(new Flywheel());
-    rightTrigger.onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
-    rightTrigger.onFalse(new InstantCommand(() -> {
-      // On release: stop flywheel, stop indexer, LEDs green
-      flywheelSubsystem.stopThrowing();
-      LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
-    }));
+    rightTrigger.onTrue(
+        new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(255, 128, 0, 0), false)));
+    rightTrigger.onFalse(
+        new InstantCommand(
+            () -> {
+              // On release: stop flywheel, stop indexer, LEDs green
+              flywheelSubsystem.stopThrowing();
+              LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
+            }));
 
     // D-Pad Down: Intake eject (reverse wheels)
-    //TODO: Address
     driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
 
+    // D-Pad Up: Intake 
+    driverXbox.povUp().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
+
+
     // D-Pad Right: Hood up (stops at upper hardware limit switch)
-    //TODO: Address
-    driverXbox.povRight().whileTrue(new InstantCommand(() -> hoodSubsystem.runUP(HoodConstants.HOOD_SPEED))); //TODO: dunno if this speed is right
+    // TODO: Address
+    driverXbox
+        .povRight()
+        .whileTrue(
+            new InstantCommand(
+                () ->
+                    hoodSubsystem.runUP(
+                        HoodConstants.HOOD_SPEED))); // TODO: dunno if this speed is right
 
     // D-Pad Left: Hood down (stops at lower hardware limit switch)
-    //TODO: Address
-    driverXbox.povLeft().whileTrue(new InstantCommand(() -> hoodSubsystem.runDOWN(HoodConstants.HOOD_SPEED)));
+    // TODO: Address
+    driverXbox
+        .povLeft()
+        .whileTrue(new InstantCommand(() -> hoodSubsystem.runDOWN(HoodConstants.HOOD_SPEED)));
 
     // Back (small left button): Slow mode (~35% speed) + LEDs blue
-    driverXbox.back().onTrue(new InstantCommand(() -> {
-      MaxSpeed = slowModeSpeed;
-      LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 255, 0), false);
-    }));
+    driverXbox
+        .back()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  MaxSpeed = slowModeSpeed;
+                  LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 255, 0), false);
+                }));
 
     // Start (small right button): Fast mode (full speed) + LEDs green
-    driverXbox.start().onTrue(new InstantCommand(() -> {
-      MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-      LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
-    }));
+    driverXbox
+        .start()
+        .onTrue(
+            new InstantCommand(
+                () -> {
+                  MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+                  LEDSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false);
+                }));
 
     // Y: Climb command (for testing/sysid)
     driverXbox.y().whileTrue(ClimbCommand);
@@ -174,7 +201,10 @@ public class RobotContainer {
     manipulatorXbox.leftTrigger(0.5).whileTrue(new InstantCommand(() -> climbSubsystem.Retract()));
 
     // B: Cycle LED animation
-    manipulatorXbox.b().onTrue(new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 0, 0), true)));
+    manipulatorXbox
+        .b()
+        .onTrue(
+            new InstantCommand(() -> LEDSubsystem.setLEDColor(new RGBWColor(0, 0, 0, 0), true)));
   }
 
   public Command getAutonomousCommand() {
