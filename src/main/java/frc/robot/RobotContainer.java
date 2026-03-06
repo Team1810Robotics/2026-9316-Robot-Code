@@ -81,7 +81,7 @@ public class RobotContainer {
 
     NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, FlywheelConstants.SHOOTING_VELOCITY));
-    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, FlywheelConstants.STOPED_VELOCITY));
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, FlywheelConstants.STOPPED_VELOCITY));
     NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
     NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
     NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
