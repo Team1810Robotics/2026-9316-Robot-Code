@@ -6,6 +6,8 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.lang.annotation.Target;
+
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -23,6 +25,7 @@ import frc.robot.commands.Intake.RunType;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.flywheel.FlywheelConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -77,8 +80,8 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
 
     NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
-    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
-    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
+    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, FlywheelConstants.SHOOTING_VELOCITY));
+    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, FlywheelConstants.STOPED_VELOCITY));
     NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
     NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
     NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
