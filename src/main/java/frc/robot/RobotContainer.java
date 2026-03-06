@@ -38,7 +38,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem("", drivetrain);
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+ // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
@@ -76,7 +76,7 @@ public class RobotContainer {
 
     // autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
+   // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand(
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
