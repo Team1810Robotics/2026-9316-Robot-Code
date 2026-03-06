@@ -3,9 +3,9 @@ package frc.robot.subsystems.intake;
 public class IntakeConstants {
   public static int INTAKE_MOTOR = 12;
   // main spinny motor for intake
-  public static int INTAKE_MOTOR_L = 11;
+  public static int INTAKE_MOTOR_L = 10;
   // left motor for raising and lowering the intake
-  public static int INTAKE_MOTOR_R = 9;
+  public static int INTAKE_MOTOR_R = 11;
   // right motor for raising and lowering the intake
   public static double kP = 0.1;
   public static double kI = 0.0;
