@@ -90,7 +90,9 @@ public class RobotContainer {
         .a()
         .onTrue(
             new Intake(
-                intakeSubsystem, 1,RunType.Intake)); // Example: Run intake at full speed when A is pressed
+                intakeSubsystem,
+                1,
+                RunType.Intake)); // Example: Run intake at full speed when A is pressed
     driverXbox.y().onTrue(new Flywheel(flywheelSubsystem, 200));
     driverXbox
         .x()
