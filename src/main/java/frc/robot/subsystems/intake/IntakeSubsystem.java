@@ -14,9 +14,6 @@ public class IntakeSubsystem extends SubsystemBase {
   public double targetPosition;
   private final PIDController intakePIDController;
   private double currentSetPoint = 0;
-  private double kP;
-  private double kI;
-  private double kD;
 
 
   public IntakeSubsystem() {
