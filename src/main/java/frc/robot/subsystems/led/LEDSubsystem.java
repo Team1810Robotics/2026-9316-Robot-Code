@@ -21,14 +21,16 @@ import com.ctre.phoenix6.signals.StripTypeValue;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+// You can actually make up to 8 animation slots on this, but for the sake of simplicty, and because
+// we dont need more, we are only using 1
+
 public class LEDSubsystem extends SubsystemBase {
 
   private CANdle m_candle;
 
   public LEDSubsystem() {
-    m_candle = new CANdle(35);
+    m_candle = new CANdle(LEDConstants.CANDLE_ID);
     configureCANdle();
-
     // Slot 0 chooser
     m_anim0Chooser.setDefaultOption("None", AnimationType.None);
     m_anim0Chooser.addOption("ColorFlow", AnimationType.ColorFlow);
@@ -36,20 +38,14 @@ public class LEDSubsystem extends SubsystemBase {
     m_anim0Chooser.addOption("Twinkle", AnimationType.Twinkle);
     m_anim0Chooser.addOption("TwinkleOff", AnimationType.TwinkleOff);
     m_anim0Chooser.addOption("Fire", AnimationType.Fire);
+    m_anim0Chooser.setDefaultOption("None", AnimationType.None);
+    m_anim0Chooser.addOption("Larson", AnimationType.Larson);
+    m_anim0Chooser.addOption("RgbFade", AnimationType.RgbFade);
+    m_anim0Chooser.addOption("SingleFade", AnimationType.SingleFade);
+    m_anim0Chooser.addOption("Strobe", AnimationType.Strobe);
     m_anim0Chooser.addOption("Empty", AnimationType.None);
-
-    // Slot 1 chooser
-    m_anim1Chooser.setDefaultOption("None", AnimationType.None);
-    m_anim1Chooser.addOption("Larson", AnimationType.Larson);
-    m_anim1Chooser.addOption("RgbFade", AnimationType.RgbFade);
-    m_anim1Chooser.addOption("SingleFade", AnimationType.SingleFade);
-    m_anim1Chooser.addOption("Strobe", AnimationType.Strobe);
-    m_anim1Chooser.addOption("Fire", AnimationType.Fire);
-    m_anim1Chooser.addOption("Empty", AnimationType.None);
-
     // Publish to dashboard so it exists and can be selected
     edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("LED Anim Slot 0", m_anim0Chooser);
-    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("LED Anim Slot 1", m_anim1Chooser);
   }
 
   public static RGBWColor LEDColor =
@@ -59,13 +55,13 @@ public class LEDSubsystem extends SubsystemBase {
     CANdleConfiguration config = new CANdleConfiguration();
 
     config.LED.BrightnessScalar = frc.robot.subsystems.led.LEDConstants.LED_Brightness;
-    config.LED.StripType = StripTypeValue.GRB;
+    config.LED.StripType =
+        StripTypeValue.GRB; // I don't know who's bright idea ir was to make it GRB im sorry brotato
     config.LED.LossOfSignalBehavior = LossOfSignalBehaviorValue.DisableLEDs;
 
     config.CANdleFeatures.StatusLedWhenActive = StatusLedWhenActiveValue.Enabled;
 
     m_candle.setControl(new EmptyAnimation(0));
-    m_candle.setControl(new EmptyAnimation(1));
 
     m_candle.getConfigurator().apply(config);
   }
@@ -77,18 +73,12 @@ public class LEDSubsystem extends SubsystemBase {
 
     RGBWColor rgbwColor = new RGBWColor(g, r, b);
 
-    m_candle.setControl(new SolidColor(1, LEDConstants.NUM_LEDS).withColor(rgbwColor));
+    m_candle.setControl(new SolidColor(0, LEDConstants.NUM_LEDS).withColor(rgbwColor));
   }
 
   public void initLEDColor() {
     setSolidColor(new int[] {0, 255, 0});
   }
-
-  // private static final RGBWColor kViolet = RGBWColor.fromHSV(Degrees.of(270), 0.9, 0.8);
-  // private static final RGBWColor kRed = RGBWColor.fromHex("#D9000000").orElseThrow();
-
-  // public static RGBWColor LEDColor = new RGBWColor(255, 0, 0, 0); //This Defaults to red and can
-  // be changed through a command
 
   private enum AnimationType {
     None,
@@ -108,14 +98,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   private static final int kSlot0StartIdx = 0;
   private static final int kSlot0EndIdx =
-      LEDConstants.NUM_LEDS / 2; // Slot 0 controls the first half of the LEDs
-
-  private static final int kSlot1StartIdx =
-      LEDConstants.NUM_LEDS / 2 + 1; // Slot 1 controls the second half of the LEDs
-  private static final int kSlot1EndIdx = LEDConstants.NUM_LEDS; // 67 OH MY GOD 67!!!!!! SO FUNNY
+      LEDConstants.NUM_LEDS; // Slot 0 controls the first half of the LEDs
 
   private AnimationType m_anim0State = AnimationType.None;
-  private AnimationType m_anim1State = AnimationType.None;
 
   private static AnimationType animation = AnimationType.None;
 
@@ -124,16 +109,12 @@ public class LEDSubsystem extends SubsystemBase {
 
   private final SendableChooser<AnimationType> m_anim0Chooser =
       new SendableChooser<AnimationType>();
-  private final SendableChooser<AnimationType> m_anim1Chooser =
-      new SendableChooser<AnimationType>();
 
-  private static AnimationType chosenAnim1 = AnimationType.None;
   private static AnimationType chosenAnim0 = AnimationType.None;
 
   @Override
   public void periodic() {
     /* if the selection for slot 0 changes, change animations */
-
     final var anim0Selection = chosenAnim0;
     if (m_anim0State != anim0Selection) {
       m_anim0State = anim0Selection;
@@ -161,57 +142,31 @@ public class LEDSubsystem extends SubsystemBase {
         case Fire:
           m_candle.setControl(new FireAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0));
           break;
-        case None:
-          System.out.println("None animation selected");
-          m_candle.setControl(new EmptyAnimation(0));
-          break;
-      }
-    }
-
-    /* if the selection for slot 1 changes, change animations */
-    final var anim1Selection = chosenAnim1;
-    if (m_anim1State != anim1Selection) {
-      m_anim1State = anim1Selection;
-
-      switch (m_anim1State) {
-        default:
-          strLEDAnimation = m_anim1State.toString() + ", " + m_anim0State.toString();
         case Larson:
           m_candle.setControl(
-              new LarsonAnimation(kSlot1StartIdx, kSlot1EndIdx).withSlot(1).withColor(LEDColor));
+              new LarsonAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0).withColor(LEDColor));
           break;
         case RgbFade:
-          m_candle.setControl(new RgbFadeAnimation(kSlot1StartIdx, kSlot1EndIdx).withSlot(1));
+          m_candle.setControl(new RgbFadeAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0));
           break;
         case SingleFade:
           m_candle.setControl(
-              new SingleFadeAnimation(kSlot1StartIdx, kSlot1EndIdx)
-                  .withSlot(1)
+              new SingleFadeAnimation(kSlot0StartIdx, kSlot0EndIdx)
+                  .withSlot(0)
                   .withColor(LEDColor));
           break;
         case Strobe:
           m_candle.setControl(
-              new StrobeAnimation(kSlot1StartIdx, kSlot1EndIdx).withSlot(1).withColor(LEDColor));
-          break;
-        case Fire:
-          /* direction can be reversed by either the Direction parameter or switching start and end */
-          m_candle.setControl(
-              new FireAnimation(kSlot1StartIdx, kSlot1EndIdx)
-                  .withSlot(1)
-                  .withDirection(AnimationDirectionValue.Backward)
-                  .withCooling(0.4)
-                  .withSparking(0.5));
+              new StrobeAnimation(kSlot0StartIdx, kSlot0EndIdx).withSlot(0).withColor(LEDColor));
           break;
         case None:
-          System.out.println("None animation selected");
-          m_candle.setControl(new EmptyAnimation(1));
+          m_candle.setControl(new EmptyAnimation(0));
           break;
       }
     }
   }
 
   public void setLEDColor(RGBWColor color, boolean Cycle) {
-    System.out.println(color);
     if (Cycle) {
       ColorCycle += 1;
       if (ColorCycle > 7) {
@@ -270,11 +225,12 @@ public class LEDSubsystem extends SubsystemBase {
       }
     }
     LEDColor = color;
-    m_candle.setControl(new SolidColor(255, 0).withColor(LEDColor));
+    m_candle.setControl(new SolidColor(0, LEDConstants.NUM_LEDS).withColor(LEDColor));
   }
 
   public void setLEDAnimation(String animationString, boolean Cycle) {
     System.out.println(animationString);
+    animation = null;
     if (Cycle) {
       AnimationCycle += 1;
       if (AnimationCycle > 10) {
@@ -300,49 +256,36 @@ public class LEDSubsystem extends SubsystemBase {
         animation = AnimationType.Strobe;
       } else if (AnimationCycle == 10) {
         animation = AnimationType.None;
-      } else {
-        if (animationString == "None") {
-          animation = AnimationType.None;
-        } else if (animationString == "ColorFlow") {
-          animation = AnimationType.ColorFlow;
-        } else if (animationString == "Rainbow") {
-          animation = AnimationType.Rainbow;
-        } else if (animationString == "Twinkle") {
-          animation = AnimationType.Twinkle;
-        } else if (animationString == "TwinkleOff") {
-          animation = AnimationType.TwinkleOff;
-        } else if (animationString == "Fire") {
-          animation = AnimationType.Fire;
-        } else if (animationString == "Larson") {
-          animation = AnimationType.Larson;
-        } else if (animationString == "RgbFade") {
-          animation = AnimationType.RgbFade;
-        } else if (animationString == "SingleFade") {
-          animation = AnimationType.SingleFade;
-        } else if (animationString == "Strobe") {
-          animation = AnimationType.Strobe;
-        }
+      }
+    } else {
+      if (animationString.equals("None")) {
+        animation = AnimationType.None;
+      } else if (animationString.equals("ColorFlow")) {
+        animation = AnimationType.ColorFlow;
+      } else if (animationString.equals("Rainbow")) {
+        animation = AnimationType.Rainbow;
+      } else if (animationString.equals("Twinkle")) {
+        animation = AnimationType.Twinkle;
+      } else if (animationString.equals("TwinkleOff")) {
+        animation = AnimationType.TwinkleOff;
+      } else if (animationString.equals("Fire")) {
+        animation = AnimationType.Fire;
+      } else if (animationString.equals("Larson")) {
+        animation = AnimationType.Larson;
+      } else if (animationString.equals("RgbFade")) {
+        animation = AnimationType.RgbFade;
+      } else if (animationString.equals("SingleFade")) {
+        animation = AnimationType.SingleFade;
+      } else if (animationString.equals("Strobe")) {
+        animation = AnimationType.Strobe;
       }
     }
-    System.out.println(animation);
-    if (animation == AnimationType.ColorFlow
-        || animation == AnimationType.Rainbow
-        || animation == AnimationType.Twinkle
-        || animation == AnimationType.TwinkleOff
-        || animation == AnimationType.Fire) {
+
+    if (animation != null) {
       chosenAnim0 = animation;
-    } else if (animation == AnimationType.Larson
-        || animation == AnimationType.RgbFade
-        || animation == AnimationType.SingleFade
-        || animation == AnimationType.Strobe) {
-      chosenAnim1 = animation;
     } else {
-      System.out.println("No animation selected");
       chosenAnim0 = AnimationType.None;
-      chosenAnim1 = AnimationType.None;
-    } // I made two different animation values just to piss off who ever is working with this (Good
-    // luck its your problem now, also Sam Bowling made it GRB instead of RGB so have fun with
-    // that)
+    }
   }
 
   public void StopLEDSubsystem() {
@@ -350,7 +293,12 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public String getLEDStats() {
-    return LEDSubsystem.strLEDAnimation + ", " + LEDSubsystem.LEDColor;
+    System.out.println(
+        "LED Animation: " + LEDSubsystem.strLEDAnimation + ", LED Color: " + LEDSubsystem.LEDColor);
+    return "LED Animation: "
+        + LEDSubsystem.strLEDAnimation
+        + ", LED Color: "
+        + LEDSubsystem.LEDColor;
   }
 }
 
