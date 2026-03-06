@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Climb;
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
-import frc.robot.commands.Indexer;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Intake.RunType;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -82,7 +81,8 @@ public class RobotContainer {
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
+    NamedCommands.registerCommand(
+        "StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake)); // Fix speeds
     NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
   }
 
@@ -128,7 +128,6 @@ public class RobotContainer {
         .a()
         .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
     // D-Pad Down: Intake eject (reverse wheels)
-    // TODO: Address
     driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
     driverXbox
         .x()
