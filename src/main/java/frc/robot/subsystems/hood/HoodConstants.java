@@ -25,7 +25,7 @@ public final class HoodConstants {
 
   // Placeholder preset positions in continuous hood-position units
   // TODO: replace with real measured values from the robot
-  public static final double HOOD_CLOSE_POSITION = 0.35;
-  public static final double HOOD_MID_POSITION = 1.20;
-  public static final double HOOD_FAR_POSITION = 2.10;
+  public static final double HOOD_CLOSE_POSITION = 0.4344005858600146;
+  public static final double HOOD_MID_POSITION = 0.4344005858600146;
+  public static final double HOOD_FAR_POSITION = 0.4344005858600146;
 }

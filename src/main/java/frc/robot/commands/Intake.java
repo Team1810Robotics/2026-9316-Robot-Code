@@ -51,23 +51,23 @@ public class Intake extends Command {
       mode = LevelMode.Down;
     }
 
-    if (mode == LevelMode.Down) {
-      while (intakeLevelDegrees >= 0) {
-        intakeSubsystem.runDOWN(levelSpeed);
-      }
-      mode = LevelMode.Immobile;
-      // tweak number
-    } else if (mode == LevelMode.Up) {
-      while (intakeLevelDegrees <= 67) {
-        intakeSubsystem.runUP(levelSpeed);
-      }
-      mode = LevelMode.Immobile;
-      // tweak number
-    }
+    // if (mode == LevelMode.Down) {
+    //   while (intakeLevelDegrees >= 0) {
+    //     intakeSubsystem.runDOWN(levelSpeed);
+    //   }
+    //   mode = LevelMode.Immobile;
+    //   // tweak number
+    // } else if (mode == LevelMode.Up) {
+    //   while (intakeLevelDegrees <= 67) {
+    //     intakeSubsystem.runUP(levelSpeed);
+    //   }
+    //   mode = LevelMode.Immobile;
+    //   // tweak number
+    // }
 
-    if (buttonSpeed != 0) {
-      intakeSubsystem.run(buttonSpeed);
-    }
+    // if (buttonSpeed != 0) {
+    //   intakeSubsystem.run(buttonSpeed);
+    // }
 
     if (PIDSetpoint != 0) {
       intakeSubsystem.setPoint(PIDSetpoint);

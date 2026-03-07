@@ -74,13 +74,18 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public void runUp(double speed) {
-    intakeMotorL.set(Math.abs(speed)); // Ensure the speed is positive for running up
-    intakeMotorR.set(-Math.abs(speed));
+    if (intakeEncoder.isConnected() || intakeEncoder.get() <= IntakeConstants.OUT_POSITION) {
+        intakeMotorL.set(-Math.abs(speed)); // Ensure the speed is positive for running up
+        intakeMotorR.set(Math.abs(speed));
+    }
+    
   }
 
   public void runDown(double speed) {
+    if (intakeEncoder.isConnected() || intakeEncoder.get() >= IntakeConstants.IN_POSITION) {
     intakeMotorL.set(Math.abs(speed)); // Ensure the speed is positive for running down
     intakeMotorR.set(-Math.abs(speed));
+    }
   }
 
   public double getIntakeEncoder() {

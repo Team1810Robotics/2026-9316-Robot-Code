@@ -112,7 +112,7 @@ public class RobotContainer {
 
     driverXbox.a().whileTrue(
         new StartEndCommand(
-            () -> intakeSubsystem.runUp(0.20), // manual pivot jog up at 20% speed
+            () -> intakeSubsystem.runUp(-0.20), // manual pivot jog up at 20% speed
             () -> intakeSubsystem.stopIntakeLevel(),
             intakeSubsystem));
 
@@ -156,6 +156,7 @@ public class RobotContainer {
             },
             () -> indexerSubsystem.stopLower(),
             indexerSubsystem));
+
 
     gamepadManipulator.b().whileTrue(
         new StartEndCommand(
@@ -231,14 +232,14 @@ public class RobotContainer {
             () -> hoodSubsystem.stopManualJog(), // stop manual jog on button release
             hoodSubsystem));
 
-    gamepadManipulator.x().onTrue(
-        new InstantCommand(() -> hoodSubsystem.goToCloseShot(), hoodSubsystem));
+    // gamepadManipulator.x().onTrue(
+    //     new InstantCommand(() -> hoodSubsystem.goToCloseShot(), hoodSubsystem));
         
-    gamepadManipulator.y().onTrue(
-        new InstantCommand(() -> hoodSubsystem.goToMidShot(), hoodSubsystem));
+    // gamepadManipulator.y().onTrue(
+    //     new InstantCommand(() -> hoodSubsystem.goToMidShot(), hoodSubsystem));
 
-    gamepadManipulator.leftBumper().onTrue(
-        new InstantCommand(() -> hoodSubsystem.goToFarShot(), hoodSubsystem));
+    // gamepadManipulator.leftBumper().onTrue(
+    //     new InstantCommand(() -> hoodSubsystem.goToFarShot(), hoodSubsystem));
 
     gamepadManipulator.rightTrigger().onTrue(
     new InstantCommand(() -> flywheelSubsystem.startFlywheel(), flywheelSubsystem));

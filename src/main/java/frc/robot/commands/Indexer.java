@@ -12,12 +12,13 @@ public class Indexer extends Command {
 
   @Override
   public void initialize() {
-    indexer.RunIndexer();
+    indexer.runBothForward();
   }
+
 
   @Override
   public void end(boolean interrupted) {
-    indexer.StopIndexer();
+    indexer.stopAll();
   }
 
   @Override

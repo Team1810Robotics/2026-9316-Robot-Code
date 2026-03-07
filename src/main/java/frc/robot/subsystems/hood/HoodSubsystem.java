@@ -78,13 +78,11 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void startManualJogUp(double speed) {
-    manualMode = true;
-    manualOutput = Math.abs(speed);
+    hoodMotor.set(speed);
   }
 
   public void startManualJogDown(double speed) {
-    manualMode = true;
-    manualOutput = -Math.abs(speed);
+    hoodMotor.set(-speed);
   }
 
   public void stopManualJog() {
@@ -109,68 +107,68 @@ public class HoodSubsystem extends SubsystemBase {
 
  // detect wraparound so one-turn encoder becomes multi-turn-ish
   private void updateHoodPosition() {
-    double currentAbsoluteReading = hoodEncoder.get();
+    // double currentAbsoluteReading = hoodEncoder.get();
 
-    if ((lastAbsoluteReading > 0.8) && (currentAbsoluteReading < 0.2)) {
-      turnCount++;
-    } else if ((lastAbsoluteReading < 0.2) && (currentAbsoluteReading > 0.8)) {
-      turnCount--;
-    }
+    // if ((lastAbsoluteReading > 0.8) && (currentAbsoluteReading < 0.2)) {
+    //   turnCount++;
+    // } else if ((lastAbsoluteReading < 0.2) && (currentAbsoluteReading > 0.8)) {
+    //   turnCount--;
+    // }
 
-    hoodPosition = turnCount + currentAbsoluteReading;
-    lastAbsoluteReading = currentAbsoluteReading;
+    // hoodPosition = turnCount + currentAbsoluteReading;
+    // lastAbsoluteReading = currentAbsoluteReading;
   }
 
   // PRESET POSITIONS
 
-  public void setHoodSetPoint(double setpoint) {
-    currentSetPoint = setpoint;
-    manualMode = false;
-  }
+  // public void setHoodSetPoint(double setpoint) {
+  //   currentSetPoint = setpoint;
+  //   manualMode = false;
+  // }
 
-  public void goToCloseShot() {
-    setHoodSetPoint(HoodConstants.HOOD_CLOSE_POSITION);
-  }
+  // public void goToCloseShot() {
+  //   setHoodSetPoint(HoodConstants.HOOD_CLOSE_POSITION);
+  // }
 
-  public void goToMidShot() {
-    setHoodSetPoint(HoodConstants.HOOD_MID_POSITION);
-  }
+  // public void goToMidShot() {
+  //   setHoodSetPoint(HoodConstants.HOOD_MID_POSITION);
+  // }
 
-  public void goToFarShot() {
-    setHoodSetPoint(HoodConstants.HOOD_FAR_POSITION);
-  }
+  // public void goToFarShot() {
+  //   setHoodSetPoint(HoodConstants.HOOD_FAR_POSITION);
+  // }
 
-  public boolean isAtSetPoint() {
-    return hoodPIDController.atSetpoint();
-  }
+  // public boolean isAtSetPoint() {
+  //   return hoodPIDController.atSetpoint();
+  // }
 
-  private void runToSetPoint() {
-    double output = hoodPIDController.calculate(hoodPosition, currentSetPoint);
+  // private void runToSetPoint() {
+  //   double output = hoodPIDController.calculate(hoodPosition, currentSetPoint);
 
-    output =
-        Math.max(
-            -HoodConstants.MAX_HOOD_OUTPUT,
-            Math.min(HoodConstants.MAX_HOOD_OUTPUT, output));
+  //   output =
+  //       Math.max(
+  //           -HoodConstants.MAX_HOOD_OUTPUT,
+  //           Math.min(HoodConstants.MAX_HOOD_OUTPUT, output));
 
-    hoodMotor.set(output);
-  }
+  //   hoodMotor.set(output);
+  // }
 
   @Override
   public void periodic() {
-    updateHoodPosition();
+    // updateHoodPosition();
 
-    //manual jog overrides PID, otherwise PID runs
-    if (manualMode) {
-      hoodMotor.set(manualOutput);
-    } else {
-      runToSetPoint();
-    }
+    // //manual jog overrides PID, otherwise PID runs
+    // if (manualMode) {
+    //   hoodMotor.set(manualOutput);
+    // } else {
+    //   runToSetPoint();
+    // }
 
     //dashboard output for debugging and tuning
     SmartDashboard.putNumber("Hood Encoder Raw", getHoodEncoderRaw());
     SmartDashboard.putNumber("Hood Position", getHoodPosition());
     SmartDashboard.putNumber("Hood Setpoint", getCurrentSetPoint());
-    SmartDashboard.putBoolean("Hood At SetPoint", isAtSetPoint());
+    //SmartDashboard.putBoolean("Hood At SetPoint", isAtSetPoint());
     SmartDashboard.putBoolean("Hood Encoder Connected", hoodEncoder.isConnected());
     SmartDashboard.putNumber("Hood Turn Count", turnCount);
   }
