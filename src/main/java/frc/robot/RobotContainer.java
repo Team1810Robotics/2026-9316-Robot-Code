@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Intake.RunType;
 import frc.robot.commands.ManualHood;
