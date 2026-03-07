@@ -20,6 +20,9 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Intake;
 import frc.robot.commands.Intake.RunType;
+import frc.robot.commands.ManualHood;
+import frc.robot.commands.SetHoodPosition;
+import frc.robot.commands.ZeroHood;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
@@ -104,10 +107,10 @@ public class RobotContainer {
             ));
 
     // levels the intake up and down
-    gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+    //gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
     //TODO: no manipulator 
 
-    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
+    //driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
     driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
     driverXbox
@@ -119,6 +122,17 @@ public class RobotContainer {
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
     driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
+
+
+    //New Hood Commands:  TEST CAREFULLY
+    gamepadManipulator.leftBumper().whileTrue(new ManualHood(hoodSubsystem, () -> -0.15));       //Drop Hood
+    gamepadManipulator.rightBumper().whileTrue(new ManualHood(hoodSubsystem, () -> 0.15));       //Raise Hood
+
+    gamepadManipulator.a().onTrue(new ZeroHood(hoodSubsystem));                                   //Zero out position (at bottom - can change when we have limit switch)   
+    gamepadManipulator.povDown().onTrue(new SetHoodPosition(hoodSubsystem, 0.0));       //Bottom Position
+    gamepadManipulator.povLeft().onTrue(new SetHoodPosition(hoodSubsystem, 10.0));      //Position 1
+    gamepadManipulator.povUp().onTrue(new SetHoodPosition(hoodSubsystem, 20.0));        //Position 2
+    gamepadManipulator.povRight().onTrue(new SetHoodPosition(hoodSubsystem,     30.0)); //Position 3 
 
     // B: Deploy intake out (arm to OUT_POSITION)
     // driverXbox

@@ -18,7 +18,7 @@ import frc.robot.subsystems.hood.HoodSubsystem;
  */
 
 public class Hood extends Command {
-  private static HoodSubsystem hoodSubsystem;
+  private final HoodSubsystem hoodSubsystem;
   private double hoodSpeed;
   private double otherHoodSpeed;
   double hoodDegrees;
@@ -57,4 +57,7 @@ public class Hood extends Command {
 }
   else if (hoodSubsystem.hoodEncoder.get() < 0.1 && !hoodSubsystem.hoodEncoderWasHigh) {
     hoodSubsystem.hoodEncoderWasHigh = true;
+}
+
+  }
 }
