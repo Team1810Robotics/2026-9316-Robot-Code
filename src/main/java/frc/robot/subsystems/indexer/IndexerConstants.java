@@ -1,8 +1,8 @@
 package frc.robot.subsystems.indexer;
 
 public final class IndexerConstants {
-  public static final int INDEXER_1_MOTOR_ID = 0; // CAN ID for the indexer motor
-  public static final int INDEXER_2_MOTOR_ID = 1; // CAN ID for the second indexer motor
+  public static final int INDEXER_1_MOTOR_ID = 13; // CAN ID for the indexer motor
+  public static final int INDEXER_2_MOTOR_ID = 17; // CAN ID for the second indexer motor
   public static final double INDEXER_1_SPEED = 0.5; // Speed at which to run the indexer
   public static final double INDEXER_2_SPEED =
       0.5; // Speed at which to run the second indexer motor
