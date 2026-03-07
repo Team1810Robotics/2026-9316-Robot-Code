@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Intake extends Command {
   private IntakeSubsystem intakeSubsystem;
@@ -34,9 +35,9 @@ public class Intake extends Command {
     this.intakeSubsystem = intakeSubsystem;
     addRequirements(intakeSubsystem);
     if (this.runType == RunType.UseManual) {
-      levelSpeed = SpeedOrSetPoint;
-    } else if (this.runType == RunType.Intake) {
       buttonSpeed = SpeedOrSetPoint;
+    } else if (this.runType == RunType.Intake) {
+      levelSpeed = SpeedOrSetPoint;
     } else if (this.runType == RunType.UsePID) {
       PIDSetpoint = SpeedOrSetPoint;
     }
@@ -44,6 +45,8 @@ public class Intake extends Command {
 
   @Override
   public void execute() {
+    SmartDashboard.putNumber("Intake Encoder Raw", intakeSubsystem.intakeEncoder.get());
+
     intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
     if (intakeLevelDegrees <= 0) {
       mode = LevelMode.Up;

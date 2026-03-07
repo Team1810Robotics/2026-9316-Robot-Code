@@ -105,6 +105,7 @@ public class RobotContainer {
 
     // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+    //TODO: no manipulator 
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
@@ -127,8 +128,10 @@ public class RobotContainer {
     // A: Retract intake in (arm to IN_POSITION)
     //driverXbox.a().onTrue(new InstantCommand(() -> IntakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
     //D-Pad Down: Intake eject (reverse wheels)
-    driverXbox.povDown().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
-    driverXbox.povUp().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
+    //driverXbox.leftTrigger().whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.UseManual));
+    //driverXbox.rightTrigger().whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.UseManual));
+    driverXbox.rightTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
+    driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
     driverXbox
         .x()
         .whileTrue(
@@ -162,19 +165,20 @@ public class RobotContainer {
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
     driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
 
-    driverXbox
-        .rightTrigger()
-        .onTrue(
-            ledSubsystem.runOnce(
-                () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false))); // Green
-    driverXbox
-        .leftTrigger()
-        .onTrue(
-            ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false))); // Rainbow
-    driverXbox
-        .povDown()
-        .onTrue(
-            ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false))); // None (off)
+    // driverXbox
+    //     .rightTrigger()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(
+    //             () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false))); // Green
+    // driverXbox
+    //     .leftTrigger()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false))); // Rainbow
+    // driverXbox
+    //     .povDown()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false))); // None (off)
+
   }
 
   public Command getAutonomousCommand() {
