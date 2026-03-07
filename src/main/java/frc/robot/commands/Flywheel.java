@@ -1,6 +1,5 @@
 package frc.robot.commands;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.flywheel.FlywheelConstants;
 // *import com.ctre.phoenix6.configs.TalonFXConfigurator;
@@ -15,7 +14,6 @@ public class Flywheel extends Command {
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
-    
 
     addRequirements(flywheelSubsystem);
   }

@@ -1,7 +1,5 @@
 package frc.robot.commands;
 
-import org.opencv.features2d.FlannBasedMatcher;
-
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.hood.HoodSubsystem;
 
@@ -51,10 +49,11 @@ public class Hood extends Command {
 
   @Override
   public void execute() {
-   if (hoodSubsystem.hoodEncoder.get() > 0.9 && hoodSubsystem.hoodEncoderWasHigh) {
-    hoodSubsystem.hoodEncoderWasHigh = false;
-    hoodSubsystem.hoodEncoderRotations++;
-}
-  else if (hoodSubsystem.hoodEncoder.get() < 0.1 && !hoodSubsystem.hoodEncoderWasHigh) {
-    hoodSubsystem.hoodEncoderWasHigh = true;
+    if (hoodSubsystem.hoodEncoder.get() > 0.9 && hoodSubsystem.hoodEncoderWasHigh) {
+      hoodSubsystem.hoodEncoderWasHigh = false;
+      hoodSubsystem.hoodEncoderRotations++;
+    } else if (hoodSubsystem.hoodEncoder.get() < 0.1 && !hoodSubsystem.hoodEncoderWasHigh) {
+      hoodSubsystem.hoodEncoderWasHigh = true;
+    }
+  }
 }

@@ -5,7 +5,6 @@ import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class IntakeSubsystem extends SubsystemBase {
   public SparkFlex intakeMotor;
@@ -20,13 +19,11 @@ public class IntakeSubsystem extends SubsystemBase {
   private double kD;
   private double encoderRead;
 
-  
-
   public IntakeSubsystem() {
     intakeMotor =
         new SparkFlex(
             IntakeConstants.INTAKE_MOTOR, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    //intakeMotor.set(0);
+    // intakeMotor.set(0);
     intakeMotorL =
         new SparkMax(
             IntakeConstants.INTAKE_MOTOR_L,
@@ -40,7 +37,8 @@ public class IntakeSubsystem extends SubsystemBase {
     intakePIDController =
         new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
 
-        edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("Intake Raw Encoder", intakeEncoder);
+    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData(
+        "Intake Raw Encoder", intakeEncoder);
   }
 
   public void run(double speed) {
@@ -58,7 +56,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
   }
 
-  public void TestingIntakeMotor(double speed){
+  public void TestingIntakeMotor(double speed) {
     intakeMotor.set(speed);
   }
 

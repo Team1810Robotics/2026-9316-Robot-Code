@@ -8,16 +8,17 @@ public class Indexer extends Command {
 
   public Indexer(IndexerSubsystem indexer) {
     this.indexer = indexer;
+    addRequirements(indexer);
   }
 
   @Override
   public void initialize() {
-    indexer.RunIndexer();
+    indexer.SetIndexEnabled(true);
   }
 
   @Override
   public void end(boolean interrupted) {
-    indexer.StopIndexer();
+    indexer.SetIndexEnabled(false);
   }
 
   @Override
