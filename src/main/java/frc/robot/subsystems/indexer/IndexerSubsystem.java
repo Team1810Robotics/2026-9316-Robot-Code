@@ -2,6 +2,8 @@ package frc.robot.subsystems.indexer;
 
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.led.LEDConstants;
@@ -9,9 +11,9 @@ import frc.robot.subsystems.led.LEDSubsystem;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexer_1_Motor =
-      new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, null); // White Roller
+      new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, MotorType.kBrushless); // White Roller
   private final SparkMax indexer_2_Motor =
-      new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, null); // Orange Wheels
+      new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless); // Orange Wheels
 
   private final DigitalInput Index_1_BeamBreak =
       new DigitalInput(

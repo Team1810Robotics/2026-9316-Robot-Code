@@ -15,17 +15,22 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+// --COMMANDS--
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Indexer;
+import frc.robot.commands.Intake;
+// --SUBSYTEM--
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -119,23 +124,23 @@ public class RobotContainer {
 
     driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
 
-    // B: Deploy intake out (arm to OUT_POSITION)
-    // driverXbox
-    //     .b()
-    //     .onTrue(new InstantCommand(() ->
-    // intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+    // X: Deploy intake out (arm to OUT_POSITION)
+    driverXbox
+        .x()
+        .onTrue(new InstantCommand(() ->
+    intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
-    // driverXbox.a().onTrue(new InstantCommand(() ->
-    // IntakeSubsystem.setPoint(IntakeConstants.IN_POSITION)));
+    driverXbox.b().onTrue(new Intake(intakeSubsystem, 0, Intake.RunType.MoveIntakeInOrOut));
     // D-Pad Down: Intake eject (reverse wheels)
-    // driverXbox.leftTrigger().whileTrue(new Intake(intakeSubsystem, -1,
-    // Intake.RunType.UseManual));
-    // driverXbox.rightTrigger().whileTrue(new Intake(intakeSubsystem, 1,
-    // Intake.RunType.UseManual));
+    driverXbox.leftTrigger().whileTrue(new Intake(intakeSubsystem, -1,
+    Intake.RunType.MoveIntakeInOrOut));
+    driverXbox.rightTrigger().whileTrue(new Intake(intakeSubsystem, 1,
+    Intake.RunType.MoveIntakeInOrOut));
     driverXbox
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
+        
     driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
     driverXbox
         .x()
