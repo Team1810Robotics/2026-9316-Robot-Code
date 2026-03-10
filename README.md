@@ -9,16 +9,15 @@
 ---
 ### Controller Bindings
 
-#### Left Joystick - 
+#### Left Joystick
 
-| Button         | Purpose    |
-----------------------------------------------
-| Left Stick     | Swerve Drive                    |
-| Right Stick    | Swerve Rotate                   |
-| L Trigger      |Intake wheels Reverse            |
+| Button         | Purpose                          |
+| -----          | -----                            |
+| Left Stick     | Swerve Drive                     |
+| Right Stick    | Swerve Rotate                    |
+| L Trigger      |Intake wheels Reverse             |
 | L Bumper       |Intake wheels spin                |
 | R Trigger      |Start shooter sequence            | 
-|                | (starting flywheel to speed up, then spin the white rollers and orange wheels) (This is also how the flywheel turns on and off based off how long you |  |                |  hold right trigger if that makes sense)            |
 | R Bumper       |Reset feild orientation           |
 | X              |Intake Down                       |
 | A              |Auto align (and hood move maybe:) |
