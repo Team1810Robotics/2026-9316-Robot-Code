@@ -14,6 +14,7 @@ public class Flywheel extends Command {
   public Flywheel(FlywheelSubsystem flywheelSubsystem, double targetVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.targetVelocity = targetVelocity;
+
     addRequirements(flywheelSubsystem);
   }
 

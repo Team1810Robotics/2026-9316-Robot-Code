@@ -1,15 +1,22 @@
 package frc.robot.subsystems.flywheel;
 
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.MotorAlignmentValue;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.indexer.IndexerConstants;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
-  private final DigitalInput beamBreak;
+  //private final DigitalInput beamBreak;
 
   // VelocityVoltage controller for precise RPM control (TalonFX built-in)
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
@@ -30,15 +37,23 @@ public class FlywheelSubsystem extends SubsystemBase {
     leftMotor = new TalonFX(FlywheelConstants.leftMotorID);
     rightMotor = new TalonFX(FlywheelConstants.rightMotorID);
 
-    beamBreak = new DigitalInput(FlywheelConstants.FlywheelBeamBreak);
+    //beamBreak = new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
 
     // TODO: Configure motor settings (inversions, PID gains) here
+
+    TalonFXConfiguration cfg = new TalonFXConfiguration();
+
+    cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+
+    rightMotor.getConfigurator().apply(cfg);
+
+    leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
   }
 
-  public boolean getBeamBreakTriggered() {
-    // Beam break is triggered when FALSE (NPN sensor logic)
-    return !beamBreak.get();
-  }
+  // public boolean getBeamBreakTriggered() {
+  //   // Beam break is triggered when FALSE (NPN sensor logic)
+  //   return !beamBreak.get();
+  // }
 
   // Set flywheel to specific velocity in rotations per second (RPS)
   public void setFlywheelVelocity(double velocityRPS) {
@@ -46,6 +61,10 @@ public class FlywheelSubsystem extends SubsystemBase {
     // Use VelocityVoltage control for precise speed management
     leftMotor.setControl(velocityControl.withVelocity(velocityRPS));
     rightMotor.setControl(velocityControl.withVelocity(velocityRPS));
+  }
+
+  public Command setDutyCycleCommand(double dutyCycle) {
+    return Commands.startEnd(() -> rightMotor.set(dutyCycle), () -> rightMotor.stopMotor(), this);
   }
 
   // Set flywheel to percentage power (legacy method for simple control)

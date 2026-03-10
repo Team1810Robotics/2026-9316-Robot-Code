@@ -9,16 +9,18 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class HoodSubsystem extends SubsystemBase {
-
+  public int hoodEncoderRotations = 0;
+  public boolean hoodEncoderWasHigh = false;
   private final TalonFX hoodMotor;
-  private final DutyCycleEncoder hoodEncoder;
+  public final DutyCycleEncoder hoodEncoder;
 
   /** Creates a new HoodSubsystem. */
   public HoodSubsystem() {
-    hoodEncoder = new DutyCycleEncoder(0);
+    hoodEncoder = new DutyCycleEncoder(1);
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     configureMotor();
+    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("Absolute Encoder", hoodEncoder);
   }
 
   /*
@@ -74,5 +76,3 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMotor.set(-speed);
   }
 }
-
-  // this code sucks

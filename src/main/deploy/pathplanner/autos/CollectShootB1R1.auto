@@ -17,12 +17,6 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "StartFlywheel"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "collectshoot"
@@ -32,6 +26,30 @@
           "type": "named",
           "data": {
             "name": "StopIntake"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StartFlywheel"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.5
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StartIndexer"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 5.0
           }
         },
         {
@@ -50,6 +68,12 @@
           "type": "named",
           "data": {
             "name": "climb"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StopIndexer"
           }
         }
       ]

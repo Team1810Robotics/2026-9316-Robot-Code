@@ -1,20 +1,25 @@
 package frc.robot.subsystems.intake;
 
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
-  public SparkMax intakeMotor; // Because this is a vortex motor, this needs to be a SparkFlex
+  public SparkFlex intakeMotor;
   public SparkMax intakeMotorL;
   public SparkMax intakeMotorR;
-  public Encoder intakeEncoder;
+  public DutyCycleEncoder intakeEncoder;
+  public double targetPosition;
+  private final PIDController intakePIDController;
+  private double currentSetPoint = 0;
 
   public IntakeSubsystem() {
     intakeMotor =
-        new SparkMax(
+        new SparkFlex(
             IntakeConstants.INTAKE_MOTOR, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    intakeMotor.set(0);
+    // intakeMotor.set(0);
     intakeMotorL =
         new SparkMax(
             IntakeConstants.INTAKE_MOTOR_L,
@@ -23,12 +28,31 @@ public class IntakeSubsystem extends SubsystemBase {
         new SparkMax(
             IntakeConstants.INTAKE_MOTOR_R,
             com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
-    intakeEncoder = new Encoder(0, 1);
+    intakeEncoder = new DutyCycleEncoder(2);
 
-    // Needs PID control for raising and lowering the intake
+    intakePIDController =
+        new PIDController(IntakeConstants.kP, IntakeConstants.kI, IntakeConstants.kD);
+
+    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData(
+        "Intake Raw Encoder", intakeEncoder);
   }
 
   public void run(double speed) {
+    intakeMotor.set(speed);
+  }
+
+  public void setPoint(double setpoint) {
+    currentSetPoint = setpoint;
+    if (intakeEncoder.isConnected()) {
+      double output = intakePIDController.calculate(intakeEncoder.get(), setpoint);
+      intakeMotorL.set(output);
+      intakeMotorR.set(-output);
+    } else {
+      stopIntakeLevel();
+    }
+  }
+
+  public void TestingIntakeMotor(double speed) {
     intakeMotor.set(speed);
   }
 
@@ -52,8 +76,6 @@ public class IntakeSubsystem extends SubsystemBase {
   }
 
   public double getIntakeEncoder() {
-    intakeEncoder.getDistance();
-    intakeEncoder.setDistancePerPulse(360 / 8192);
-    return intakeEncoder.getDistance();
+    return intakeEncoder.get();
   }
 }

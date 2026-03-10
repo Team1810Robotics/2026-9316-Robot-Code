@@ -12,29 +12,34 @@ import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.commands.Climb;
+// --COMMANDS--
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
+import frc.robot.commands.Indexer;
 import frc.robot.commands.Intake;
-import frc.robot.subsystems.climb.ClimbSubsystem;
+// --SUBSYTEM--
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
+
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  private final VisionSubsystem visionSubsystem = new VisionSubsystem("", drivetrain);
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  //   private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", drivetrain);
+  // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
@@ -72,13 +77,16 @@ public class RobotContainer {
 
     // autoChooser = AutoBuilder.buildAutoChooser();
 
-    NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
+    // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand(
         "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
-    NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1));
-    NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0));
+    // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake));
+    // // Fix speeds
+    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
+    // NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
+    // NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
   }
 
   private void configureBindings() {
@@ -99,14 +107,9 @@ public class RobotContainer {
                             * MaxAngularRate) // Drive counterclockwise with negative X (left)
             ));
 
-    driverXbox.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
-    gamepadManipulator.rightBumper().whileTrue(new Intake(intakeSubsystem, 1));
-    // sucks ball in
-    gamepadManipulator.leftBumper().whileTrue(new Intake(intakeSubsystem, -1));
-    // spits ball out
-    gamepadManipulator.x().onTrue(new Intake(intakeSubsystem, 1));
     // levels the intake up and down
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+    // TODO: no manipulator
 
     driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
@@ -119,6 +122,26 @@ public class RobotContainer {
                     point.withModuleDirection(
                         new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
+    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
+
+    // X: Deploy intake out (arm to OUT_POSITION)
+    driverXbox
+        .x()
+        .onTrue(new InstantCommand(() ->
+    intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+
+    // A: Retract intake in (arm to IN_POSITION)
+    driverXbox.b().onTrue(new Intake(intakeSubsystem, 0, Intake.RunType.MoveIntakeInOrOut));
+    // D-Pad Down: Intake eject (reverse wheels)
+    driverXbox.leftTrigger().whileTrue(new Intake(intakeSubsystem, -1,
+    Intake.RunType.MoveIntakeInOrOut));
+    driverXbox.rightTrigger().whileTrue(new Intake(intakeSubsystem, 1,
+    Intake.RunType.MoveIntakeInOrOut));
+    driverXbox
+        .rightTrigger()
+        .whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
+        
+    driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
     driverXbox
         .x()
         .whileTrue(
@@ -146,12 +169,30 @@ public class RobotContainer {
     // reset the field-centric heading on left bumper press
     driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // drivetrain.registerTelemetry(logger::telemeterize);
-
-    gamepadManipulator
-        .x()
+    // Cycle
+    driverXbox
+        .povRight()
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
-    gamepadManipulator.b().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+    driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+
+    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem));
+
+    // driverXbox
+    //     .rightTrigger()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(
+    //             () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false))); // Green
+    // driverXbox
+    //     .leftTrigger()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false))); //
+    // Rainbow
+    // driverXbox
+    //     .povDown()
+    //     .onTrue(
+    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false))); // None
+    // (off)
+
   }
 
   public Command getAutonomousCommand() {
