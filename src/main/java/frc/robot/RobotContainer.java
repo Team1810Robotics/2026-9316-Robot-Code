@@ -23,14 +23,13 @@ import frc.robot.commands.Intake;
 // --SUBSYTEM--
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
+import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
-
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -127,20 +126,21 @@ public class RobotContainer {
     // X: Deploy intake out (arm to OUT_POSITION)
     driverXbox
         .x()
-        .onTrue(new InstantCommand(() ->
-    intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
 
     // A: Retract intake in (arm to IN_POSITION)
     driverXbox.b().onTrue(new Intake(intakeSubsystem, 0, Intake.RunType.MoveIntakeInOrOut));
     // D-Pad Down: Intake eject (reverse wheels)
-    driverXbox.leftTrigger().whileTrue(new Intake(intakeSubsystem, -1,
-    Intake.RunType.MoveIntakeInOrOut));
-    driverXbox.rightTrigger().whileTrue(new Intake(intakeSubsystem, 1,
-    Intake.RunType.MoveIntakeInOrOut));
+    driverXbox
+        .leftTrigger()
+        .whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.MoveIntakeInOrOut));
+    driverXbox
+        .rightTrigger()
+        .whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.MoveIntakeInOrOut));
     driverXbox
         .rightTrigger()
         .whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
-        
+
     driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
     driverXbox
         .x()

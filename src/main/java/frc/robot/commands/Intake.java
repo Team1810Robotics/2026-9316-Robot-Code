@@ -40,7 +40,7 @@ public class Intake extends Command {
 
     } else if (this.runType == RunType.Intake) {
       intakeManualSpeed = SpeedOrSetPoint;
-      
+
     } else if (this.runType == RunType.UsePID) {
       PIDSetpoint = SpeedOrSetPoint;
     }
@@ -49,16 +49,15 @@ public class Intake extends Command {
   @Override
   public void execute() {
     SmartDashboard.putNumber("Intake Encoder Raw", intakeSubsystem.intakeEncoder.get());
-    /* 
-    
-    
+    /*
+
+
     //TODO: use instant commands to run intake and use this command to run the intake posiiton using PID and encoder
-    
-    
+
+
     */
     intakeSubsystem.run(intakeManualSpeed);
-    if (intakePositionSpeed <= 0.0)
-    intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
+    if (intakePositionSpeed <= 0.0) intakeLevelDegrees = intakeSubsystem.getIntakeEncoder();
     // if (intakeLevelDegrees <= 0) {
     //   mode = LevelMode.Up;
     // } else if (intakeLevelDegrees >= 67) {
