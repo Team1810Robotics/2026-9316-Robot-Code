@@ -11,7 +11,7 @@ public class IntakeConstants {
   // DIO port for the intake encoder, which measures the angle of the intake
 
   // TODO: Tune PID values for intake level control
-  public static final double kP = 0.1;
+  public static final double kP = 0.02;
   public static final double kI = 0.0;
   public static final double kD = 0.0;
 
@@ -22,8 +22,9 @@ public class IntakeConstants {
 
   public static final double ROLLER_IN_SPEED = 0.45; // Speed for intaking game pieces
   public static final double ROLLER_OUT_SPEED = -0.2; // Speed for ejecting game pieces
-  public static double IN_POSITION = 0.6; // Set point for the intake being fully retracted (arm up)
+  public static double IN_POSITION =
+      0.642; // Set point for the intake being fully retracted (arm up)
   public static double OUT_POSITION =
-      0.25; // Set point for the intake being fully deployed (arm down)
+      0.216; // Set point for the intake being fully deployed (arm down)
   // TODO: tune set points :)
 }

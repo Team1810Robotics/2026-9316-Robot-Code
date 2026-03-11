@@ -6,26 +6,20 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
-import java.lang.annotation.Target;
-
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.NamedCommands;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 // --COMMANDS--
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Indexer;
-import frc.robot.commands.Intake;
 // --SUBSYTEM--
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
-import frc.robot.subsystems.flywheel.FlywheelConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
@@ -33,7 +27,6 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
-import frc.robot.subsystems.vision.VisionSubsystem;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -114,48 +107,59 @@ public class RobotContainer {
     gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
     // TODO: no manipulator
 
-    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
+    // driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
 
-    driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverXbox
-        .b()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
-
-    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
+    // driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
 
     // X: Deploy intake out (arm to OUT_POSITION)
-    driverXbox
-        .x()
-        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
-
-    // A: Retract intake in (arm to IN_POSITION)
-    driverXbox.b().onTrue(new Intake(intakeSubsystem, 0, Intake.RunType.MoveIntakeInOrOut));
-    // D-Pad Down: Intake eject (reverse wheels)
-    driverXbox
-        .leftTrigger()
-        .whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.MoveIntakeInOrOut));
-    driverXbox
-        .rightTrigger()
-        .whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.MoveIntakeInOrOut));
-    driverXbox
-        .rightTrigger()
-        .whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
-
-    driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
+    // driverXbox
+    //     .x()
+    //     .whileTrue((new Intake(intakeSubsystem, IntakeConstants.OUT_POSITION,
+    // Intake.RunType.UsePID)));
     driverXbox
         .x()
         .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    faceAngle
-                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                        .withTargetDirection(drivetrain.getAngleToHub())
-                        .withHeadingPID(5, 0, 0)));
+            Commands.startEnd(
+                () -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION),
+                () -> intakeSubsystem.stopIntakeLevel(),
+                intakeSubsystem));
+    // A: Retract intake in (arm to IN_POSITION)
+    // driverXbox.b().onTrue(new Intake(intakeSubsystem, IntakeConstants.IN_POSITION,
+    // Intake.RunType.UsePID));
+    // D-Pad Down: Intake eject (reverse wheels)
+    // driverXbox
+    //     .leftTrigger()
+    //     .whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.MoveIntakeInOrOut));
+    // driverXbox
+    //     .rightTrigger()
+    //     .whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.MoveIntakeInOrOut));
+    driverXbox
+        .leftBumper()
+        .whileTrue(
+            Commands.startEnd(
+                () -> intakeSubsystem.run(0.5),
+                () -> intakeSubsystem.stopIntake(),
+                intakeSubsystem));
+
+    // driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
+
+    driverXbox
+        .leftTrigger()
+        .whileTrue(
+            Commands.startEnd(
+                () -> intakeSubsystem.run(-0.5),
+                () -> intakeSubsystem.stopIntake(),
+                intakeSubsystem));
+    // driverXbox
+    //     .x()
+    //     .whileTrue(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 faceAngle
+    //                     .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+    //                     .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+    //                     .withTargetDirection(drivetrain.getAngleToHub())
+    //                     .withHeadingPID(5, 0, 0)));
 
     // Run SysId routines when holding back/start and X/Y.
     // Note that each routine should be run exactly once in a single log.

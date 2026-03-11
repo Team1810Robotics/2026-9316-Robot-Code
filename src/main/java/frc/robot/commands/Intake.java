@@ -33,6 +33,7 @@ public class Intake extends Command {
    */
   public Intake(IntakeSubsystem intakeSubsystem, double SpeedOrSetPoint, RunType runType) {
     this.intakeSubsystem = intakeSubsystem;
+    this.runType = runType;
     addRequirements(intakeSubsystem);
 
     if (this.runType == RunType.MoveIntakeInOrOut) {
@@ -78,9 +79,9 @@ public class Intake extends Command {
     //   // tweak number
     // }
 
-    if (intakeManualSpeed != 0) {
-      intakeSubsystem.run(intakeManualSpeed);
-    }
+    // if (intakeManualSpeed != 0) {
+    //   intakeSubsystem.run(intakeManualSpeed);
+    // }
 
     if (PIDSetpoint != 0) {
       intakeSubsystem.setPoint(PIDSetpoint);

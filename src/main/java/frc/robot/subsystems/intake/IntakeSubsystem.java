@@ -43,6 +43,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
   public void setPoint(double setpoint) {
     currentSetPoint = setpoint;
+    System.out.println("Hola Como Estas Estoy bien");
     if (intakeEncoder.isConnected()) {
       double output = intakePIDController.calculate(intakeEncoder.get(), setpoint);
       intakeMotorL.set(output);
@@ -50,10 +51,6 @@ public class IntakeSubsystem extends SubsystemBase {
     } else {
       stopIntakeLevel();
     }
-  }
-
-  public void TestingIntakeMotor(double speed) {
-    intakeMotor.set(speed);
   }
 
   public void stopIntake() {
