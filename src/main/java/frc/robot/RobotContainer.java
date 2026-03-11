@@ -26,6 +26,7 @@ import frc.robot.subsystems.hood.HoodSubsystem;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
+// import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
 
 @SuppressWarnings("unused")
@@ -48,6 +49,7 @@ public class RobotContainer {
       RotationsPerSecond.of(0.75)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
+// public static Climb Climb = new Climb();
   private final SwerveRequest.FieldCentricFacingAngle faceAngle =
       new SwerveRequest.FieldCentricFacingAngle()
           .withDeadband(MaxSpeed * 0.1)
