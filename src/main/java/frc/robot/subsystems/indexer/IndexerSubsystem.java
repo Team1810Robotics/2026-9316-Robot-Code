@@ -66,8 +66,10 @@ public class IndexerSubsystem extends SubsystemBase {
 
     if (index_1_Broken == true) {
       LEDChange = true;
-      LEDConstants.IDLE = true;
-      LEDSubsystem.setLEDColor(new RGBWColor(LEDConstants.ORANGE[0], LEDConstants.ORANGE[1], LEDConstants.ORANGE[2], 0),false); // Lets Drive Team know a ball is detected by setting LEDs to orange
+      LEDConstants.IDLE = false;
+      LEDSubsystem.setLEDColor(
+          new RGBWColor(LEDConstants.ORANGE[0], LEDConstants.ORANGE[1], LEDConstants.ORANGE[2], 0),
+          false); // Lets Drive Team know a ball is detected by setting LEDs to orange
       System.out.println("Ball Detected");
     } else {
       if (LEDChange == true) { // Puts the LEDs back into idle
