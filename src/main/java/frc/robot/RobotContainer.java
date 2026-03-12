@@ -68,20 +68,20 @@ public class RobotContainer {
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
-  //   private final SendableChooser<Command> autoChooser;
+ // private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
-    configureBindings();
-
-    // autoChooser = AutoBuilder.buildAutoChooser();
+   // autoChooser = AutoBuilder.buildAutoChooser();
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
     NamedCommands.registerCommand("StartIntake", intakeSubsystem.run(0.5));
-    NamedCommands.registerCommand("StopIntake", intakeSubsystem.run(0.5) );
+    NamedCommands.registerCommand("StopIntake", intakeSubsystem.run(0) );
     NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
     NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
+      configureBindings();
+
   }
 
   private void configureBindings() {
@@ -147,8 +147,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> intakeSubsystem.run(-0.5),
-                () -> intakeSubsystem.stopIntake(),
-                intakeSubsystem));
+                () -> intakeSubsystem.stopIntake(),    intakeSubsystem));
     // driverXbox
     //     .x()
     //     .whileTrue(

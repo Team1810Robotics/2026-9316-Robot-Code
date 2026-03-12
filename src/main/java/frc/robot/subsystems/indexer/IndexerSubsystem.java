@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.RGBWColor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.led.LEDConstants;
 import frc.robot.subsystems.led.LEDSubsystem;
@@ -99,6 +100,11 @@ public class IndexerSubsystem extends SubsystemBase {
       StopIndexer_2();
     }
   }
+
+public Command run(int i) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'run'");
+}
 }
 
 // Code by: Will Edwards (The best programmer in the world?)

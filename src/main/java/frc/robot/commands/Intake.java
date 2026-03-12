@@ -91,10 +91,9 @@ public class Intake extends Command {
       intakeSubsystem.setPoint(PIDSetpoint);
     }
   }
-
-
     public class intake extends IntakeSubsystem {{
       new InstantCommand(() -> intakeSubsystem.run(0.5));
+      
       }
     }
 
