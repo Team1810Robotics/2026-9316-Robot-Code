@@ -173,7 +173,7 @@ public class RobotContainer {
     driverXbox
         .povRight()
         .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
-    driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDColor(null, true)));
+    driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
 
     driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem));
 

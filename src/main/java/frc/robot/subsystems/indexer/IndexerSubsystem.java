@@ -5,8 +5,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.led.*;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexer_1_Motor =
@@ -22,7 +21,7 @@ public class IndexerSubsystem extends SubsystemBase {
           IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
 
   private boolean LEDChange = false; // To make sure the LEDs aren't changed multiple times
-  private boolean Shooting = false; // Determine if the flywheel is activley shooting
+  private static boolean Shooting = false; // Determine if the flywheel is activley shooting
   private boolean IndexingEnabled = false; // If the motors are currently running
 
   public void RunIndexer_1() { // Starts the white roller motor
@@ -45,7 +44,7 @@ public class IndexerSubsystem extends SubsystemBase {
     IndexingEnabled = enabled;
   }
 
-  public void SetShooting(boolean shooting) { // Sets the shooting variable
+  public static void SetShooting(boolean shooting) { // Sets the shooting variable
     Shooting = shooting;
   }
 
@@ -67,17 +66,13 @@ public class IndexerSubsystem extends SubsystemBase {
 
     if (index_1_Broken == true) {
       LEDChange = true;
-      LEDSubsystem.LEDColor =
-          new RGBWColor(
-              LEDConstants.ORANGE[0],
-              LEDConstants.ORANGE[1],
-              LEDConstants.ORANGE[2],
-              0); // Lets drive team know that a ball is detected in the indexer
+      LEDConstants.IDLE = true;
+      LEDSubsystem.setLEDColor(new RGBWColor(LEDConstants.ORANGE[0], LEDConstants.ORANGE[1], LEDConstants.ORANGE[2], 0),false); // Lets Drive Team know a ball is detected by setting LEDs to orange
       System.out.println("Ball Detected");
     } else {
       if (LEDChange == true) { // Puts the LEDs back into idle
         LEDChange = false;
-        // TODO: Change IDLE to false
+        LEDConstants.IDLE = true;
       }
     }
 
@@ -101,4 +96,4 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 }
 
-// Code by: Will Edwards (The best programmer in the world?)
+// Code by: Will Edwards (The best programmer in the world)
