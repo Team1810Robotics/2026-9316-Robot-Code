@@ -17,8 +17,6 @@ public class IndexerSubsystem extends SubsystemBase {
       new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, MotorType.kBrushless); // White Roller
   private final SparkMax indexer_2_Motor =
       new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless); // Orange Wheels
-      SparkMaxConfig config = new SparkMaxConfig();
-      config.@idleMode(IdleMode.kBrake);
   private final DigitalInput Index_1_BeamBreak =
       new DigitalInput(
           IndexerConstants.INDEXER_1_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
