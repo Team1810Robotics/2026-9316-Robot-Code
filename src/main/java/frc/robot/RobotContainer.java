@@ -26,6 +26,7 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -172,10 +173,12 @@ public class RobotContainer {
     // Cycle
     driverXbox
         .povRight()
-        .onTrue(ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation(null, true)));
+        .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
     driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
 
-    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem));
+    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem,false));
+
+    driverXbox.povDown().whileTrue(new Indexer(indexerSubsystem,true));
 
     // driverXbox
     //     .rightTrigger()

@@ -25,7 +25,11 @@ public class IndexerSubsystem extends SubsystemBase {
   private boolean IndexingEnabled = false; // If the motors are currently running
 
   public void RunIndexer_1() { // Starts the white roller motor
-    indexer_1_Motor.set(IndexerConstants.INDEXER_1_SPEED);
+    if (IndexerConstants.Reverse == false) {
+      indexer_1_Motor.set(IndexerConstants.INDEXER_1_SPEED);
+    } else{
+       indexer_1_Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
+    }
   }
 
   public void StopIndexer_1() { // Stops the white roller motor
@@ -33,7 +37,12 @@ public class IndexerSubsystem extends SubsystemBase {
   }
 
   public void RunIndexer_2() { // Starts the orange wheel motor
-    indexer_2_Motor.set(IndexerConstants.INDEXER_2_SPEED);
+    if (IndexerConstants.Reverse == false) {
+      indexer_2_Motor.set(IndexerConstants.INDEXER_2_SPEED);
+    } else {
+      indexer_2_Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
+    }
+
   }
 
   public void StopIndexer_2() { // Stops the orange wheel motor

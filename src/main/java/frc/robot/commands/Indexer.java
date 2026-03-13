@@ -1,12 +1,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.indexer.IndexerSubsystem;
+import frc.robot.subsystems.indexer.*;
 
 public class Indexer extends Command {
   private final IndexerSubsystem indexer;
 
-  public Indexer(IndexerSubsystem indexer) {
+  public Indexer(IndexerSubsystem indexer,boolean reverse) {
+    if (reverse == true) {
+      IndexerConstants.Reverse = true;
+    } else {
+      IndexerConstants.Reverse = false;
+    }
     this.indexer = indexer;
     addRequirements(indexer);
   }
