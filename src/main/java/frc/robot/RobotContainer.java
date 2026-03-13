@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 // --COMMANDS--
@@ -176,9 +177,9 @@ public class RobotContainer {
         .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
     driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
 
-    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem,false));
+    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem,true));
 
-    driverXbox.povDown().whileTrue(new Indexer(indexerSubsystem,true));
+    driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.ReverseWheels(),() -> indexerSubsystem.StopIndexer()));
 
     // driverXbox
     //     .rightTrigger()

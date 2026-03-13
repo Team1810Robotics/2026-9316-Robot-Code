@@ -35,23 +35,24 @@ public class IndexerSubsystem extends SubsystemBase {
        indexer_1_Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
     }
   }
+    public void ReverseWheels() { // REVERSE
+       indexer_1_Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
+      indexer_2_Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
+  }
 
-  public void StopIndexer_1() { // Stops the white roller motor
+  public void StopIndexer() { // Stops the white roller motor
     indexer_1_Motor.set(0);
+    indexer_2_Motor.set(0);
   }
 
   public void RunIndexer_2() { // Starts the orange wheel motor
-    if (IndexerConstants.Reverse == false) {
-      indexer_2_Motor.set(IndexerConstants.INDEXER_2_SPEED);
-    } else {
-      indexer_2_Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
+      if (IndexerConstants.Reverse == false) {
+      indexer_1_Motor.set(IndexerConstants.INDEXER_2_SPEED);
+    } else{
+       indexer_1_Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
     }
-
   }
 
-  public void StopIndexer_2() { // Stops the orange wheel motor
-    indexer_2_Motor.set(0);
-  }
 
   public void SetIndexEnabled(boolean enabled) { // Sets the indexing enabled variable
     IndexingEnabled = enabled;
@@ -96,7 +97,7 @@ public class IndexerSubsystem extends SubsystemBase {
       // ROLLERS
       RunIndexer_1();
     } else {
-      StopIndexer_1();
+      StopIndexer();
     }
 
     if (Shooting) { // Only runs if shooting is enabled ONLY FOR ORANGE WHEELS
@@ -106,7 +107,7 @@ public class IndexerSubsystem extends SubsystemBase {
       // second area (to prevent jamming)
       RunIndexer_2();
     } else {
-      StopIndexer_2();
+      StopIndexer();
     }
 
     SmartDashboard.putBoolean("Indexer 1 Broken", index_1_Broken);
