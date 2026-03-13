@@ -79,128 +79,107 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
-    NamedCommands.registerCommand(
-        "Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
+    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
     NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
     NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
     // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake));
-    // // Fix speeds
     // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
     // NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
     // NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
   }
 
   private void configureBindings() {
-    // Note that X is defined as forward according to WPILib convention,
-    // and Y is defined as to the left according to WPILib convention.
-    drivetrain.setDefaultCommand(
-        // Drivetrain will execute this command periodically
-        drivetrain.applyRequest(
-            () ->
-                drive
-                    .withVelocityX(
-                        -driverXbox.getLeftY()
-                            * MaxSpeed) // Drive forward with negative Y (forward)
-                    .withVelocityY(
-                        -driverXbox.getLeftX() * MaxSpeed) // Drive left with negative X (left)
-                    .withRotationalRate(
-                        -driverXbox.getRightX()
-                            * MaxAngularRate) // Drive counterclockwise with negative X (left)
-            ));
+  // Default drivetrain command
+  drivetrain.setDefaultCommand(
+      drivetrain.applyRequest(
+          () ->
+              drive
+                  .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                  .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                  .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate)));
 
-    // levels the intake up and down
-    gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
-    // TODO: no manipulator
+  // ---------------- DRIVER CONTROLS ----------------
+  // B = point wheels in joystick direction
+  driverXbox
+      .b()
+      .whileTrue(
+          drivetrain.applyRequest(
+              () ->
+                  point.withModuleDirection(
+                      new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-    driverXbox.b().onTrue(new Hood(hoodSubsystem, 1, true));
+  // X = face target / hub while driving
+  driverXbox
+      .x()
+      .whileTrue(
+          drivetrain.applyRequest(
+              () ->
+                  faceAngle
+                      .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                      .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                      .withTargetDirection(drivetrain.getAngleToHub())
+                      .withHeadingPID(5, 0, 0)));
 
-    driverXbox.a().whileTrue(drivetrain.applyRequest(() -> brake));
-    driverXbox
-        .b()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
+  // Left bumper = reset field-centric heading
+  driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(.75));
+  // Right bumper = run flywheel
+  driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(0.75));
 
-    // X: Deploy intake out (arm to OUT_POSITION)
-    driverXbox
-        .x()
-        .onTrue(new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION)));
+  // ---------------- INTAKE CONTROLS ----------------
 
-    // A: Retract intake in (arm to IN_POSITION)
-    driverXbox.b().onTrue(new Intake(intakeSubsystem, 0, Intake.RunType.MoveIntakeInOrOut));
-    // D-Pad Down: Intake eject (reverse wheels)
-    driverXbox
-        .leftTrigger()
-        .whileTrue(new Intake(intakeSubsystem, -1, Intake.RunType.MoveIntakeInOrOut));
-    driverXbox
-        .rightTrigger()
-        .whileTrue(new Intake(intakeSubsystem, 1, Intake.RunType.MoveIntakeInOrOut));
-    driverXbox
-        .rightTrigger()
-        .whileTrue(new InstantCommand(() -> intakeSubsystem.TestingIntakeMotor(0.5)));
+  // Right trigger = intake wheels forward
+  driverXbox.rightTrigger().whileTrue(
+      Commands.startEnd(
+          () -> intakeSubsystem.TestingIntakeMotor(0.5),
+          () -> intakeSubsystem.TestingIntakeMotor(0.0),
+          intakeSubsystem));
 
-    driverXbox.leftTrigger().whileTrue(new InstantCommand(() -> intakeSubsystem.runDOWN(-.5)));
-    driverXbox
-        .x()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    faceAngle
-                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                        .withTargetDirection(drivetrain.getAngleToHub())
-                        .withHeadingPID(5, 0, 0)));
+  // Left trigger = intake wheels reverse
+  driverXbox.leftTrigger().whileTrue(
+      Commands.startEnd(
+          () -> intakeSubsystem.TestingIntakeMotor(-0.5),
+          () -> intakeSubsystem.TestingIntakeMotor(0.0),
+          intakeSubsystem));
 
-    // Run SysId routines when holding back/start and X/Y.
-    // Note that each routine should be run exactly once in a single log.
-    driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    driverXbox
-        .start()
-        .and(driverXbox.y())
-        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    driverXbox
-        .start()
-        .and(driverXbox.x())
-        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+  // Intake arm out
+  driverXbox.y().onTrue(
+      new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
 
-    // reset the field-centric heading on left bumper press
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+  // Intake arm in
+  driverXbox.start().onTrue(
+      new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION), intakeSubsystem));
 
-    // Cycle
-    driverXbox
-        .povRight()
-        .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
-    driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+  // ---------------- HOOD CONTROLS ----------------
 
-    driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem,true));
+  // Manipulator Y = move hood
+  gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
-    driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.ReverseWheels(),() -> indexerSubsystem.StopIndexer()));
+  // Driver back = alternate hood action
+  driverXbox.back().onTrue(new Hood(hoodSubsystem, 1, true));
 
-    // driverXbox
-    //     .rightTrigger()
-    //     .onTrue(
-    //         ledSubsystem.runOnce(
-    //             () -> ledSubsystem.setLEDColor(new RGBWColor(0, 255, 0, 0), false))); // Green
-    // driverXbox
-    //     .leftTrigger()
-    //     .onTrue(
-    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("Rainbow", false))); //
-    // Rainbow
-    // driverXbox
-    //     .povDown()
-    //     .onTrue(
-    //         ledSubsystem.runOnce(() -> ledSubsystem.setLEDAnimation("None", false))); // None
-    // (off)
+  // ---------------- INDEXER CONTROLS ----------------
 
-  }
+  // POV up = normal indexer run
+  driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem, true));
 
-  public Command getAutonomousCommand() {
-    // return autoChooser.getSelected();
-    return Commands.print("Payton is love. Payton is life.");
-  }
+  // POV down = reverse both indexer sections together
+driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.runIndexer1Reverse () , () -> indexerSubsystem.stopIndexer1()));
+driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.runIndexer2Reverse () , () -> indexerSubsystem.stopIndexer2()));
+
+  driverXbox
+      .povRight()
+      .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
+
+  driverXbox
+      .povLeft()
+      .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+
+  // ---------------- SYSID ----------------
+
+  driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+  driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+  driverXbox.start().and(driverXbox.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+  driverXbox.start().and(driverXbox.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+}
 }

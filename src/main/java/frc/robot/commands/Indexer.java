@@ -18,12 +18,12 @@ public class Indexer extends Command {
 
   @Override
   public void initialize() {
-    indexer.SetIndexEnabled(true);
+    indexer.inde(true);
   }
 
   @Override
   public void end(boolean interrupted) {
-    indexer.SetIndexEnabled(false);
+    indexer.indexingEnabled(false);
   }
 
   @Override
