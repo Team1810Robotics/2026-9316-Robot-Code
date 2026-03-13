@@ -3,16 +3,22 @@ package frc.robot.subsystems.indexer;
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.led.*;
+
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexer_1_Motor =
       new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, MotorType.kBrushless); // White Roller
   private final SparkMax indexer_2_Motor =
       new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless); // Orange Wheels
-
+      SparkMaxConfig config = new SparkMaxConfig();
+      config.@idleMode(IdleMode.kBrake);
   private final DigitalInput Index_1_BeamBreak =
       new DigitalInput(
           IndexerConstants.INDEXER_1_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
@@ -68,7 +74,7 @@ public class IndexerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     boolean index_1_Broken =
-        !Index_1_BeamBreak.get(); // Detects if the beam is broken (ball is present)
+       false; // Detects if the beam is broken (ball is present)
     boolean index_2_Broken =
         !Index_2_BeamBreak
             .get(); // Detects if the beam is broken in the second area (ball is present)
@@ -104,6 +110,10 @@ public class IndexerSubsystem extends SubsystemBase {
     } else {
       StopIndexer_2();
     }
+
+    SmartDashboard.putBoolean("Indexer 1 Broken", index_1_Broken);
+    SmartDashboard.putBoolean("Indexer 2 Broken", index_2_Broken);
+
   }
 }
 

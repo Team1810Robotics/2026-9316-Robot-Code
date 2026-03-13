@@ -136,13 +136,13 @@ public class LEDSubsystem extends SubsystemBase {
       periodic() { // This method is called once per scheduler run, used to update the LED animation
     // and color based on the current state and selections
 
-    if (LEDConstants
+    /* if (LEDConstants
         .IDLE) { // When the robot is idle, set the LEDs to a default color and animation
       setLEDColor(
           new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2], 0),
           false); // Idle is PURPLE
       setLEDAnimation("ColorFlow", false); // Idle is ColorFlow
-    }
+    } */
 
     /* if the selection for slot 0 changes, change animations */
     final var anim0Selection = chosenAnim0;
