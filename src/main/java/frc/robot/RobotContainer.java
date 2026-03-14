@@ -39,7 +39,8 @@ public class RobotContainer {
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
+  
+    private final HoodSubsystem hoodSubsystem = new HoodSubsystem(visionSubsystem);
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
@@ -128,7 +129,16 @@ public class RobotContainer {
     driverXbox.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Right bumper = run flywheel using velocity control / fallback target
-    driverXbox.rightTrigger().whileTrue(new FlywheelTune(flywheelSubsystem, indexerSubsystem));
+    driverXbox.rightTrigger().whileTrue(
+    Commands.run(() -> {
+        if (visionSubsystem.targetValid()) {
+            double ty = visionSubsystem.getTy();
+            hoodSubsystem.setPoint(hoodSubsystem.computeHoodSetpointFromTY(ty));
+            double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(ty);
+            flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+        }
+    }, hoodSubsystem, flywheelSubsystem)
+);
 
     // ---------------- INTAKE CONTROLS ----------------
 
