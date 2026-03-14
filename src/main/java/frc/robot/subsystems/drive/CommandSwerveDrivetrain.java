@@ -136,7 +136,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
@@ -165,7 +164,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
@@ -205,7 +203,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);

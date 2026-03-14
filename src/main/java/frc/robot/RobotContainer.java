@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.robot.commands.AimAtHub;
 // --COMMANDS--
 import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
@@ -33,13 +34,14 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDSubsystem;
+import frc.robot.subsystems.vision.VisionSubsystem;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
-  //   private final VisionSubsystem visionSubsystem = new VisionSubsystem("limelight", drivetrain);
+    private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
@@ -180,24 +182,25 @@ driverXbox.leftBumper().whileTrue(
     // ---------------- HOOD CONTROLS ----------------
 
 // Manipulator Y = hood up while held
-driverXbox.a().whileTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+driverXbox.povUp().whileTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
 // Manipulator A = hood down while held
-driverXbox.povRight().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
+driverXbox.povDown().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
+driverXbox.a().whileTrue((new AimAtHub(drivetrain, visionSubsystem, () -> -driverXbox.getLeftY(), () -> -driverXbox.getLeftX())));
     // ---------------- INDEXER CONTROLS ----------------
 
-    // POV up = normal indexer run
-    driverXbox.povUp().whileTrue(
-        Commands.startEnd(
-            () -> indexerSubsystem.runBothForward(),
-            () -> indexerSubsystem.stopAll(),
-            indexerSubsystem));
+    // // POV up = normal indexer run
+    // driverXbox.povUp().whileTrue(
+    //     Commands.startEnd(
+    //         () -> indexerSubsystem.runBothForward(),
+    //         () -> indexerSubsystem.stopAll(),
+    //         indexerSubsystem));
 
-    driverXbox.povDown().whileTrue(
-        Commands.startEnd(
-            () -> indexerSubsystem.runBothReverse(),
-            () -> indexerSubsystem.stopAll(),
-            indexerSubsystem));
+    // driverXbox.povDown().whileTrue(
+    //     Commands.startEnd(
+    //         () -> indexerSubsystem.runBothReverse(),
+    //         () -> indexerSubsystem.stopAll(),
+    //         indexerSubsystem));
 
     // driverXbox
     //     .povRight()
@@ -219,11 +222,5 @@ driverXbox.povRight().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEE
         .start()
         .and(driverXbox.x())
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-
-        gamepadManipulator.y().onTrue(
-    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(2.0), flywheelSubsystem));
-
-gamepadManipulator.a().onTrue(
-    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(-2.0), flywheelSubsystem));
   }
 }

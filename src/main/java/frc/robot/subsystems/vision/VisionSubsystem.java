@@ -11,33 +11,15 @@ import frc.robot.util.LimelightHelpers.PoseEstimate;
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
 
-  private final CommandSwerveDrivetrain drivetrain;
 
-  public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
-    this.limelightName = name;
-    this.drivetrain = drivetrain;
+  public VisionSubsystem() {
+    this.limelightName = VisionConstants.LIMELIGHT_NAME;
 
-    LimelightHelpers.setPipelineIndex(limelightName, 0);
-    LimelightHelpers.SetIMUAssistAlpha(limelightName, .001);
+    LimelightHelpers.setPipelineIndex(limelightName, 2);
   }
 
   @Override
   public void periodic() {
-    if (DriverStation.isDisabled()) {
-      LimelightHelpers.SetIMUMode(limelightName, 1);
-    } else {
-      LimelightHelpers.SetIMUMode(limelightName, 4);
-    }
-
-    LimelightHelpers.SetRobotOrientation(
-        limelightName,
-        drivetrain.getState().Pose.getRotation().getDegrees(),
-        drivetrain.getState().Speeds.omegaRadiansPerSecond,
-        drivetrain.getPigeon2().getPitch().getValueAsDouble(),
-        0,
-        drivetrain.getPigeon2().getRoll().getValueAsDouble(),
-        0);
-
     if (!targetValid()) {
       DogLog.log("Vision/BotPose", new Pose2d());
       DogLog.log("Vision/TargetValid", false);
@@ -48,17 +30,12 @@ public class VisionSubsystem extends SubsystemBase {
       return;
     }
 
-    PoseEstimate botPoseMT2 = getBotPoseMT2();
-    drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
-    DogLog.log("Vision/BotPose", botPoseMT2.pose);
+
     DogLog.log("Vision/TargetValid", targetValid());
     DogLog.log("Vision/TX", getTx());
     DogLog.log("Vision/TY", getTy());
     DogLog.log("Vision/TargetID", getTargetID());
-    DogLog.log("Vision/TargetForwardMeters", getTargetForwardMeters());
-    DogLog.log("Vision/TargetLateralMeters", getTargetLateralMeters());
-    DogLog.log("Vision/TargetDistanceMeters", getTargetDistanceMeters());
   }
 
   public int getTargetID() {
@@ -77,77 +54,4 @@ public class VisionSubsystem extends SubsystemBase {
     return LimelightHelpers.getTY(limelightName);
   }
 
-  public PoseEstimate getBotPoseMT1() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
-  }
-
-  public PoseEstimate getBotPoseMT2() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-  }
-
-  public Pose2d getBotPoseTargetSpace() {
-    return LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_TargetSpace(limelightName))
-        .toPose2d();
-  }
-
-  /**
-   * Returns the raw bot-pose-in-target-space array from Limelight.
-   * Useful for debugging axis meanings.
-   */
-  public double[] getTargetSpaceArray() {
-    return LimelightHelpers.getBotPose_TargetSpace(limelightName);
-  }
-
-  /**
-   * Estimated forward distance from robot/camera to target in meters.
-   * Assumes target-space Z is the forward/depth axis.
-   */
-  public double getTargetForwardMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double[] targetSpace = getTargetSpaceArray();
-    if (targetSpace == null || targetSpace.length < 3) {
-      return -1.0;
-    }
-
-    return targetSpace[2];
-  }
-
-  /**
-   * Estimated lateral offset from robot/camera to target in meters.
-   * Assumes target-space X is the left/right axis.
-   */
-  public double getTargetLateralMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double[] targetSpace = getTargetSpaceArray();
-    if (targetSpace == null || targetSpace.length < 3) {
-      return -1.0;
-    }
-
-    return targetSpace[0];
-  }
-
-  /**
-   * Estimated planar distance from robot/camera to target in meters.
-   * Uses lateral + forward components from target space.
-   */
-  public double getTargetDistanceMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double lateral = getTargetLateralMeters();
-    double forward = getTargetForwardMeters();
-
-    if (lateral < 0 && forward < 0) {
-      return -1.0;
-    }
-
-    return Math.hypot(lateral, forward);
-  }
 }
