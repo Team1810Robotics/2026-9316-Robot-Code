@@ -30,7 +30,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.subsystems.drive.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.util.FieldConstants;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -136,7 +135,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
@@ -165,7 +163,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
@@ -205,7 +202,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     // configureAutoBuilder();
-    setVisionMeasurementStdDevs(VisionConstants.visionMeasurementStdDevs);
 
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);

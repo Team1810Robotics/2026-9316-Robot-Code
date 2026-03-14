@@ -20,7 +20,7 @@ public class Hood extends Command {
     if (isGoToPos) {
       hoodSubsystem.setPoint(hoodValue);
     }
-  } 
+  }
 
   @Override
   public void execute() {

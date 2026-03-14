@@ -4,13 +4,11 @@ import com.ctre.phoenix6.signals.RGBWColor;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.led.LEDConstants;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightHelpers.PoseEstimate;
 
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
@@ -23,8 +21,9 @@ public class VisionSubsystem extends SubsystemBase {
     this.limelightName = name;
     this.drivetrain = drivetrain;
 
-    LimelightHelpers.setPipelineIndex(limelightName, 0);
-    LimelightHelpers.SetIMUAssistAlpha(limelightName, .001);
+  public VisionSubsystem() {
+    this.limelightName = VisionConstants.LIMELIGHT_NAME;
+    LimelightHelpers.setPipelineIndex(limelightName, 2);
   }
 
   @Override
@@ -55,6 +54,7 @@ public class VisionSubsystem extends SubsystemBase {
         LEDConstants.IDLE = true;
         LED_CD = true;
       }
+          DogLog.log("Vision/HoodSetpoint", 0.0);
         return;
     }
 
@@ -64,19 +64,20 @@ public class VisionSubsystem extends SubsystemBase {
         false);
     LEDSubsystem.setLEDAnimation("Rainbow", false);
 
-    LED_CD = false;
+   
 
     PoseEstimate botPoseMT2 = getBotPoseMT2();
     drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
-    DogLog.log("Vision/BotPose", botPoseMT2.pose);
-    DogLog.log("Vision/TargetValid", targetValid());
+    LED_CD = false;
+
+  
     DogLog.log("Vision/TX", getTx());
     DogLog.log("Vision/TY", getTy());
     DogLog.log("Vision/TargetID", getTargetID());
-    DogLog.log("Vision/TargetForwardMeters", getTargetForwardMeters());
-    DogLog.log("Vision/TargetLateralMeters", getTargetLateralMeters());
     DogLog.log("Vision/TargetDistanceMeters", getTargetDistanceMeters());
+    // Log the computed hood setpoint every loop so you can verify it in AdvantageScope
+    DogLog.log("Vision/HoodSetpoint", getHoodSetpointFromTY());
   }
 
   public int getTargetID() {
@@ -95,78 +96,43 @@ public class VisionSubsystem extends SubsystemBase {
     return LimelightHelpers.getTY(limelightName);
   }
 
-  public PoseEstimate getBotPoseMT1() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
-  }
-
-  public PoseEstimate getBotPoseMT2() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
-  }
-
-  public Pose2d getBotPoseTargetSpace() {
-    return LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_TargetSpace(limelightName))
-        .toPose2d();
-  }
-
   /**
-   * Returns the raw bot-pose-in-target-space array from Limelight.
-   * Useful for debugging axis meanings.
+   * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit.
+   * y = 1.23 - 0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵
+   * Only call this when targetValid() is true.
    */
-  public double[] getTargetSpaceArray() {
-    return LimelightHelpers.getBotPose_TargetSpace(limelightName);
+  public double getHoodSetpointFromTY() {
+    double x = getTy();
+    return  1.23
+          + (-0.271)   * x
+          + (0.0609)   * Math.pow(x, 2)
+          + (-5.73e-3) * Math.pow(x, 3)
+          + (2.48e-4)  * Math.pow(x, 4)
+          + (-3.94e-6) * Math.pow(x, 5);
   }
 
-  /**
-   * Estimated forward distance from robot/camera to target in meters.
-   * Assumes target-space Z is the forward/depth axis.
-   */
+  /** Estimated forward distance (Z axis in target space) to target in meters. */
   public double getTargetForwardMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double[] targetSpace = getTargetSpaceArray();
-    if (targetSpace == null || targetSpace.length < 3) {
-      return -1.0;
-    }
-
-    return targetSpace[2];
+    if (!targetValid()) return -1.0;
+    double[] ts = LimelightHelpers.getBotPose_TargetSpace(limelightName);
+    if (ts == null || ts.length < 3) return -1.0;
+    return ts[2];
   }
 
-  /**
-   * Estimated lateral offset from robot/camera to target in meters.
-   * Assumes target-space X is the left/right axis.
-   */
+  /** Estimated lateral offset (X axis in target space) to target in meters. */
   public double getTargetLateralMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double[] targetSpace = getTargetSpaceArray();
-    if (targetSpace == null || targetSpace.length < 3) {
-      return -1.0;
-    }
-
-    return targetSpace[0];
+    if (!targetValid()) return -1.0;
+    double[] ts = LimelightHelpers.getBotPose_TargetSpace(limelightName);
+    if (ts == null || ts.length < 3) return -1.0;
+    return ts[0];
   }
 
-  /**
-   * Estimated planar distance from robot/camera to target in meters.
-   * Uses lateral + forward components from target space.
-   */
+  /** Planar distance to target using forward + lateral components. */
   public double getTargetDistanceMeters() {
-    if (!targetValid()) {
-      return -1.0;
-    }
-
-    double lateral = getTargetLateralMeters();
-    double forward = getTargetForwardMeters();
-
-    if (lateral < 0 && forward < 0) {
-      return -1.0;
-    }
-
-    return Math.hypot(lateral, forward);
+    double lat = getTargetLateralMeters();
+    double fwd = getTargetForwardMeters();
+    if (lat == -1.0 && fwd == -1.0) return -1.0;
+    return Math.hypot(lat, fwd);
   }
   public double getTargetBearingDegrees() {
     if (!targetValid()) return 0.0;

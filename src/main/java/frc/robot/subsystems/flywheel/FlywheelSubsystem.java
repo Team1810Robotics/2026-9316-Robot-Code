@@ -41,16 +41,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    rightConfig.Slot0 = new Slot0Configs()
-        .withKP(0.12)
-        .withKI(0.0)
-        .withKD(0.0)
-        .withKV(0.12);
+    rightConfig.Slot0 = new Slot0Configs().withKP(0.12).withKI(0.0).withKD(0.0).withKV(0.12);
 
     rightMotor.getConfigurator().apply(rightConfig);
 
-    leftMotor.setControl(
-        new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
+    leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
 
     SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
   }
@@ -118,7 +113,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   public double getCurrentVelocity() {
     return rightMotor.getVelocity().getValueAsDouble();
   }
-
+  
   public double getTargetVelocity() {
     return activeTargetVelocityRPS;
   }
@@ -131,7 +126,12 @@ public class FlywheelSubsystem extends SubsystemBase {
   public String getFlywheelState() {
     return state.toString();
   }
-
+  public double computeFlywheelRPMFromTY(double ty) {
+    return  3065
+          + (-70.4) * ty
+          + (5.9)   * Math.pow(ty, 2)
+          + (-0.122) * Math.pow(ty, 3);
+  }
   @Override
   public void periodic() {
     if (activeTargetVelocityRPS == 0.0) {

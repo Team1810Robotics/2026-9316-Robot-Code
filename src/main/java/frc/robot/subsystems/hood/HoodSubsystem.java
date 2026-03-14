@@ -7,15 +7,21 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.vision.VisionSubsystem; // NEW: import for VisionSubsystem
 
 public class HoodSubsystem extends SubsystemBase {
   public int hoodEncoderRotations = 0;
 
   private final TalonFX hoodMotor;
   public final DutyCycleEncoder hoodEncoder;
+
+  // NEW: limit switch
+  private final DigitalInput hoodLimitSwitch;
+  private boolean lastLimitSwitchPressed = false;
 
   private final PIDController hoodPIDController;
 
@@ -29,25 +35,28 @@ public class HoodSubsystem extends SubsystemBase {
 
   private double manualSpeed = 0.0;
   private double currentSetPoint = HoodConstants.DEFAULT_POSITION;
-  private double defaultSetPoint = HoodConstants.DEFAULT_POSITION;
-  private double visionSetPoint = HoodConstants.DEFAULT_POSITION;
-  private boolean hasVisionTarget = false;
+  // NEW: removed defaultSetPoint, visionSetPoint, and hasVisionTarget —
+  // vision targeting is now handled automatically in periodic()
 
   private double lastRawEncoder = 0.0;
   private boolean encoderInitialized = false;
 
-  // Added for zeroing continuous encoder on boot
   private double hoodZeroOffset = 0.0;
   private boolean hoodZeroed = false;
+  
+    private VisionSubsystem visionSubsystem;
+  
+    // NEW: constructor now accepts VisionSubsystem instead of no arguments
+    public HoodSubsystem(VisionSubsystem visionSubsystem) {
+      this.visionSubsystem = visionSubsystem;
 
-  public HoodSubsystem() {
     hoodEncoder = new DutyCycleEncoder(HoodConstants.HOOD_ENCODER_DIO);
+    hoodLimitSwitch = new DigitalInput(HoodConstants.HOOD_LIMIT_SWITCH_DIO); // NEW
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     configureMotor();
 
-    hoodPIDController =
-        new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    hoodPIDController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
     hoodPIDController.setTolerance(HoodConstants.HOOD_TOLERANCE);
 
     SmartDashboard.putData("Hood Encoder", hoodEncoder);
@@ -56,8 +65,7 @@ public class HoodSubsystem extends SubsystemBase {
   private void configureMotor() {
     var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 
-    var ramps =
-        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25);
+    var ramps = new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25);
 
     var current =
         new CurrentLimitsConfigs()
@@ -85,12 +93,9 @@ public class HoodSubsystem extends SubsystemBase {
     boolean isHigh = currentRaw > 0.8;
     boolean isLow = currentRaw < 0.2;
 
-    // Wrapped high -> low
     if (wasHigh && isLow) {
       hoodEncoderRotations++;
-    }
-    // Wrapped low -> high
-    else if (wasLow && isHigh) {
+    } else if (wasLow && isHigh) {
       hoodEncoderRotations--;
     }
 
@@ -98,12 +103,26 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void zeroContinuousHoodEncoder() {
-  hoodEncoderRotations = 0;
-  lastRawEncoder = hoodEncoder.get();
-  encoderInitialized = true;
-  hoodZeroOffset = -hoodEncoder.get();
-  hoodZeroed = true;
-}
+    hoodEncoderRotations = 0;
+    lastRawEncoder = hoodEncoder.get();
+    encoderInitialized = true;
+    hoodZeroOffset = -hoodEncoder.get();
+    hoodZeroed = true;
+  }
+
+  public double getHoodEncoder () {
+    return hoodEncoder.get();
+  }
+
+  public double getContinuousHoodEncoder() {
+    double rawContinuous = -(hoodEncoderRotations + hoodEncoder.get());
+    return rawContinuous - hoodZeroOffset;
+  }
+
+  // NEW
+  public boolean isLimitSwitchPressed() {
+    return hoodLimitSwitch.get() == HoodConstants.HOOD_LIMIT_SWITCH_PRESSED_STATE;
+  }
 
   public void run(double speed) {
     hoodMode = HoodMode.MANUAL;
@@ -114,16 +133,6 @@ public class HoodSubsystem extends SubsystemBase {
     hoodMode = HoodMode.IDLE;
     manualSpeed = 0.0;
     hoodMotor.stopMotor();
-  }
-
-  public double getHoodEncoder() {
-    return hoodEncoder.get();
-  }
-
-  // Continuous value increases when hood goes UP, and resets to 0 on boot
-  public double getContinuousHoodEncoder() {
-    double rawContinuous = -(hoodEncoderRotations + hoodEncoder.get());
-    return rawContinuous - hoodZeroOffset;
   }
 
   public void runUP(double speed) {
@@ -145,34 +154,35 @@ public class HoodSubsystem extends SubsystemBase {
     return currentSetPoint;
   }
 
-  public void setDefaultSetPoint(double setpoint) {
-    defaultSetPoint = setpoint;
-  }
-
-  public void setVisionSetPoint(double setpoint) {
-    visionSetPoint = setpoint;
-  }
-
-  public void setHasVisionTarget(boolean hasTarget) {
-    hasVisionTarget = hasTarget;
-  }
-
-  public boolean hasVisionTarget() {
-    return hasVisionTarget;
-  }
-
-  public void runSelectedSetPoint() {
-    setPoint(hasVisionTarget ? visionSetPoint : defaultSetPoint);
-  }
-
   public boolean isAtSetPoint() {
-    return Math.abs(getContinuousHoodEncoder() - currentSetPoint)
-        <= HoodConstants.HOOD_TOLERANCE;
+    return Math.abs(getContinuousHoodEncoder() - currentSetPoint) <= HoodConstants.HOOD_TOLERANCE;
+  }
+  // 
+  /**
+   * NEW: Computes the desired hood encoder position from Limelight TY
+   * using a 5th-degree polynomial best fit curve.
+   * y = 1.23 - 0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵
+   * where x = TY (degrees), y = hood encoder value
+   */
+  public double computeHoodSetpointFromTY(double ty) {
+    return  1.23
+          + (-0.271)   * ty
+          + (0.0609)   * Math.pow(ty, 2)
+          + (-5.73e-3) * Math.pow(ty, 3)
+          + (2.48e-4)  * Math.pow(ty, 4)
+          + (-3.94e-6) * Math.pow(ty, 5);
   }
 
   private void applyMotorOutput(double output) {
     double clamped =
         MathUtil.clamp(output, -HoodConstants.MAX_PID_OUTPUT, HoodConstants.MAX_PID_OUTPUT);
+
+    // NEW:
+    // If the hood is on the zero/home switch, do not allow further downward motion.
+    // Negative output is assumed to be DOWN toward the limit switch.
+    if (isLimitSwitchPressed() && clamped < 0) {
+      clamped = 0.0;
+    }
 
     hoodMotor.set(clamped);
   }
@@ -181,10 +191,16 @@ public class HoodSubsystem extends SubsystemBase {
   public void periodic() {
     updateEncoderTracking();
 
-    // Zero once after encoder tracking is initialized
     if (encoderInitialized && !hoodZeroed) {
       zeroContinuousHoodEncoder();
     }
+
+    // NEW: zero encoder when switch is newly pressed
+    boolean limitPressed = isLimitSwitchPressed();
+    if (limitPressed && !lastLimitSwitchPressed) {
+      zeroContinuousHoodEncoder();
+    }
+    lastLimitSwitchPressed = limitPressed;
 
     double currentPosition = getContinuousHoodEncoder();
 
@@ -204,16 +220,18 @@ public class HoodSubsystem extends SubsystemBase {
         break;
     }
 
+
     SmartDashboard.putNumber("Hood Raw Encoder", getHoodEncoder());
     SmartDashboard.putNumber("Hood Continuous Encoder", getContinuousHoodEncoder());
     SmartDashboard.putNumber("Hood Encoder Rotations", hoodEncoderRotations);
     SmartDashboard.putNumber("Hood Zero Offset", hoodZeroOffset);
     SmartDashboard.putBoolean("Hood Zeroed", hoodZeroed);
+    SmartDashboard.putBoolean("Hood Limit Switch", isLimitSwitchPressed()); // NEW
     SmartDashboard.putString("Hood Mode", hoodMode.toString());
     SmartDashboard.putNumber("Hood SetPoint", currentSetPoint);
-    SmartDashboard.putNumber("Hood Default SetPoint", defaultSetPoint);
-    SmartDashboard.putNumber("Hood Vision SetPoint", visionSetPoint);
-    SmartDashboard.putBoolean("Hood Has Vision Target", hasVisionTarget);
     SmartDashboard.putBoolean("Hood At SetPoint", isAtSetPoint());
+    // NEW: replaces the old "Hood Has Vision Target" boolean that relied on the
+    // removed hasVisionTarget field — now reads directly from VisionSubsystem
+    SmartDashboard.putBoolean("Hood Has Vision Target", visionSubsystem.targetValid());
   }
 }

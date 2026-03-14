@@ -30,8 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
   public IntakeSubsystem() {
     intakeMotor =
         new SparkFlex(
-            IntakeConstants.INTAKE_MOTOR,
-            com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
+            IntakeConstants.INTAKE_MOTOR, com.revrobotics.spark.SparkLowLevel.MotorType.kBrushless);
 
     intakeMotorL =
         new SparkMax(
