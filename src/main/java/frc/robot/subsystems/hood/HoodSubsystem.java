@@ -157,7 +157,7 @@ public class HoodSubsystem extends SubsystemBase {
   public boolean isAtSetPoint() {
     return Math.abs(getContinuousHoodEncoder() - currentSetPoint) <= HoodConstants.HOOD_TOLERANCE;
   }
-
+  // 
   /**
    * NEW: Computes the desired hood encoder position from Limelight TY
    * using a 5th-degree polynomial best fit curve.
