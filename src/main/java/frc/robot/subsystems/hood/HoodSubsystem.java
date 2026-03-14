@@ -5,74 +5,215 @@ import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.OpenLoopRampsConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class HoodSubsystem extends SubsystemBase {
   public int hoodEncoderRotations = 0;
-  public boolean hoodEncoderWasHigh = false;
+
   private final TalonFX hoodMotor;
   public final DutyCycleEncoder hoodEncoder;
 
-  /** Creates a new HoodSubsystem. */
+  private final PIDController hoodPIDController;
+
+  private enum HoodMode {
+    IDLE,
+    MANUAL,
+    POSITION
+  }
+
+  private HoodMode hoodMode = HoodMode.IDLE;
+
+  private double manualSpeed = 0.0;
+  private double currentSetPoint = HoodConstants.DEFAULT_POSITION;
+  private double defaultSetPoint = HoodConstants.DEFAULT_POSITION;
+  private double visionSetPoint = HoodConstants.DEFAULT_POSITION;
+  private boolean hasVisionTarget = false;
+
+  private double lastRawEncoder = 0.0;
+  private boolean encoderInitialized = false;
+
+  // Added for zeroing continuous encoder on boot
+  private double hoodZeroOffset = 0.0;
+  private boolean hoodZeroed = false;
+
   public HoodSubsystem() {
-    hoodEncoder = new DutyCycleEncoder(1);
+    hoodEncoder = new DutyCycleEncoder(HoodConstants.HOOD_ENCODER_DIO);
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     configureMotor();
-    edu.wpi.first.wpilibj.smartdashboard.SmartDashboard.putData("Absolute Encoder", hoodEncoder);
+
+    hoodPIDController =
+        new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    hoodPIDController.setTolerance(HoodConstants.HOOD_TOLERANCE);
+
+    SmartDashboard.putData("Hood Encoder", hoodEncoder);
   }
 
-  /*
-  public Command AimHood() {
-    // Inline construction of command goes here.
-    // Subsystem::RunOnce implicitly requires `this` subsystem.
-    hoodEncoder = new DutyCycleEncoder(0);
-    hoodMotor = new TalonFX(Constants.HoodConstants.HOOD_MOTOR_ID);
-    hoodMotor.set(0);
-    return runOnce(
-        () -> {
-          // one-time action goes here
-        });
-  }
-  */
   private void configureMotor() {
     var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 
     var ramps =
-        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25); // smooth starts/stops
+        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25);
 
     var current =
         new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(true)
-            .withStatorCurrentLimit(40) // start conservative
+            .withStatorCurrentLimit(40)
             .withSupplyCurrentLimitEnable(true)
-            .withSupplyCurrentLimit(35); // start conservative
+            .withSupplyCurrentLimit(35);
 
     hoodMotor.getConfigurator().apply(outCfg);
     hoodMotor.getConfigurator().apply(ramps);
     hoodMotor.getConfigurator().apply(current);
   }
 
+  private void updateEncoderTracking() {
+    double currentRaw = hoodEncoder.get();
+
+    if (!encoderInitialized) {
+      lastRawEncoder = currentRaw;
+      encoderInitialized = true;
+      return;
+    }
+
+    boolean wasHigh = lastRawEncoder > 0.8;
+    boolean wasLow = lastRawEncoder < 0.2;
+    boolean isHigh = currentRaw > 0.8;
+    boolean isLow = currentRaw < 0.2;
+
+    // Wrapped high -> low
+    if (wasHigh && isLow) {
+      hoodEncoderRotations++;
+    }
+    // Wrapped low -> high
+    else if (wasLow && isHigh) {
+      hoodEncoderRotations--;
+    }
+
+    lastRawEncoder = currentRaw;
+  }
+
+  public void zeroContinuousHoodEncoder() {
+  hoodEncoderRotations = 0;
+  lastRawEncoder = hoodEncoder.get();
+  encoderInitialized = true;
+  hoodZeroOffset = -hoodEncoder.get();
+  hoodZeroed = true;
+}
+
   public void run(double speed) {
-    hoodMotor.set(speed);
+    hoodMode = HoodMode.MANUAL;
+    manualSpeed = speed;
   }
 
   public void stopHood() {
-    hoodMotor.stopMotor(); // Stop the hood motor
+    hoodMode = HoodMode.IDLE;
+    manualSpeed = 0.0;
+    hoodMotor.stopMotor();
   }
 
   public double getHoodEncoder() {
-
-    // figured out pulses per second (1 khz)
     return hoodEncoder.get();
   }
 
+  // Continuous value increases when hood goes UP, and resets to 0 on boot
+  public double getContinuousHoodEncoder() {
+    double rawContinuous = -(hoodEncoderRotations + hoodEncoder.get());
+    return rawContinuous - hoodZeroOffset;
+  }
+
   public void runUP(double speed) {
-    hoodMotor.set(speed);
+    hoodMode = HoodMode.MANUAL;
+    manualSpeed = Math.abs(speed);
   }
 
   public void runDOWN(double speed) {
-    hoodMotor.set(-speed);
+    hoodMode = HoodMode.MANUAL;
+    manualSpeed = -Math.abs(speed);
+  }
+
+  public void setPoint(double setpoint) {
+    currentSetPoint = setpoint;
+    hoodMode = HoodMode.POSITION;
+  }
+
+  public double getSetPoint() {
+    return currentSetPoint;
+  }
+
+  public void setDefaultSetPoint(double setpoint) {
+    defaultSetPoint = setpoint;
+  }
+
+  public void setVisionSetPoint(double setpoint) {
+    visionSetPoint = setpoint;
+  }
+
+  public void setHasVisionTarget(boolean hasTarget) {
+    hasVisionTarget = hasTarget;
+  }
+
+  public boolean hasVisionTarget() {
+    return hasVisionTarget;
+  }
+
+  public void runSelectedSetPoint() {
+    setPoint(hasVisionTarget ? visionSetPoint : defaultSetPoint);
+  }
+
+  public boolean isAtSetPoint() {
+    return Math.abs(getContinuousHoodEncoder() - currentSetPoint)
+        <= HoodConstants.HOOD_TOLERANCE;
+  }
+
+  private void applyMotorOutput(double output) {
+    double clamped =
+        MathUtil.clamp(output, -HoodConstants.MAX_PID_OUTPUT, HoodConstants.MAX_PID_OUTPUT);
+
+    hoodMotor.set(clamped);
+  }
+
+  @Override
+  public void periodic() {
+    updateEncoderTracking();
+
+    // Zero once after encoder tracking is initialized
+    if (encoderInitialized && !hoodZeroed) {
+      zeroContinuousHoodEncoder();
+    }
+
+    double currentPosition = getContinuousHoodEncoder();
+
+    switch (hoodMode) {
+      case MANUAL:
+        applyMotorOutput(manualSpeed);
+        break;
+
+      case POSITION:
+        double output = hoodPIDController.calculate(currentPosition, currentSetPoint);
+        applyMotorOutput(output);
+        break;
+
+      case IDLE:
+      default:
+        hoodMotor.stopMotor();
+        break;
+    }
+
+    SmartDashboard.putNumber("Hood Raw Encoder", getHoodEncoder());
+    SmartDashboard.putNumber("Hood Continuous Encoder", getContinuousHoodEncoder());
+    SmartDashboard.putNumber("Hood Encoder Rotations", hoodEncoderRotations);
+    SmartDashboard.putNumber("Hood Zero Offset", hoodZeroOffset);
+    SmartDashboard.putBoolean("Hood Zeroed", hoodZeroed);
+    SmartDashboard.putString("Hood Mode", hoodMode.toString());
+    SmartDashboard.putNumber("Hood SetPoint", currentSetPoint);
+    SmartDashboard.putNumber("Hood Default SetPoint", defaultSetPoint);
+    SmartDashboard.putNumber("Hood Vision SetPoint", visionSetPoint);
+    SmartDashboard.putBoolean("Hood Has Vision Target", hasVisionTarget);
+    SmartDashboard.putBoolean("Hood At SetPoint", isAtSetPoint());
   }
 }

@@ -79,9 +79,9 @@ public class RobotContainer {
     // autoChooser = AutoBuilder.buildAutoChooser();
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
-    NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, 67.0)); // Example: Spin flywheel to 100 RPS
-    NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, 200));
-    NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, 0));
+NamedCommands.registerCommand("Flywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 67.0));
+NamedCommands.registerCommand("StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200));
+NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0));
     // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake));
     // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
     // NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
@@ -89,97 +89,112 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-  // Default drivetrain command
-  drivetrain.setDefaultCommand(
-      drivetrain.applyRequest(
-          () ->
-              drive
-                  .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                  .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                  .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate)));
+    // Default drivetrain command
+    driverXbox.back().onTrue(Commands.runOnce(() -> hoodSubsystem.zeroContinuousHoodEncoder(), hoodSubsystem));
 
-  // ---------------- DRIVER CONTROLS ----------------
-  // B = point wheels in joystick direction
-  driverXbox
-      .b()
-      .whileTrue(
-          drivetrain.applyRequest(
-              () ->
-                  point.withModuleDirection(
-                      new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
+    drivetrain.setDefaultCommand(
+        drivetrain.applyRequest(
+            () ->
+                drive
+                    .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                    .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                    .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate)));
 
-  // X = face target / hub while driving
-  driverXbox
-      .x()
-      .whileTrue(
-          drivetrain.applyRequest(
-              () ->
-                  faceAngle
-                      .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                      .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                      .withTargetDirection(drivetrain.getAngleToHub())
-                      .withHeadingPID(5, 0, 0)));
+    // ---------------- DRIVER CONTROLS ----------------
+    // B = point wheels in joystick direction
+    driverXbox
+        .b()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    point.withModuleDirection(
+                        new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
-  // Left bumper = reset field-centric heading
-  driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // X = face target / hub while driving
+    driverXbox
+        .x()
+        .whileTrue(
+            drivetrain.applyRequest(
+                () ->
+                    faceAngle
+                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+                        .withTargetDirection(drivetrain.getAngleToHub())
+                        .withHeadingPID(5, 0, 0)));
 
-  // Right bumper = run flywheel
-  driverXbox.rightBumper().whileTrue(flywheelSubsystem.setDutyCycleCommand(0.75));
+    // Left bumper = reset field-centric heading
+    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-  // ---------------- INTAKE CONTROLS ----------------
+    // Right bumper = run flywheel using velocity control / fallback target
+    driverXbox.rightBumper().whileTrue(new Flywheel(flywheelSubsystem, indexerSubsystem, 67.0));
 
-  // Right trigger = intake wheels forward
-  driverXbox.rightTrigger().whileTrue(
-      Commands.startEnd(
-          () -> intakeSubsystem.TestingIntakeMotor(0.5),
-          () -> intakeSubsystem.TestingIntakeMotor(0.0),
-          intakeSubsystem));
+    // ---------------- INTAKE CONTROLS ----------------
 
-  // Left trigger = intake wheels reverse
-  driverXbox.leftTrigger().whileTrue(
-      Commands.startEnd(
-          () -> intakeSubsystem.TestingIntakeMotor(-0.5),
-          () -> intakeSubsystem.TestingIntakeMotor(0.0),
-          intakeSubsystem));
+    // Right trigger = intake wheels forward
+    driverXbox.rightTrigger().whileTrue(
+        Commands.startEnd(
+            () -> intakeSubsystem.TestingIntakeMotor(0.5),
+            () -> intakeSubsystem.TestingIntakeMotor(0.0),
+            intakeSubsystem));
 
-  // Intake arm out
-  driverXbox.y().onTrue(
-      new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
+    // Left trigger = intake wheels reverse
+    driverXbox.leftTrigger().whileTrue(
+        Commands.startEnd(
+            () -> intakeSubsystem.TestingIntakeMotor(-0.5),
+            () -> intakeSubsystem.TestingIntakeMotor(0.0),
+            intakeSubsystem));
 
-  // Intake arm in
-  driverXbox.start().onTrue(
-      new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION), intakeSubsystem));
+    // Intake arm out
+    driverXbox.y().onTrue(
+        new InstantCommand(
+            () -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
 
-  // ---------------- HOOD CONTROLS ----------------
+    // Intake arm in
+    driverXbox.start().onTrue(
+        new InstantCommand(
+            () -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION), intakeSubsystem));
 
-  // Manipulator Y = move hood
-  gamepadManipulator.y().onTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
+    // ---------------- HOOD CONTROLS ----------------
 
-  // Driver back = alternate hood action
-  driverXbox.back().onTrue(new Hood(hoodSubsystem, 1, true));
+// Manipulator Y = hood up while held
+driverXbox.a().whileTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
-  // ---------------- INDEXER CONTROLS ----------------
+// Manipulator A = hood down while held
+driverXbox.povRight().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
+    // ---------------- INDEXER CONTROLS ----------------
 
-  // POV up = normal indexer run
-  driverXbox.povUp().whileTrue(new Indexer(indexerSubsystem, true));
+    // POV up = normal indexer run
+    driverXbox.povUp().whileTrue(
+        Commands.startEnd(
+            () -> indexerSubsystem.runBothForward(),
+            () -> indexerSubsystem.stopAll(),
+            indexerSubsystem));
 
-  // POV down = reverse both indexer sections together
-driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.runIndexer1Reverse () , () -> indexerSubsystem.stopIndexer1()));
-driverXbox.povDown().whileTrue(Commands.startEnd(() -> indexerSubsystem.runIndexer2Reverse () , () -> indexerSubsystem.stopIndexer2()));
+    driverXbox.povDown().whileTrue(
+        Commands.startEnd(
+            () -> indexerSubsystem.runBothReverse(),
+            () -> indexerSubsystem.stopAll(),
+            indexerSubsystem));
 
-  driverXbox
-      .povRight()
-      .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
+    // driverXbox
+    //     .povRight()
+    //     .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
 
-  driverXbox
-      .povLeft()
-      .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
+    driverXbox
+        .povLeft()
+        .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null, true)));
 
-  // ---------------- SYSID ----------------
+    // ---------------- SYSID ----------------
 
-  driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-  driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-  driverXbox.start().and(driverXbox.y()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-  driverXbox.start().and(driverXbox.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
-}
+    driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
+    driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
+    driverXbox
+        .start()
+        .and(driverXbox.y())
+        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
+    driverXbox
+        .start()
+        .and(driverXbox.x())
+        .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+  }
 }

@@ -1,28 +1,35 @@
 package frc.robot.subsystems.flywheel;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
-  // private final DigitalInput beamBreak;
 
-  // VelocityVoltage controller for precise RPM control (TalonFX built-in)
+  // Reuse this control request object
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  // Target velocity in rotations per second (RPS)
-  private double targetVelocity = 200.0;
+  // Fallback target when no vision target is present
+  private double defaultVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
 
-  // Flywheel state tracking for diagnostics and control
+  // Target calculated from limelight/vision later
+  private double visionVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
+
+  // Whether vision currently sees a valid target
+  private boolean hasVisionTarget = false;
+
+  // What we are currently asking the flywheel to do
+  private double activeTargetVelocityRPS = 0.0;
+
   private enum FlywheelState {
     STOPPED,
     SPINNING_UP,
@@ -35,76 +42,112 @@ public class FlywheelSubsystem extends SubsystemBase {
     leftMotor = new TalonFX(FlywheelConstants.leftMotorID);
     rightMotor = new TalonFX(FlywheelConstants.rightMotorID);
 
-    // beamBreak = new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
+    TalonFXConfiguration rightConfig = new TalonFXConfiguration();
 
-    // TODO: Configure motor settings (inversions, PID gains) here
+    rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    TalonFXConfiguration cfg = new TalonFXConfiguration();
+    // Example gains - tune these on the robot
+    rightConfig.Slot0 = new Slot0Configs()
+        .withKP(0.12)
+        .withKI(0.0)
+        .withKD(0.0)
+        .withKV(0.12);
 
-    cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    rightMotor.getConfigurator().apply(rightConfig);
 
-    rightMotor.getConfigurator().apply(cfg);
-
-    leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
+    // Left follows right
+    leftMotor.setControl(
+        new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
   }
 
-  // public boolean getBeamBreakTriggered() {
-  //   // Beam break is triggered when FALSE (NPN sensor logic)
-  //   return !beamBreak.get();
-  // }
+  // -------------------------
+  // Target selection
+  // -------------------------
 
-  // Set flywheel to specific velocity in rotations per second (RPS)
+  public void setDefaultVelocity(double velocityRPS) {
+    defaultVelocityRPS = velocityRPS;
+  }
+
+  public double getDefaultVelocity() {
+    return defaultVelocityRPS;
+  }
+
+  public void setVisionVelocity(double velocityRPS) {
+    visionVelocityRPS = velocityRPS;
+  }
+
+  public double getVisionVelocity() {
+    return visionVelocityRPS;
+  }
+
+  public void setHasVisionTarget(boolean hasTarget) {
+    hasVisionTarget = hasTarget;
+  }
+
+  public boolean hasVisionTarget() {
+    return hasVisionTarget;
+  }
+
+  public double getRequestedVelocity() {
+    return hasVisionTarget ? visionVelocityRPS : defaultVelocityRPS;
+  }
+
+  // -------------------------
+  // Flywheel control
+  // -------------------------
+
+  public void runSelectedVelocity() {
+    activeTargetVelocityRPS = getRequestedVelocity();
+    rightMotor.setControl(velocityControl.withVelocity(activeTargetVelocityRPS));
+  }
+
   public void setFlywheelVelocity(double velocityRPS) {
-    this.targetVelocity = velocityRPS;
-    // Use VelocityVoltage control for precise speed management
-    leftMotor.setControl(velocityControl.withVelocity(velocityRPS));
+    activeTargetVelocityRPS = velocityRPS;
     rightMotor.setControl(velocityControl.withVelocity(velocityRPS));
   }
 
-  public Command setDutyCycleCommand(double dutyCycle) {
-    return Commands.startEnd(() -> rightMotor.set(dutyCycle), () -> rightMotor.stopMotor(), this);
+  public void stopFlywheel() {
+    activeTargetVelocityRPS = 0.0;
+    rightMotor.stopMotor();
   }
 
-  // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-
-    leftMotor.set(powerPercent);
+    activeTargetVelocityRPS = 0.0;
     rightMotor.set(powerPercent);
   }
 
-  // Get current velocity in RPS (for diagnostics and feedback)
   public double getCurrentVelocity() {
-    // Average velocity of both motors
-    double leftVel = leftMotor.getVelocity().getValueAsDouble();
-    double rightVel = rightMotor.getVelocity().getValueAsDouble();
-    return (leftVel + rightVel) / 2.0;
+    return rightMotor.getVelocity().getValueAsDouble();
   }
 
-  // Get target velocity
   public double getTargetVelocity() {
-    return targetVelocity;
+    return activeTargetVelocityRPS;
   }
 
-  // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed() {
-    double tolerance = 2.0; // RPS tolerance (adjust as needed)
-    return Math.abs(getCurrentVelocity() - targetVelocity) < tolerance;
+    double tolerance = 2.0;
+    return Math.abs(getCurrentVelocity() - activeTargetVelocityRPS) < tolerance;
   }
 
-  // Get current state for debugging
   public String getFlywheelState() {
     return state.toString();
   }
 
   @Override
   public void periodic() {
-    // Update state machine based on current performance
-    if (targetVelocity == 0.0) {
+    if (activeTargetVelocityRPS == 0.0) {
       state = FlywheelState.STOPPED;
     } else if (isAtTargetSpeed()) {
       state = FlywheelState.AT_SPEED;
     } else {
       state = FlywheelState.SPINNING_UP;
     }
+
+    SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
+    SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Vision RPS", visionVelocityRPS);
+    SmartDashboard.putBoolean("Flywheel Has Vision Target", hasVisionTarget);
+    SmartDashboard.putString("Flywheel State", state.toString());
   }
 }

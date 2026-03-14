@@ -3,42 +3,35 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.hood.HoodSubsystem;
 
-/*
- * notes go here:
- *
- * kraken x44 motor
- *
- * encoder (tell where the hood is based on how many rotations it has done)
- *   0 = hood is fully down, 1 = hood is fully up (or something like that)
- *
- * up and down movement
- *
- */
-
 public class Hood extends Command {
-  private static HoodSubsystem hoodSubsystem;
-  private double hoodSpeed;
-  private double otherHoodSpeed;
-  double hoodDegrees;
-  HoodMode mode;
+  private final HoodSubsystem hoodSubsystem;
+  private final double hoodValue;
+  private final boolean isGoToPos;
 
-  enum HoodMode {
-    Up,
-    Down,
-    Immobile,
-    goToPos1,
-    goToPos2,
-    goToPos3
+  public Hood(HoodSubsystem hoodSubsystem, double speedOrPosition, boolean isGoToPos) {
+    this.hoodSubsystem = hoodSubsystem;
+    this.hoodValue = speedOrPosition;
+    this.isGoToPos = isGoToPos;
+    addRequirements(hoodSubsystem);
   }
 
-  public Hood(HoodSubsystem hoodSubsystem, double Speed, boolean isGoToPos) {
-    this.hoodSubsystem = hoodSubsystem;
-    addRequirements(hoodSubsystem);
-
+  @Override
+  public void initialize() {
     if (isGoToPos) {
-      otherHoodSpeed = Speed;
-    } else {
-      hoodSpeed = Speed;
+      hoodSubsystem.setPoint(hoodValue);
+    }
+  } 
+
+  @Override
+  public void execute() {
+    if (!isGoToPos) {
+      if (hoodValue > 0) {
+        hoodSubsystem.runUP(hoodValue);
+      } else if (hoodValue < 0) {
+        hoodSubsystem.runDOWN(Math.abs(hoodValue));
+      } else {
+        hoodSubsystem.stopHood();
+      }
     }
   }
 
@@ -48,12 +41,7 @@ public class Hood extends Command {
   }
 
   @Override
-  public void execute() {
-    if (hoodSubsystem.hoodEncoder.get() > 0.9 && hoodSubsystem.hoodEncoderWasHigh) {
-      hoodSubsystem.hoodEncoderWasHigh = false;
-      hoodSubsystem.hoodEncoderRotations++;
-    } else if (hoodSubsystem.hoodEncoder.get() < 0.1 && !hoodSubsystem.hoodEncoderWasHigh) {
-      hoodSubsystem.hoodEncoderWasHigh = true;
-    }
+  public boolean isFinished() {
+    return isGoToPos && hoodSubsystem.isAtSetPoint();
   }
 }
