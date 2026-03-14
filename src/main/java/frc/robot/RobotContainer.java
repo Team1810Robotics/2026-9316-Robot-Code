@@ -21,6 +21,7 @@ import frc.robot.commands.Flywheel;
 import frc.robot.commands.Hood;
 import frc.robot.commands.Indexer;
 import frc.robot.commands.Intake;
+import frc.robot.commands.FlywheelTune;
 // --SUBSYTEM--
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
@@ -50,7 +51,7 @@ public class RobotContainer {
       TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
 
   private double MaxAngularRate =
-      RotationsPerSecond.of(0.75)
+      RotationsPerSecond.of(0.45)
           .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
   private final SwerveRequest.FieldCentricFacingAngle faceAngle =
@@ -61,8 +62,8 @@ public class RobotContainer {
   /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
-          .withDeadband(MaxSpeed * 0.1)
-          .withRotationalDeadband(MaxAngularRate * 0.1) // Add a 10% deadband
+          .withDeadband(MaxSpeed * 0.15)
+          .withRotationalDeadband(MaxAngularRate * 0.15) // Add a 10% deadband
           .withDriveRequestType(
               DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
@@ -112,7 +113,7 @@ NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, in
 
     // X = face target / hub while driving
     driverXbox
-        .x()
+        .back()
         .whileTrue(
             drivetrain.applyRequest(
                 () ->
@@ -123,34 +124,56 @@ NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, in
                         .withHeadingPID(5, 0, 0)));
 
     // Left bumper = reset field-centric heading
-    driverXbox.leftBumper().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    driverXbox.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Right bumper = run flywheel using velocity control / fallback target
-    driverXbox.rightBumper().whileTrue(new Flywheel(flywheelSubsystem, indexerSubsystem, 67.0));
+    driverXbox.rightTrigger().whileTrue(new FlywheelTune(flywheelSubsystem, indexerSubsystem));
 
     // ---------------- INTAKE CONTROLS ----------------
 
     // Right trigger = intake wheels forward
-    driverXbox.rightTrigger().whileTrue(
-        Commands.startEnd(
-            () -> intakeSubsystem.TestingIntakeMotor(0.5),
-            () -> intakeSubsystem.TestingIntakeMotor(0.0),
-            intakeSubsystem));
+    // Right trigger = intake wheels forward + indexer forward
+driverXbox.leftTrigger().whileTrue(
+    Commands.startEnd(
+        () -> {
+          intakeSubsystem.TestingIntakeMotor(0.5);
+          indexerSubsystem.runBothForward();
+        },
+        () -> {
+          intakeSubsystem.TestingIntakeMotor(0.0);
+          indexerSubsystem.stopAll();
+        },
+        intakeSubsystem,
+        indexerSubsystem));
+
+// Left trigger = intake wheels reverse + indexer reverse
+driverXbox.leftBumper().whileTrue(
+    Commands.startEnd(
+        () -> {
+          intakeSubsystem.TestingIntakeMotor(-0.5);
+          indexerSubsystem.runBothForward();
+        },
+        () -> {
+          intakeSubsystem.TestingIntakeMotor(0.0);
+          indexerSubsystem.stopAll();
+        },
+        intakeSubsystem,
+        indexerSubsystem));
 
     // Left trigger = intake wheels reverse
-    driverXbox.leftTrigger().whileTrue(
+    driverXbox.rightBumper().whileTrue(
         Commands.startEnd(
             () -> intakeSubsystem.TestingIntakeMotor(-0.5),
             () -> intakeSubsystem.TestingIntakeMotor(0.0),
             intakeSubsystem));
 
     // Intake arm out
-    driverXbox.y().onTrue(
+    driverXbox.x().onTrue(
         new InstantCommand(
             () -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
 
     // Intake arm in
-    driverXbox.start().onTrue(
+    driverXbox.b().onTrue(
         new InstantCommand(
             () -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION), intakeSubsystem));
 
@@ -196,5 +219,11 @@ driverXbox.povRight().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEE
         .start()
         .and(driverXbox.x())
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+        gamepadManipulator.y().onTrue(
+    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(2.0), flywheelSubsystem));
+
+gamepadManipulator.a().onTrue(
+    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(-2.0), flywheelSubsystem));
   }
 }

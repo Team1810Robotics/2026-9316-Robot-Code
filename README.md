@@ -15,16 +15,16 @@
 | -----          | -----                            |
 | Left Stick     | Swerve Drive                     |
 | Right Stick    | Swerve Rotate                    |
-| L Trigger      |Intake wheels spin                |
+| L Trigger      |Intake/Indexer wheels spin        |
 | L Bumper       |Intake wheels reverse             |
-| R Trigger      |Start shooter sequence            | 
-| R Bumper       |Reset feild orientation           |
+| R Trigger      |Shooter sequence                  | 
+| R Bumper       |Indexer reverse                   |
 | X              |Intake Down                       |
 | A              |Auto align (and hood move maybe:) |
 | B              |Intake Up                         |
-| Y              |                                  |
-| POV Up         | Manual hood move up              |
-| POV Down       | Manual hood move down            |
+| Y              |Reset feild orientation           |
+| POV Up         |Manual hood move up               |
+| POV Down       |Manual hood move down             |
 | POV Left       |                                  |
 | POV Right      |                                  |
 

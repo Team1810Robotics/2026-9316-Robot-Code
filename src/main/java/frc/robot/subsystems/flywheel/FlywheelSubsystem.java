@@ -15,20 +15,15 @@ public class FlywheelSubsystem extends SubsystemBase {
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
 
-  // Reuse this control request object
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  // Fallback target when no vision target is present
   private double defaultVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
-
-  // Target calculated from limelight/vision later
   private double visionVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
-
-  // Whether vision currently sees a valid target
   private boolean hasVisionTarget = false;
-
-  // What we are currently asking the flywheel to do
   private double activeTargetVelocityRPS = 0.0;
+
+  private static final String SHOOTER_TARGET_RPS_KEY = "Shooter Target RPS";
+  private static final double DEFAULT_TUNING_RPS = 52.0;
 
   private enum FlywheelState {
     STOPPED,
@@ -46,7 +41,6 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    // Example gains - tune these on the robot
     rightConfig.Slot0 = new Slot0Configs()
         .withKP(0.12)
         .withKI(0.0)
@@ -55,14 +49,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     rightMotor.getConfigurator().apply(rightConfig);
 
-    // Left follows right
     leftMotor.setControl(
         new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
-  }
 
-  // -------------------------
-  // Target selection
-  // -------------------------
+    SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
+  }
 
   public void setDefaultVelocity(double velocityRPS) {
     defaultVelocityRPS = velocityRPS;
@@ -92,9 +83,17 @@ public class FlywheelSubsystem extends SubsystemBase {
     return hasVisionTarget ? visionVelocityRPS : defaultVelocityRPS;
   }
 
-  // -------------------------
-  // Flywheel control
-  // -------------------------
+  public double getDashboardTargetVelocity() {
+    return SmartDashboard.getNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
+  }
+
+  public void setDashboardTargetVelocity(double velocityRPS) {
+    SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, velocityRPS);
+  }
+
+  public void adjustDashboardTargetVelocity(double deltaRPS) {
+    setDashboardTargetVelocity(getDashboardTargetVelocity() + deltaRPS);
+  }
 
   public void runSelectedVelocity() {
     activeTargetVelocityRPS = getRequestedVelocity();
@@ -147,7 +146,11 @@ public class FlywheelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
     SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
     SmartDashboard.putNumber("Flywheel Vision RPS", visionVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Dashboard Target RPS", getDashboardTargetVelocity());
+    SmartDashboard.putNumber("Flywheel Current RPM", getCurrentVelocity() * 60.0);
+    SmartDashboard.putNumber("Flywheel Target RPM", activeTargetVelocityRPS * 60.0);
     SmartDashboard.putBoolean("Flywheel Has Vision Target", hasVisionTarget);
+    SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
     SmartDashboard.putString("Flywheel State", state.toString());
   }
 }

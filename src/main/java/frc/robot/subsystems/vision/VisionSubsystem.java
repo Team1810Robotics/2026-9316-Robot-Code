@@ -1,6 +1,5 @@
 package frc.robot.subsystems.vision;
 
-// DriverStation not used in this subsystem
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -9,20 +8,10 @@ import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.util.LimelightHelpers;
 import frc.robot.util.LimelightHelpers.PoseEstimate;
 
-/**
- * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting the appropriate
- * alliance botpose entries (wpiblue / wpired) based on DriverStation.
- *
- * <p>Includes a small runtime validator to log raw Limelight arrays and converted poses for
- * on-robot verification.
- */
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
 
   private final CommandSwerveDrivetrain drivetrain;
-
-  // TODO: At some point come by and grab the logging changes I (sam) made in 1810, works a lil
-  // better
 
   public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
     this.limelightName = name;
@@ -34,10 +23,6 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // TODO: From 1810 testing, this will need to be slightly different. Probably applying mode 1 in
-    // auto and/or the early part of teleop, then switching to mode 4 after the match starts. This
-    // is because the botpose MT2 entries are very noisy when the robot is stationary, which is most
-    // of auto and the early part of teleop.
     if (DriverStation.isDisabled()) {
       LimelightHelpers.SetIMUMode(limelightName, 1);
     } else {
@@ -55,27 +40,41 @@ public class VisionSubsystem extends SubsystemBase {
 
     if (!targetValid()) {
       DogLog.log("Vision/BotPose", new Pose2d());
-
+      DogLog.log("Vision/TargetValid", false);
+      DogLog.log("Vision/TX", 0.0);
+      DogLog.log("Vision/TY", 0.0);
+      DogLog.log("Vision/TargetID", -1);
+      DogLog.log("Vision/TargetDistanceMeters", -1.0);
       return;
     }
 
     PoseEstimate botPoseMT2 = getBotPoseMT2();
-
     drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
-    DogLog.log("Vision/BotPose", getBotPoseMT2().pose);
+    DogLog.log("Vision/BotPose", botPoseMT2.pose);
+    DogLog.log("Vision/TargetValid", targetValid());
+    DogLog.log("Vision/TX", getTx());
+    DogLog.log("Vision/TY", getTy());
+    DogLog.log("Vision/TargetID", getTargetID());
+    DogLog.log("Vision/TargetForwardMeters", getTargetForwardMeters());
+    DogLog.log("Vision/TargetLateralMeters", getTargetLateralMeters());
+    DogLog.log("Vision/TargetDistanceMeters", getTargetDistanceMeters());
   }
 
-  // gets the april tag ID
-  /**
-   * @return AprilTag / fiducial ID (tid)
-   */
   public int getTargetID() {
     return (int) LimelightHelpers.getFiducialID(limelightName);
   }
 
   public boolean targetValid() {
     return LimelightHelpers.getTV(limelightName);
+  }
+
+  public double getTx() {
+    return LimelightHelpers.getTX(limelightName);
+  }
+
+  public double getTy() {
+    return LimelightHelpers.getTY(limelightName);
   }
 
   public PoseEstimate getBotPoseMT1() {
@@ -86,20 +85,69 @@ public class VisionSubsystem extends SubsystemBase {
     return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
   }
 
-  /**
-   * this is the one that matters ;)
-   * 676676767676676767676767676767676767676767676767676767676767676767676767676767676767676 CALL
-   * THIS NUMBER -> (913) 488-2670 -sam
-   *
-   * @return
-   */
-
-  /*this is the tuffest iteration of this code and pls text
-  +1 (913) 660 6067 and only send the word avacado
-  -Grant */
-
   public Pose2d getBotPoseTargetSpace() {
     return LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_TargetSpace(limelightName))
         .toPose2d();
+  }
+
+  /**
+   * Returns the raw bot-pose-in-target-space array from Limelight.
+   * Useful for debugging axis meanings.
+   */
+  public double[] getTargetSpaceArray() {
+    return LimelightHelpers.getBotPose_TargetSpace(limelightName);
+  }
+
+  /**
+   * Estimated forward distance from robot/camera to target in meters.
+   * Assumes target-space Z is the forward/depth axis.
+   */
+  public double getTargetForwardMeters() {
+    if (!targetValid()) {
+      return -1.0;
+    }
+
+    double[] targetSpace = getTargetSpaceArray();
+    if (targetSpace == null || targetSpace.length < 3) {
+      return -1.0;
+    }
+
+    return targetSpace[2];
+  }
+
+  /**
+   * Estimated lateral offset from robot/camera to target in meters.
+   * Assumes target-space X is the left/right axis.
+   */
+  public double getTargetLateralMeters() {
+    if (!targetValid()) {
+      return -1.0;
+    }
+
+    double[] targetSpace = getTargetSpaceArray();
+    if (targetSpace == null || targetSpace.length < 3) {
+      return -1.0;
+    }
+
+    return targetSpace[0];
+  }
+
+  /**
+   * Estimated planar distance from robot/camera to target in meters.
+   * Uses lateral + forward components from target space.
+   */
+  public double getTargetDistanceMeters() {
+    if (!targetValid()) {
+      return -1.0;
+    }
+
+    double lateral = getTargetLateralMeters();
+    double forward = getTargetForwardMeters();
+
+    if (lateral < 0 && forward < 0) {
+      return -1.0;
+    }
+
+    return Math.hypot(lateral, forward);
   }
 }
