@@ -1,5 +1,7 @@
 package frc.robot.subsystems.hood;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 public final class HoodConstants {
   public static final int HOOD_MOTOR_ID = 15;
   public static final int HOOD_ENCODER_DIO = 1;
@@ -30,4 +32,15 @@ public final class HoodConstants {
 
   // Wrap detection threshold for a 0-1 absolute encoder
   public static final double ENCODER_WRAP_THRESHOLD = 0.5;
+  // In HoodConstants.java
+  public static final InterpolatingDoubleTreeMap DISTANCE_TO_HOOD_SETPOINT = new InterpolatingDoubleTreeMap();
+
+  static {
+    // Tune these by shooting at known distances
+    DISTANCE_TO_HOOD_SETPOINT.put(1.0, 0.12);
+    DISTANCE_TO_HOOD_SETPOINT.put(2.0, 0.25);
+    DISTANCE_TO_HOOD_SETPOINT.put(3.0, 0.41);
+    DISTANCE_TO_HOOD_SETPOINT.put(4.0, 0.58);
+    DISTANCE_TO_HOOD_SETPOINT.put(5.0, 0.72);
+  }
 }
