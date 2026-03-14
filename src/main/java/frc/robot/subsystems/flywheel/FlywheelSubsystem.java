@@ -118,7 +118,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   public double getCurrentVelocity() {
     return rightMotor.getVelocity().getValueAsDouble();
   }
-
+  
   public double getTargetVelocity() {
     return activeTargetVelocityRPS;
   }
@@ -131,7 +131,12 @@ public class FlywheelSubsystem extends SubsystemBase {
   public String getFlywheelState() {
     return state.toString();
   }
-
+  public double computeFlywheelRPMFromTY(double ty) {
+    return  3065
+          + (-70.4) * ty
+          + (5.9)   * Math.pow(ty, 2)
+          + (-0.122) * Math.pow(ty, 3);
+  }
   @Override
   public void periodic() {
     if (activeTargetVelocityRPS == 0.0) {

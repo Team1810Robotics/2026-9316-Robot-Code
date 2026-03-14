@@ -56,5 +56,4 @@ public class AimAtHub extends Command {
             .withVelocityY(ySupplier.getAsDouble() * maxTranlationalVelocity).withRotationalRate(rotationalRate * maxRotationalVelocity)
         );
     }
-    
 }
