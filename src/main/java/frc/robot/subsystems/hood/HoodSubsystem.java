@@ -7,6 +7,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -16,6 +17,10 @@ public class HoodSubsystem extends SubsystemBase {
 
   private final TalonFX hoodMotor;
   public final DutyCycleEncoder hoodEncoder;
+
+  // NEW: limit switch
+  private final DigitalInput hoodLimitSwitch;
+  private boolean lastLimitSwitchPressed = false;
 
   private final PIDController hoodPIDController;
 
@@ -42,12 +47,12 @@ public class HoodSubsystem extends SubsystemBase {
 
   public HoodSubsystem() {
     hoodEncoder = new DutyCycleEncoder(HoodConstants.HOOD_ENCODER_DIO);
+    hoodLimitSwitch = new DigitalInput(HoodConstants.HOOD_LIMIT_SWITCH_DIO); // NEW
     hoodMotor = new TalonFX(HoodConstants.HOOD_MOTOR_ID);
     hoodMotor.set(0);
     configureMotor();
 
-    hoodPIDController =
-        new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    hoodPIDController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
     hoodPIDController.setTolerance(HoodConstants.HOOD_TOLERANCE);
 
     SmartDashboard.putData("Hood Encoder", hoodEncoder);
@@ -56,8 +61,7 @@ public class HoodSubsystem extends SubsystemBase {
   private void configureMotor() {
     var outCfg = new MotorOutputConfigs().withNeutralMode(NeutralModeValue.Brake);
 
-    var ramps =
-        new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25);
+    var ramps = new OpenLoopRampsConfigs().withDutyCycleOpenLoopRampPeriod(0.25);
 
     var current =
         new CurrentLimitsConfigs()
@@ -98,12 +102,17 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public void zeroContinuousHoodEncoder() {
-  hoodEncoderRotations = 0;
-  lastRawEncoder = hoodEncoder.get();
-  encoderInitialized = true;
-  hoodZeroOffset = -hoodEncoder.get();
-  hoodZeroed = true;
-}
+    hoodEncoderRotations = 0;
+    lastRawEncoder = hoodEncoder.get();
+    encoderInitialized = true;
+    hoodZeroOffset = -hoodEncoder.get();
+    hoodZeroed = true;
+  }
+
+  // NEW
+  public boolean isLimitSwitchPressed() {
+    return hoodLimitSwitch.get() == HoodConstants.HOOD_LIMIT_SWITCH_PRESSED_STATE;
+  }
 
   public void run(double speed) {
     hoodMode = HoodMode.MANUAL;
@@ -166,13 +175,19 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public boolean isAtSetPoint() {
-    return Math.abs(getContinuousHoodEncoder() - currentSetPoint)
-        <= HoodConstants.HOOD_TOLERANCE;
+    return Math.abs(getContinuousHoodEncoder() - currentSetPoint) <= HoodConstants.HOOD_TOLERANCE;
   }
 
   private void applyMotorOutput(double output) {
     double clamped =
         MathUtil.clamp(output, -HoodConstants.MAX_PID_OUTPUT, HoodConstants.MAX_PID_OUTPUT);
+
+    // NEW:
+    // If the hood is on the zero/home switch, do not allow further downward motion.
+    // Negative output is assumed to be DOWN toward the limit switch.
+    if (isLimitSwitchPressed() && clamped < 0) {
+      clamped = 0.0;
+    }
 
     hoodMotor.set(clamped);
   }
@@ -185,6 +200,13 @@ public class HoodSubsystem extends SubsystemBase {
     if (encoderInitialized && !hoodZeroed) {
       zeroContinuousHoodEncoder();
     }
+
+    // NEW: zero encoder when switch is newly pressed
+    boolean limitPressed = isLimitSwitchPressed();
+    if (limitPressed && !lastLimitSwitchPressed) {
+      zeroContinuousHoodEncoder();
+    }
+    lastLimitSwitchPressed = limitPressed;
 
     double currentPosition = getContinuousHoodEncoder();
 
@@ -209,6 +231,7 @@ public class HoodSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Hood Encoder Rotations", hoodEncoderRotations);
     SmartDashboard.putNumber("Hood Zero Offset", hoodZeroOffset);
     SmartDashboard.putBoolean("Hood Zeroed", hoodZeroed);
+    SmartDashboard.putBoolean("Hood Limit Switch", isLimitSwitchPressed()); // NEW
     SmartDashboard.putString("Hood Mode", hoodMode.toString());
     SmartDashboard.putNumber("Hood SetPoint", currentSetPoint);
     SmartDashboard.putNumber("Hood Default SetPoint", defaultSetPoint);

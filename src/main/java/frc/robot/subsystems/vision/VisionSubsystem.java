@@ -2,15 +2,11 @@ package frc.robot.subsystems.vision;
 
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightHelpers.PoseEstimate;
 
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
-
 
   public VisionSubsystem() {
     this.limelightName = VisionConstants.LIMELIGHT_NAME;
@@ -29,8 +25,6 @@ public class VisionSubsystem extends SubsystemBase {
       DogLog.log("Vision/TargetDistanceMeters", -1.0);
       return;
     }
-
-
 
     DogLog.log("Vision/TargetValid", targetValid());
     DogLog.log("Vision/TX", getTx());
@@ -53,5 +47,4 @@ public class VisionSubsystem extends SubsystemBase {
   public double getTy() {
     return LimelightHelpers.getTY(limelightName);
   }
-
 }

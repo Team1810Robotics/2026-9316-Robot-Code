@@ -41,16 +41,11 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    rightConfig.Slot0 = new Slot0Configs()
-        .withKP(0.12)
-        .withKI(0.0)
-        .withKD(0.0)
-        .withKV(0.12);
+    rightConfig.Slot0 = new Slot0Configs().withKP(0.12).withKI(0.0).withKD(0.0).withKV(0.12);
 
     rightMotor.getConfigurator().apply(rightConfig);
 
-    leftMotor.setControl(
-        new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
+    leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
 
     SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
   }
