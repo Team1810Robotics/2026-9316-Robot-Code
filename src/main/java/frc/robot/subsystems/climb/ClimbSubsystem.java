@@ -12,41 +12,39 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 
 public class ClimbSubsystem extends SubsystemBase {
-  // private final SparkMax motor1;
-  // private final SparkMax motor2;
+  private final SparkMax motor1;
+  private final SparkMax motor2;
 
-  // public boolean isExtended = false;
+  public boolean isExtended = false;
 
   public ClimbSubsystem() {
-    // motor1 = new SparkMax(ClimbConstants.motor1ID, MotorType.kBrushless);
-    /* motor2 = new SparkMax(ClimbConstants.motor2ID, MotorType.kBrushless);
+    motor1 = new SparkMax(ClimbConstants.motor1ID, MotorType.kBrushless);
+    motor2 = new SparkMax(ClimbConstants.motor2ID, MotorType.kBrushless);
 
      SparkMaxConfig config = new SparkMaxConfig();
      config.follow(motor1.getDeviceId());
-    */
-    // config.inverted(true);
+    config.inverted(true);
 
-    // motor2.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
   }
 
   public void Extend() {
-  //  motor1.set(ClimbConstants.SPEED);
-  // motor2.set(-ClimbConstants.SPEED);
-  // LEDConstants.IDLE = false;
-  // LEDSubsystem.setLEDColor(
-  //     new RGBWColor(LEDConstants.GREEN[0], LEDConstants.GREEN[1], LEDConstants.GREEN[2], 0),
-  //      false);
-  //  LEDSubsystem.setLEDAnimation("Fire", false);
+    motor1.set(ClimbConstants.SPEED);
+    motor2.set(-ClimbConstants.SPEED);
+    LEDConstants.IDLE = false;
+    LEDSubsystem.setLEDColor(
+        new RGBWColor(LEDConstants.GREEN[0], LEDConstants.GREEN[1], LEDConstants.GREEN[2], 0),
+        false);
+    LEDSubsystem.setLEDAnimation("Fire", false);
   }
 
   public void Stop() {
- //   motor1.set(0.0);
- //   motor2.set(0);
+    motor1.set(0.0);
+    motor2.set(0);
   }
 
   public void Retract() {
-  //  motor1.set(-ClimbConstants.SPEED);
-  //  motor2.set(ClimbConstants.SPEED);
-  //  LEDConstants.IDLE = true;
+    motor1.set(-ClimbConstants.SPEED);
+    motor2.set(ClimbConstants.SPEED);
+    LEDConstants.IDLE = true;
   }
 }

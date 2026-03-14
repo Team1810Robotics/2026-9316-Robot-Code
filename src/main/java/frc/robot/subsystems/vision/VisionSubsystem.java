@@ -15,6 +15,12 @@ public class VisionSubsystem extends SubsystemBase {
 
   private boolean LED_CD = false;
 
+  private final CommandSwerveDrivetrain drivetrain;
+
+  public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
+    this.limelightName = name;
+    this.drivetrain = drivetrain;
+
   public VisionSubsystem() {
     this.limelightName = VisionConstants.LIMELIGHT_NAME;
     LimelightHelpers.setPipelineIndex(limelightName, 2);
@@ -22,21 +28,33 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!targetValid()) {
+    if (DriverStation.isDisabled()) {
+      LimelightHelpers.SetIMUMode(limelightName, 1);
+    } else {
+      LimelightHelpers.SetIMUMode(limelightName, 4);
+    }
+
+    LimelightHelpers.SetRobotOrientation(
+        limelightName,
+        drivetrain.getState().Pose.getRotation().getDegrees(),
+        drivetrain.getState().Speeds.omegaRadiansPerSecond,
+        drivetrain.getPigeon2().getPitch().getValueAsDouble(),
+        0,
+        drivetrain.getPigeon2().getRoll().getValueAsDouble(),
+        0);
+
+    if (!targetValid() || getBotPoseMT2() == null) {
+      DogLog.log("Vision/BotPose", new Pose2d());
       DogLog.log("Vision/TargetValid", false);
       DogLog.log("Vision/TX", 0.0);
       DogLog.log("Vision/TY", 0.0);
       DogLog.log("Vision/TargetID", -1);
       DogLog.log("Vision/TargetDistanceMeters", -1.0);
-      DogLog.log("Vision/HoodSetpoint", 0.0);
-      return;
-    }
-
-    DogLog.log("Vision/TargetValid", true);
     if (!LED_CD) {
         LEDConstants.IDLE = true;
         LED_CD = true;
       }
+          DogLog.log("Vision/HoodSetpoint", 0.0);
         return;
     }
 
@@ -45,6 +63,11 @@ public class VisionSubsystem extends SubsystemBase {
         new RGBWColor(LEDConstants.PERRYWINKLE[0], LEDConstants.PERRYWINKLE[1], LEDConstants.PERRYWINKLE[2], 0),
         false);
     LEDSubsystem.setLEDAnimation("Rainbow", false);
+
+   
+
+    PoseEstimate botPoseMT2 = getBotPoseMT2();
+    drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
     LED_CD = false;
 
@@ -110,5 +133,15 @@ public class VisionSubsystem extends SubsystemBase {
     double fwd = getTargetForwardMeters();
     if (lat == -1.0 && fwd == -1.0) return -1.0;
     return Math.hypot(lat, fwd);
+  }
+  public double getTargetBearingDegrees() {
+    if (!targetValid()) return 0.0;
+
+    double lateral = getTargetLateralMeters();
+    double forward = getTargetForwardMeters();
+
+    if (lateral == -1.0 && forward == -1.0) return 0.0;
+
+    return Math.toDegrees(Math.atan2(lateral, forward)); // gets the angle of the measurement
   }
 }
