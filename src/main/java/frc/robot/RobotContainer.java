@@ -105,25 +105,25 @@ NamedCommands.registerCommand("StopFlywheel", new Flywheel(flywheelSubsystem, in
 
     // ---------------- DRIVER CONTROLS ----------------
     // B = point wheels in joystick direction
-    driverXbox
-        .b()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    point.withModuleDirection(
-                        new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
+    // driverXbox
+    //     .b()
+    //     .whileTrue(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 point.withModuleDirection(
+    //                     new Rotation2d(-driverXbox.getLeftY(), -driverXbox.getLeftX()))));
 
     // X = face target / hub while driving
-    driverXbox
-        .back()
-        .whileTrue(
-            drivetrain.applyRequest(
-                () ->
-                    faceAngle
-                        .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
-                        .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
-                        .withTargetDirection(drivetrain.getAngleToHub())
-                        .withHeadingPID(5, 0, 0)));
+    // driverXbox
+    //     .back()
+    //     .whileTrue(
+    //         drivetrain.applyRequest(
+    //             () ->
+    //                 faceAngle
+    //                     .withVelocityX(-driverXbox.getLeftY() * MaxSpeed)
+    //                     .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
+    //                     .withTargetDirection(drivetrain.getAngleToHub())
+    //                     .withHeadingPID(5, 0, 0)));
 
     // Left bumper = reset field-centric heading
     driverXbox.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
@@ -222,5 +222,11 @@ driverXbox.a().whileTrue((new AimAtHub(drivetrain, visionSubsystem, () -> -drive
         .start()
         .and(driverXbox.x())
         .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+
+    gamepadManipulator.y().onTrue(
+    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(2.0), flywheelSubsystem));
+
+    gamepadManipulator.a().onTrue(
+    Commands.runOnce(() -> flywheelSubsystem.adjustDashboardTargetVelocity(-2.0), flywheelSubsystem));
   }
 }
