@@ -43,10 +43,12 @@ public class HoodSubsystem extends SubsystemBase {
 
   private double hoodZeroOffset = 0.0;
   private boolean hoodZeroed = false;
-
-  // NEW: constructor now accepts VisionSubsystem instead of no arguments
-  public HoodSubsystem(VisionSubsystem visionSubsystem) {
-    this.visionSubsystem = visionSubsystem;
+  
+    private VisionSubsystem visionSubsystem;
+  
+    // NEW: constructor now accepts VisionSubsystem instead of no arguments
+    public HoodSubsystem(VisionSubsystem visionSubsystem) {
+      this.visionSubsystem = visionSubsystem;
 
     hoodEncoder = new DutyCycleEncoder(HoodConstants.HOOD_ENCODER_DIO);
     hoodLimitSwitch = new DigitalInput(HoodConstants.HOOD_LIMIT_SWITCH_DIO); // NEW
@@ -106,6 +108,15 @@ public class HoodSubsystem extends SubsystemBase {
     encoderInitialized = true;
     hoodZeroOffset = -hoodEncoder.get();
     hoodZeroed = true;
+  }
+
+  public double getHoodEncoder () {
+    return hoodEncoder.get();
+  }
+
+  public double getContinuousHoodEncoder() {
+    double rawContinuous = -(hoodEncoderRotations + hoodEncoder.get());
+    return rawContinuous - hoodZeroOffset;
   }
 
   // NEW
@@ -208,6 +219,7 @@ public class HoodSubsystem extends SubsystemBase {
         hoodMotor.stopMotor();
         break;
     }
+
 
     SmartDashboard.putNumber("Hood Raw Encoder", getHoodEncoder());
     SmartDashboard.putNumber("Hood Continuous Encoder", getContinuousHoodEncoder());
