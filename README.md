@@ -15,8 +15,8 @@
 | -----          | -----                            |
 | Left Stick     | Swerve Drive                     |
 | Right Stick    | Swerve Rotate                    |
-| L Trigger      |Intake wheels Reverse             |
-| L Bumper       |Intake wheels spin                |
+| L Trigger      |Intake wheels spin                |
+| L Bumper       |Intake wheels Reverse             |
 | R Trigger      |Start shooter sequence            | 
 | R Bumper       |Reset feild orientation           |
 | X              |Intake Down                       |
