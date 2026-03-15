@@ -87,9 +87,9 @@ private static final double TY_UPDATE_THRESHOLD = 0.2;
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand(
-        "StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200).withTimeout(5));
+        "StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200));
     NamedCommands.registerCommand(
-        "StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0).withTimeout(5));
+        "StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0));
     // NamedCommands.registerCommand("StartIntake", Commands.runOnce(() ->
     // intakeSubsystem.TestingIntakeMotor(0.5), intakeSubsystem));
     // NamedCommands.registerCommand("StopIntake", Commands.runOnce(() ->
