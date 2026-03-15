@@ -61,8 +61,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     configureMotor();
 
-    hoodPIDController =
-        new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
+    hoodPIDController = new PIDController(HoodConstants.kP, HoodConstants.kI, HoodConstants.kD);
     hoodPIDController.setTolerance(HoodConstants.HOOD_TOLERANCE);
 
     hoodMotor.stopMotor();
@@ -114,7 +113,7 @@ public class HoodSubsystem extends SubsystemBase {
   /**
    * Returns a wrapped encoder position in [0,1) that increases as the hood moves UP.
    *
-   * You observed that raw encoder decreases when hood goes up, so we invert it here.
+   * <p>You observed that raw encoder decreases when hood goes up, so we invert it here.
    */
   private double getWrappedHoodPosition() {
     double wrapped = 1.0 - hoodEncoder.get();
@@ -188,9 +187,8 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   /**
-   * Continuous hood position in "encoder turns from home", where:
-   * home ≈ 0
-   * moving hood up increases position
+   * Continuous hood position in "encoder turns from home", where: home ≈ 0 moving hood up increases
+   * position
    */
   public double getContinuousHoodEncoder() {
     double continuous = hoodEncoderRotations + getWrappedHoodPosition();
@@ -249,8 +247,7 @@ public class HoodSubsystem extends SubsystemBase {
   }
 
   public boolean isAtSetPoint() {
-    return Math.abs(getContinuousHoodEncoder() - currentSetPoint)
-        <= HoodConstants.HOOD_TOLERANCE;
+    return Math.abs(getContinuousHoodEncoder() - currentSetPoint) <= HoodConstants.HOOD_TOLERANCE;
   }
 
   public double computeHoodSetpointFromTY(double ty) {

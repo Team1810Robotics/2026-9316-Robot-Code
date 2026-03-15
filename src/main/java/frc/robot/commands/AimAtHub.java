@@ -27,10 +27,8 @@ public class AimAtHub extends Command {
 
   private final SwerveRequest.RobotCentric request = new SwerveRequest.RobotCentric();
 
-  private final double maxTranlationalVelocity =
-      TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-  private final double maxRotationalVelocity =
-      RotationsPerSecond.of(.5).in(RadiansPerSecond);
+  private final double maxTranlationalVelocity = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+  private final double maxRotationalVelocity = RotationsPerSecond.of(.5).in(RadiansPerSecond);
 
   public AimAtHub(
       CommandSwerveDrivetrain drivetrain,

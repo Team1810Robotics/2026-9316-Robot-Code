@@ -128,9 +128,9 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public double computeFlywheelRPMFromTY(double ty) {
-  double x = Math.abs(ty);
-  return 3065 + (-70.4) * x + (5.9) * Math.pow(x, 2) + (-0.122) * Math.pow(x, 3);
-}
+    double x = Math.abs(ty);
+    return 3065 + (-70.4) * x + (5.9) * Math.pow(x, 2) + (-0.122) * Math.pow(x, 3);
+  }
 
   @Override
   public void periodic() {
