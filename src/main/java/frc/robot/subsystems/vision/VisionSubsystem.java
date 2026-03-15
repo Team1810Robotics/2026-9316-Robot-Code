@@ -1,19 +1,18 @@
 package frc.robot.subsystems.vision;
 
-import com.ctre.phoenix6.signals.RGBWColor;
+// import com.ctre.phoenix6.signals.RGBWColor;
 
 import dev.doglog.DogLog;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.subsystems.led.LEDSubsystem;
+// import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+// import frc.robot.subsystems.led.LEDConstants;
+// import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.util.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
 
-  private boolean LED_CD = false;
+  // private boolean LED_CD = false;
 
   public VisionSubsystem() {
     this.limelightName = VisionConstants.LIMELIGHT_NAME;
@@ -33,22 +32,21 @@ public class VisionSubsystem extends SubsystemBase {
     }
 
     DogLog.log("Vision/TargetValid", true);
-    if (!LED_CD) {
-        LEDConstants.IDLE = true;
-        LED_CD = true;
-      }
-        return;
-    }
+    // if (!LED_CD) {
+    //     LEDConstants.IDLE = true;
+    //     LED_CD = true;
+    //   }
+    //     return;
+    // }
 
-    LEDConstants.IDLE = false;
-    LEDSubsystem.setLEDColor(
-        new RGBWColor(LEDConstants.PERRYWINKLE[0], LEDConstants.PERRYWINKLE[1], LEDConstants.PERRYWINKLE[2], 0),
-        false);
-    LEDSubsystem.setLEDAnimation("Rainbow", false);
+    // LEDConstants.IDLE = false;
+    // LEDSubsystem.setLEDColor(
+    //     new RGBWColor(LEDConstants.PERRYWINKLE[0], LEDConstants.PERRYWINKLE[1],
+    // LEDConstants.PERRYWINKLE[2], 0),
+    //     false);
+    // LEDSubsystem.setLEDAnimation("Rainbow", false);
 
-    LED_CD = false;
-
-  
+    // LED_CD = false;
     DogLog.log("Vision/TX", getTx());
     DogLog.log("Vision/TY", getTy());
     DogLog.log("Vision/TargetID", getTargetID());
@@ -74,18 +72,18 @@ public class VisionSubsystem extends SubsystemBase {
   }
 
   /**
-   * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit.
-   * y = 1.23 - 0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵
-   * Only call this when targetValid() is true.
+   * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit. y =
+   * 1.23 - 0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵ Only call this when targetValid()
+   * is true.
    */
   public double getHoodSetpointFromTY() {
     double x = getTy();
-    return  1.23
-          + (-0.271)   * x
-          + (0.0609)   * Math.pow(x, 2)
-          + (-5.73e-3) * Math.pow(x, 3)
-          + (2.48e-4)  * Math.pow(x, 4)
-          + (-3.94e-6) * Math.pow(x, 5);
+    return 1.23
+        + (-0.271) * x
+        + (0.0609) * Math.pow(x, 2)
+        + (-5.73e-3) * Math.pow(x, 3)
+        + (2.48e-4) * Math.pow(x, 4)
+        + (-3.94e-6) * Math.pow(x, 5);
   }
 
   /** Estimated forward distance (Z axis in target space) to target in meters. */

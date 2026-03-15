@@ -4,14 +4,11 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.util.HubStateUtil;
+
+// import frc.robot.util.HubStateUtil;
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in
@@ -38,9 +35,9 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
     CommandScheduler.getInstance().run();
 
-    HubStateUtil.log();
-    SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
-    SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
+    // HubStateUtil.log();
+    // SmartDashboard.putNumber("Match Time", DriverStation.getMatchTime());
+    // SmartDashboard.putNumber("Battery Voltage", RobotController.getBatteryVoltage());
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
@@ -75,7 +72,7 @@ public class Robot extends TimedRobot {
       CommandScheduler.getInstance().cancel(m_autonomousCommand);
     }
 
-    m_robotContainer.ledSubsystem.setSolidColor(LEDConstants.RED);
+    // m_robotContainer.ledSubsystem.setSolidColor(LEDConstants.RED);
   }
 
   /** This function is called periodically during operator control. */

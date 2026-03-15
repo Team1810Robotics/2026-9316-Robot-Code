@@ -1,12 +1,9 @@
 package frc.robot.subsystems.climb;
 
-public class ClimbConstants {
-  public static final int motor1ID = 12;
-  public static final int motor2ID = 13; // TODO: Fill me in
+public final class ClimbConstants {
 
-  public static final int time = 1; // Time in seconds for the climb to extend/retract
+  public static final int LEFT_CLIMB_MOTOR_ID = 12;
+  public static final int RIGHT_CLIMB_MOTOR_ID = 13;
 
-  // Climb motor speeds
-  public static final double EXTEND_SPEED = 0.25; // 25% power to extend
-  public static final double RETRACT_SPEED = -0.25; // -25% power to retract
+  public static final double CLIMB_SPEED = 0.7;
 }

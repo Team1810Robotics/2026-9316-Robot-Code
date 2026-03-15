@@ -4,37 +4,29 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 
 public class Climb extends Command {
-  private final ClimbSubsystem climbSubsystem;
 
-  public Climb(ClimbSubsystem climbSubsystem) {
+  private final ClimbSubsystem climbSubsystem;
+  private final double speed;
+
+  public Climb(ClimbSubsystem climbSubsystem, double speed) {
     this.climbSubsystem = climbSubsystem;
+    this.speed = speed;
+
     addRequirements(climbSubsystem);
   }
 
-  // @Override
-  //  public void initialize() {
-  //   if (climbSubsystem.isExtended == false) {
-  //     climbSubsystem.Extend();
-  //     this.withTimeout(ClimbConstants.time);
-  //     climbSubsystem.Stop();
-
-  //     climbSubsystem.isExtended = true;
-
-  //   } else {
-  //     climbSubsystem.Retract();
-  //     this.withTimeout(ClimbConstants.time);
-  //     climbSubsystem.Stop();
-  //     climbSubsystem.isExtended = false;
-  //   }
-  // }
-
-  // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    climbSubsystem.Extend();
+    climbSubsystem.runClimb(speed);
   }
 
-  // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    climbSubsystem.stopClimb();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

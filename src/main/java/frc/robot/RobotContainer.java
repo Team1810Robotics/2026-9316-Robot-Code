@@ -16,7 +16,6 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.AimAtHub;
 // --COMMANDS--
 import frc.robot.commands.Flywheel;
-import frc.robot.commands.FlywheelTune;
 // --SUBSYTEM--
 import frc.robot.commands.Hood;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
@@ -39,8 +38,8 @@ public class RobotContainer {
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  
-    private final HoodSubsystem hoodSubsystem = new HoodSubsystem(visionSubsystem);
+
+  private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
@@ -78,15 +77,19 @@ public class RobotContainer {
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
     NamedCommands.registerCommand(
-        "Flywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 67.0));
+        "StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200).withTimeout(5));
     NamedCommands.registerCommand(
-        "StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200));
+        "StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0).withTimeout(5));
+    // NamedCommands.registerCommand("StartIntake", Commands.runOnce(() ->
+    // intakeSubsystem.TestingIntakeMotor(0.5), intakeSubsystem));
+    // NamedCommands.registerCommand("StopIntake", Commands.runOnce(() ->
+    // intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
     NamedCommands.registerCommand(
-        "StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0));
-    // NamedCommands.registerCommand("StartIntake", new Intake(intakeSubsystem, 1, RunType.Intake));
-    // NamedCommands.registerCommand("StopIntake", new Intake(intakeSubsystem, 0, RunType.Intake));
-    // NamedCommands.registerCommand("StartIndexer", new Indexer(indexerSubsystem));
-    // NamedCommands.registerCommand("StopIndexer", new Indexer(indexerSubsystem));
+        "StartIndexer", Commands.runOnce(() -> indexerSubsystem.runBothForward()));
+    NamedCommands.registerCommand(
+        "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll()));
+    NamedCommands.registerCommand(
+        "AimAtHub", new AimAtHub(drivetrain, visionSubsystem, () -> 0, () -> 0));
   }
 
   private void configureBindings() {
@@ -129,18 +132,27 @@ public class RobotContainer {
     driverXbox.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
     // Right bumper = run flywheel using velocity control / fallback target
-    driverXbox.rightTrigger().whileTrue(
-    Commands.run(() -> {
-        if (visionSubsystem.targetValid()) {
-            double ty = visionSubsystem.getTy();
-            hoodSubsystem.setPoint(hoodSubsystem.computeHoodSetpointFromTY(ty));
-            double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(ty);
-            flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
-        }
-    }, hoodSubsystem, flywheelSubsystem)
-);
-
-
+    driverXbox
+    .rightTrigger()
+    .whileTrue(
+        Commands.run(
+                () -> {
+                  if (visionSubsystem.targetValid()) {
+                    double ty = visionSubsystem.getTy();
+                    double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(ty);
+                    hoodSubsystem.setVisionSetPoint(hoodTarget);
+                    hoodSubsystem.setPoint(hoodTarget);
+                    double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(ty);
+                    flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+                  }
+                },
+                hoodSubsystem,
+                flywheelSubsystem)
+            .finallyDo(
+                interrupted -> {
+                  hoodSubsystem.stopHood();
+                  flywheelSubsystem.setFlywheelVelocity(0.0);
+                }));
     // ---------------- INTAKE CONTROLS ----------------
 
     // Right trigger = intake wheels forward
