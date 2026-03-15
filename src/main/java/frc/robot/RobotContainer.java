@@ -5,6 +5,8 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.ctre.phoenix6.signals.RGBWColor;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -31,7 +33,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDConstants;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
+//import frc.robot.subsystems.climb.ClimbSubsystem;
 
 @SuppressWarnings("unused")
 public class RobotContainer {
@@ -39,7 +41,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
-  private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
+  //private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
 
@@ -71,8 +73,12 @@ public class RobotContainer {
 
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
-
+private final Debouncer shooterReadyDebouncer = new Debouncer(0.05);
   //   private final SendableChooser<Command> autoChooser;
+
+  private double lastVisionTy = 0.0;
+private boolean hasLockedVisionTarget = false;
+private static final double TY_UPDATE_THRESHOLD = 0.2;
 
   public RobotContainer() {
     configureBindings();
@@ -127,19 +133,39 @@ driverXbox
                   if (hasTarget) {
                     double ty = visionSubsystem.getTy();
 
-                    double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(ty);
-                    hoodSubsystem.setVisionSetPoint(hoodTarget);
-                    hoodSubsystem.setPoint(hoodTarget);
+                    if (!hasLockedVisionTarget || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
+                      lastVisionTy = ty;
+                      hasLockedVisionTarget = true;
 
-                    double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(ty);
-                    flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+                      double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
+                      hoodSubsystem.setVisionSetPoint(hoodTarget);
+                      hoodSubsystem.setPoint(hoodTarget);
+
+                      double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
+                      flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+                    }
                   } else {
+                    hasLockedVisionTarget = false;
+
                     // Fallback/default shot if no valid AprilTag is seen
                     hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
                     flywheelSubsystem.setFlywheelVelocity(flywheelSubsystem.getDefaultVelocity());
                   }
 
-                  boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 1.0;
+                  boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
+
+                  SmartDashboard.putBoolean("Has Target", hasTarget);
+                  SmartDashboard.putBoolean("Lined Up", linedUp);
+                  SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
+                  SmartDashboard.putBoolean("Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
+
+                  SmartDashboard.putNumber("TX", visionSubsystem.getTx());
+                  SmartDashboard.putNumber("TY", visionSubsystem.getTy());
+                  SmartDashboard.putNumber("Locked TY", lastVisionTy);
+                  SmartDashboard.putNumber("Hood Position", hoodSubsystem.getContinuousHoodEncoder());
+                  SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
+                  SmartDashboard.putNumber("Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
+                  SmartDashboard.putNumber("Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
 
                   boolean visionReady =
                       hasTarget
@@ -152,7 +178,19 @@ driverXbox
                           && hoodSubsystem.isAtSetPoint()
                           && flywheelSubsystem.isAtTargetSpeed();
 
-                  if (visionReady) {
+                  boolean rawShooterReady = visionReady || fallbackReady;
+                  boolean debouncedShooterReady =
+                      shooterReadyDebouncer.calculate(rawShooterReady);
+
+                  SmartDashboard.putBoolean("Vision Ready", visionReady);
+                  SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
+                  SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
+                  SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
+
+                  indexerSubsystem.setShooting(true);
+                  indexerSubsystem.setShooterReady(debouncedShooterReady);
+
+                  if (debouncedShooterReady && visionReady) {
                     LEDSubsystem.setLEDColor(
                         new RGBWColor(
                             LEDConstants.GREEN[0],
@@ -161,7 +199,7 @@ driverXbox
                             0),
                         false);
                     LEDSubsystem.setLEDAnimation("SingleFade", false);
-                  } else if (fallbackReady) {
+                  } else if (debouncedShooterReady && fallbackReady) {
                     LEDSubsystem.setLEDColor(
                         new RGBWColor(
                             LEDConstants.RED[0],
@@ -173,12 +211,15 @@ driverXbox
                   }
                 },
                 hoodSubsystem,
-                flywheelSubsystem)
+                flywheelSubsystem,
+                indexerSubsystem)
             .finallyDo(
                 interrupted -> {
                   hoodSubsystem.stopHood();
                   flywheelSubsystem.setFlywheelVelocity(0.0);
+                  indexerSubsystem.stopAll();
                   LEDSubsystem.setLEDAnimation("None", false);
+                  hasLockedVisionTarget = false;
                 }));
    
    
@@ -260,7 +301,7 @@ driverXbox
                 ledSubsystem,
                 () -> -driverXbox.getLeftY(),
                 () -> -driverXbox.getLeftX())));
-                
+
     // ---------------- INDEXER CONTROLS ----------------
 
     // // POV up = normal indexer run
@@ -299,10 +340,10 @@ driverXbox
     // ---------------- CLIMB CONTROLS ----------------
 
     // D-pad right = climb one direction while held
-    driverXbox.povRight().whileTrue(new Climb(climbSubsystem, 0.5));
+    //driverXbox.povRight().whileTrue(new Climb(climbSubsystem, 0.5));
 
     // D-pad left = climb opposite direction while held
-    driverXbox.povLeft().whileTrue(new Climb(climbSubsystem, -0.5));
+    //driverXbox.povLeft().whileTrue(new Climb(climbSubsystem, -0.5));
 
 
     gamepadManipulator
