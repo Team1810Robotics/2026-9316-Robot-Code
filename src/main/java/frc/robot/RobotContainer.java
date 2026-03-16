@@ -11,6 +11,9 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+
+import dev.doglog.DogLog;
+import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -19,15 +22,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AimAtHub;
-// --COMMANDS--
-import frc.robot.commands.Flywheel;
-// --SUBSYTEM--
 import frc.robot.commands.Hood;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
+import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -40,80 +41,202 @@ import frc.robot.subsystems.vision.VisionSubsystem;
 @SuppressWarnings("unused")
 public class RobotContainer {
 
-  // The robot's subsystems and commands are defined here...
+  // ---------------- SUBSYSTEMS ----------------
   public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
   private final VisionSubsystem visionSubsystem = new VisionSubsystem();
   // private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
   private final IndexerSubsystem indexerSubsystem = new IndexerSubsystem();
   private final IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
 
-  private double MaxSpeed =
-      TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+  // ---------------- DRIVE CONFIG ----------------
+  private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
 
-  private double MaxAngularRate =
-      RotationsPerSecond.of(0.45)
-          .in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
+  private final double MaxAngularRate = RotationsPerSecond.of(0.45).in(RadiansPerSecond);
 
   private final SwerveRequest.FieldCentricFacingAngle faceAngle =
       new SwerveRequest.FieldCentricFacingAngle()
           .withDeadband(MaxSpeed * 0.1)
           .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
-  /* Setting up bindings for necessary control of the swerve drive platform */
   private final SwerveRequest.FieldCentric drive =
       new SwerveRequest.FieldCentric()
           .withDeadband(MaxSpeed * 0.15)
-          .withRotationalDeadband(MaxAngularRate * 0.15) // Add a 10% deadband
-          .withDriveRequestType(
-              DriveRequestType.OpenLoopVoltage); // Use open-loop control for drive motors
+          .withRotationalDeadband(MaxAngularRate * 0.15)
+          .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+
   private final SwerveRequest.SwerveDriveBrake brake = new SwerveRequest.SwerveDriveBrake();
   private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
 
+  // ---------------- CONTROLLERS ----------------
   private final CommandXboxController driverXbox = new CommandXboxController(0);
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
+
+  // ---------------- SHOOTER STATE ----------------
   private final Debouncer shooterReadyDebouncer = new Debouncer(0.05);
 
   private double lastVisionTy = 0.0;
   private boolean hasLockedVisionTarget = false;
   private static final double TY_UPDATE_THRESHOLD = 0.2;
 
+  // ---------------- AUTO ----------------
   private final SendableChooser<Command> autoChooser;
 
   public RobotContainer() {
     configureBindings();
+    registerNamedCommands();
 
     autoChooser = AutoBuilder.buildAutoChooser();
+    SmartDashboard.putData("Auto Chooser", autoChooser);
+
+    DogLog.setOptions(new DogLogOptions().withCaptureNt(true).withCaptureDs(true).withNtPublish(true));
+  }
+
+  private void registerNamedCommands() {
+    // Register ALL named commands before building the auto chooser
+    // so PathPlanner can resolve them correctly.
 
     // NamedCommands.registerCommand("climb", new Climb(climbSubsystem));
-    NamedCommands.registerCommand(
-        "StartFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 200));
-    NamedCommands.registerCommand(
-        "StopFlywheel", new Flywheel(flywheelSubsystem, indexerSubsystem, 0));
-    // NamedCommands.registerCommand("StartIntake", Commands.runOnce(() ->
-    // intakeSubsystem.TestingIntakeMotor(0.5), intakeSubsystem));
-    // NamedCommands.registerCommand("StopIntake", Commands.runOnce(() ->
-    // intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
-    NamedCommands.registerCommand(
-        "StartIndexer", Commands.runOnce(() -> indexerSubsystem.runBothForward()));
-    NamedCommands.registerCommand(
-        "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll()));
-    NamedCommands.registerCommand(
-        "AimAtHub", new AimAtHub(drivetrain, visionSubsystem, ledSubsystem, () -> 0, () -> 0));
 
-    SmartDashboard.putData(autoChooser);
+    NamedCommands.registerCommand(
+        "StartFlywheel",
+        Commands.runOnce(() -> flywheelSubsystem.runSelectedVelocity(), flywheelSubsystem));
+
+    NamedCommands.registerCommand(
+        "StopFlywheel",
+        Commands.runOnce(() -> flywheelSubsystem.stopFlywheel(), flywheelSubsystem));
+
+    NamedCommands.registerCommand(
+        "Shoot",
+        Commands.run(
+                    () -> {
+                      boolean hasTarget = visionSubsystem.targetValid();
+
+                      if (hasTarget) {
+                        double ty = visionSubsystem.getTy();
+
+                        if (!hasLockedVisionTarget
+                            || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
+                          lastVisionTy = ty;
+                          hasLockedVisionTarget = true;
+
+                          double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
+                          hoodSubsystem.setVisionSetPoint(hoodTarget);
+                          hoodSubsystem.setPoint(hoodTarget);
+
+                          double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
+                          flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+                        }
+                      } else {
+                        hasLockedVisionTarget = false;
+
+                        // Fallback/default shot if no valid AprilTag is seen
+                        hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
+                        flywheelSubsystem.setFlywheelVelocity(
+                            flywheelSubsystem.getDefaultVelocity());
+                      }
+
+                      boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
+
+                      SmartDashboard.putBoolean("Has Target", hasTarget);
+                      SmartDashboard.putBoolean("Lined Up", linedUp);
+                      SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
+                      SmartDashboard.putBoolean(
+                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
+
+                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
+                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
+                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
+                      SmartDashboard.putNumber(
+                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
+                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
+                      SmartDashboard.putNumber(
+                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
+                      SmartDashboard.putNumber(
+                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
+
+                      boolean visionReady =
+                          hasTarget
+                              && linedUp
+                              && hoodSubsystem.isAtSetPoint()
+                              && flywheelSubsystem.isAtTargetSpeed();
+
+                      boolean fallbackReady =
+                          !hasTarget
+                              && hoodSubsystem.isAtSetPoint()
+                              && flywheelSubsystem.isAtTargetSpeed();
+
+                      boolean rawShooterReady = visionReady || fallbackReady;
+                      boolean debouncedShooterReady =
+                          shooterReadyDebouncer.calculate(rawShooterReady);
+
+                      SmartDashboard.putBoolean("Vision Ready", visionReady);
+                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
+                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
+                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
+
+                      indexerSubsystem.setShooting(true);
+                      indexerSubsystem.setShooterReady(debouncedShooterReady);
+
+                      if (debouncedShooterReady && visionReady) {
+                        LEDSubsystem.setLEDColor(
+                            new RGBWColor(
+                                LEDConstants.GREEN[0],
+                                LEDConstants.GREEN[1],
+                                LEDConstants.GREEN[2],
+                                0),
+                            false);
+                        LEDSubsystem.setLEDAnimation("SingleFade", false);
+                      } else if (debouncedShooterReady && fallbackReady) {
+                        LEDSubsystem.setLEDColor(
+                            new RGBWColor(
+                                LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
+                            false);
+                        LEDSubsystem.setLEDAnimation("SingleFade", false);
+                      }
+                    },
+                    hoodSubsystem,
+                    flywheelSubsystem,
+                    indexerSubsystem)
+                .finallyDo(
+                    interrupted -> {
+                      hoodSubsystem.stopHood();
+                      flywheelSubsystem.setFlywheelVelocity(0.0);
+                      indexerSubsystem.stopAll();
+                      LEDSubsystem.setLEDAnimation("None", false);
+                      hasLockedVisionTarget = false;
+                    }));
+
+    NamedCommands.registerCommand(
+        "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll(), indexerSubsystem));
+
+    NamedCommands.registerCommand(
+        "AimAtHub",
+        new AimAtHub(drivetrain, visionSubsystem, ledSubsystem, () -> 0, () -> 0).withTimeout(10));
+
+    NamedCommands.registerCommand(
+        "IntakeOut", 
+        new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
+
+    NamedCommands.registerCommand("ZeroHood", new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false).withTimeout(1));
+    // If you later want intake named commands, use subsystem requirements like this:
+    // NamedCommands.registerCommand(
+    //     "StartIntake",
+    //     Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.5), intakeSubsystem));
+    //
+    // NamedCommands.registerCommand(
+    //     "StopIntake",
+    //     Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
+  }
+
+  public Command getAutonomousCommand() {
+    return autoChooser.getSelected();
   }
 
   private void configureBindings() {
-    // Default drivetrain command
-    // driverXbox
-    //     .back()
-    //     .onTrue(Commands.runOnce(() -> hoodSubsystem.zeroContinuousHoodEncoder(),
-    // hoodSubsystem));
-
+    // ---------------- DEFAULT DRIVE COMMAND ----------------
     drivetrain.setDefaultCommand(
         drivetrain.applyRequest(
             () ->
@@ -122,10 +245,10 @@ public class RobotContainer {
                     .withVelocityY(-driverXbox.getLeftX() * MaxSpeed)
                     .withRotationalRate(-driverXbox.getRightX() * MaxAngularRate)));
 
-    // Left bumper = reset field-centric heading
-    driverXbox.start().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
+    // Reset field-centric heading
+    driverXbox.y().onTrue(drivetrain.runOnce(() -> drivetrain.seedFieldCentric()));
 
-    // Right trigger = run vision-based hood + flywheel targeting, or fallback targets if no tag
+    // ---------------- SHOOTER / VISION ----------------
     driverXbox
         .rightTrigger()
         .whileTrue(
@@ -230,17 +353,15 @@ public class RobotContainer {
 
     // ---------------- INTAKE CONTROLS ----------------
 
-    // Left trigger = intake wheels pull in & index runs
-    // Left bumper = intake wheels push out
-    // 'x' intake goes out
-    // 'b' intake stows
+    // Intake in + index forward
     driverXbox
         .leftTrigger()
         .whileTrue(
             Commands.startEnd(
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.5);
-                  indexerSubsystem.runBothForward();
+                indexerSubsystem.runBothForward();
+        
                 },
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.0);
@@ -249,14 +370,14 @@ public class RobotContainer {
                 intakeSubsystem,
                 indexerSubsystem));
 
-    // Left trigger = intake wheels reverse + indexer reverse
+    // Intake reverse + index forward
     driverXbox
         .leftBumper()
         .whileTrue(
             Commands.startEnd(
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(-0.5);
-                  indexerSubsystem.runBothForward();
+                  indexerSubsystem.runBothReverse();
                 },
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.0);
@@ -265,7 +386,7 @@ public class RobotContainer {
                 intakeSubsystem,
                 indexerSubsystem));
 
-    // Left trigger = intake wheels reverse
+    // Intake reverse only
     driverXbox
         .rightBumper()
         .whileTrue(
@@ -290,66 +411,28 @@ public class RobotContainer {
 
     // ---------------- HOOD CONTROLS ----------------
 
-    //  Dpad up = hood up while held
+    // D-pad up = hood up while held
     driverXbox.povUp().whileTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
-    //  Dpad down = hood down while held
+    // D-pad down = hood down while held
     driverXbox.povDown().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
 
-    // hold a to aim horizontally at hub
+    // Hold A to aim horizontally at hub
     driverXbox
         .a()
         .whileTrue(
-            (new AimAtHub(
+            new AimAtHub(
                 drivetrain,
                 visionSubsystem,
                 ledSubsystem,
                 () -> -driverXbox.getLeftY(),
-                () -> -driverXbox.getLeftX())));
-
-    // ---------------- INDEXER CONTROLS ----------------
-
-    // // POV up = normal indexer run
-    // driverXbox.povUp().whileTrue(
-    //     Commands.startEnd(
-    //         () -> indexerSubsystem.runBothForward(),
-    //         () -> indexerSubsystem.stopAll(),
-    //         indexerSubsystem));
-
-    // driverXbox.povDown().whileTrue(
-    //     Commands.startEnd(
-    //         () -> indexerSubsystem.runBothReverse(),
-    //         () -> indexerSubsystem.stopAll(),
-    //         indexerSubsystem));
-
-    // driverXbox
-    //     .povRight()
-    //     .onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDAnimation(null, true)));
-
-    // driverXbox.povLeft().onTrue(ledSubsystem.runOnce(() -> LEDSubsystem.setLEDColor(null,
-    // true)));
-
-    // ---------------- SYSID ----------------
-
-    // driverXbox.back().and(driverXbox.y()).whileTrue(drivetrain.sysIdDynamic(Direction.kForward));
-    // driverXbox.back().and(driverXbox.x()).whileTrue(drivetrain.sysIdDynamic(Direction.kReverse));
-    // driverXbox
-    //     .start()
-    //     .and(driverXbox.y())
-    //     .whileTrue(drivetrain.sysIdQuasistatic(Direction.kForward));
-    // driverXbox
-    //     .start()
-    //     .and(driverXbox.x())
-    //     .whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
+                () -> -driverXbox.getLeftX()));
 
     // ---------------- CLIMB CONTROLS ----------------
-
-    // D-pad right = climb one direction while held
     // driverXbox.povRight().whileTrue(new Climb(climbSubsystem, 0.5));
-
-    // D-pad left = climb opposite direction while held
     // driverXbox.povLeft().whileTrue(new Climb(climbSubsystem, -0.5));
 
+    // ---------------- MANIPULATOR CONTROLS ----------------
     gamepadManipulator
         .y()
         .onTrue(

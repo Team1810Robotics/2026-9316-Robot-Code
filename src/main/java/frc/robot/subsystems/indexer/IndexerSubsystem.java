@@ -3,6 +3,7 @@ package frc.robot.subsystems.indexer;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -90,6 +91,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     boolean index2Broken = isIndex2Broken();
 
     // Motor 1 logic

@@ -20,7 +20,7 @@
 | R Trigger      |Shooter sequence                  | 
 | R Bumper       |Indexer reverse                   |
 | X              |Intake Down                       |
-| A              |Auto align (and hood move maybe:) |
+| A              |Auto align                        |
 | B              |Intake Up                         |
 | Y              |Reset feild orientation           |
 | POV Up         |Manual hood move up               |

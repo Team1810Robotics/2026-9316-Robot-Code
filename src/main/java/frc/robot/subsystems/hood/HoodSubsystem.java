@@ -85,7 +85,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     SmartDashboard.putBoolean("Hood Zeroed", false);
     SmartDashboard.putBoolean("Hood Limit Switch Raw", false);
-    SmartDashboard.putBoolean("Hood Limit Switch Pressed", false);
+    SmartDashboard.putBoolean("Hood Limit Switch Pressed", true);
     SmartDashboard.putBoolean("Hood Has Vision Target", false);
     SmartDashboard.putBoolean("Hood At SetPoint", false);
     SmartDashboard.putBoolean("Hood Encoder Connected", false);
@@ -254,7 +254,7 @@ public class HoodSubsystem extends SubsystemBase {
     double x = Math.abs(ty);
 
     double setpoint =
-        1.23
+        1.01
             + (-0.271) * x
             + (0.0609) * Math.pow(x, 2)
             + (-5.73e-3) * Math.pow(x, 3)

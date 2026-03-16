@@ -7,37 +7,38 @@
         {
           "type": "named",
           "data": {
-            "name": "StartFlywheel"
+            "name": "ZeroHood"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "Start to collect"
+            "pathName": "MidStartToShoot"
           }
         },
         {
           "type": "named",
           "data": {
-            "name": "StartIndexer"
+            "name": "IntakeOut"
           }
         },
         {
-          "type": "wait",
+          "type": "parallel",
           "data": {
-            "waitTime": 5.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIndexer"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopFlywheel"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "AimAtHub"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "Shoot"
+                }
+              }
+            ]
           }
         }
       ]
