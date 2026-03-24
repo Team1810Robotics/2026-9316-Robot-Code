@@ -181,6 +181,7 @@ public class RobotContainer {
                       indexerSubsystem.setShooterReady(debouncedShooterReady);
 
                       if (debouncedShooterReady && visionReady) {
+                        intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
                         LEDSubsystem.setLEDColor(
                             new RGBWColor(
                                 LEDConstants.GREEN[0],
@@ -205,6 +206,7 @@ public class RobotContainer {
                       hoodSubsystem.stopHood();
                       flywheelSubsystem.setFlywheelVelocity(0.0);
                       indexerSubsystem.stopAll();
+                      intakeSubsystem.stopIntake();
                       LEDSubsystem.setLEDAnimation("None", false);
                       hasLockedVisionTarget = false;
                     }));
@@ -323,6 +325,7 @@ public class RobotContainer {
                       indexerSubsystem.setShooterReady(debouncedShooterReady);
 
                       if (debouncedShooterReady && visionReady) {
+                        intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
                         LEDSubsystem.setLEDColor(
                             new RGBWColor(
                                 LEDConstants.GREEN[0],
@@ -347,10 +350,10 @@ public class RobotContainer {
                       hoodSubsystem.stopHood();
                       flywheelSubsystem.setFlywheelVelocity(0.0);
                       indexerSubsystem.stopAll();
+                      intakeSubsystem.stopIntake();
                       LEDSubsystem.setLEDAnimation("None", false);
                       hasLockedVisionTarget = false;
                     }));
-
     // ---------------- INTAKE CONTROLS ----------------
 
     // Intake in + index forward
@@ -359,7 +362,7 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(0.5);
+                  intakeSubsystem.TestingIntakeMotor(0.9);
                 indexerSubsystem.runBothForward();
         
                 },

@@ -254,7 +254,7 @@ public class HoodSubsystem extends SubsystemBase {
     double x = Math.abs(ty);
 
     double setpoint =
-        1.01
+        0.892
             + (-0.271) * x
             + (0.0609) * Math.pow(x, 2)
             + (-5.73e-3) * Math.pow(x, 3)

@@ -64,7 +64,7 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public double getHoodSetpointFromTY() {
     double x = Math.abs(getTy());
-    return 1.01
+    return 0.892
         + (-0.271) * x
         + (0.0609) * Math.pow(x, 2)
         + (-5.73e-3) * Math.pow(x, 3)
