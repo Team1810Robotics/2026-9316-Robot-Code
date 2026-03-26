@@ -7,6 +7,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -119,7 +121,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public boolean isAtTargetSpeed() {
-    double tolerance = 2.0;
+    double tolerance = 10.0;
     return Math.abs(getCurrentVelocity() - activeTargetVelocityRPS) < tolerance;
   }
 
@@ -141,6 +143,13 @@ public class FlywheelSubsystem extends SubsystemBase {
     } else {
       state = FlywheelState.SPINNING_UP;
     }
+
+     if (DriverStation.isEnabled()) {
+      // Idle spin when enabled
+      new RunCommand(() -> flywheelSubsystem.setSpeed(0.2));
+    } else {
+      // Safety: stop when disabled
+      stopFlywheel();
 
     // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
     // SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);

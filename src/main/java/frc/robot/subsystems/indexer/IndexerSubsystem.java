@@ -107,8 +107,8 @@ public class IndexerSubsystem extends SubsystemBase {
     if (reverse2Enabled) {
       indexer2Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
     } else if (shootingEnabled && shooterReady) {
-      indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
-    } else if (indexingEnabled && !index2Broken) {
+      indexer2Motor.set(IndexerConstants.INDEXER_2_SHOOTER_SPEED);
+    } else if (indexingEnabled) {
       indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
     } else {
       indexer2Motor.set(0);

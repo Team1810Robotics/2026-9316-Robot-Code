@@ -75,7 +75,7 @@ public class RobotContainer {
   private final CommandXboxController gamepadManipulator = new CommandXboxController(1);
 
   // ---------------- SHOOTER STATE ----------------
-  private final Debouncer shooterReadyDebouncer = new Debouncer(0.05);
+  private final Debouncer shooterReadyDebouncer = new Debouncer(0.5);
 
   private double lastVisionTy = 0.0;
   private boolean hasLockedVisionTarget = false;
@@ -222,15 +222,17 @@ public class RobotContainer {
         "IntakeOut", 
         new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
 
-    NamedCommands.registerCommand("ZeroHood", new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false).withTimeout(1));
-    // If you later want intake named commands, use subsystem requirements like this:
-    // NamedCommands.registerCommand(
-    //     "StartIntake",
-    //     Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.5), intakeSubsystem));
-    //
-    // NamedCommands.registerCommand(
-    //     "StopIntake",
-    //     Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
+    NamedCommands.registerCommand(
+        "ZeroHood",
+         new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false).withTimeout(1));
+   
+    NamedCommands.registerCommand(
+        "StartIntake",
+        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.9), intakeSubsystem));
+    
+    NamedCommands.registerCommand(
+        "StopIntake",
+        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
   }
 
   public Command getAutonomousCommand() {
@@ -284,9 +286,9 @@ public class RobotContainer {
 
                       boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
 
-                      SmartDashboard.putBoolean("Has Target", hasTarget);
-                      SmartDashboard.putBoolean("Lined Up", linedUp);
-                      SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
+                    //   SmartDashboard.putBoolean("Has Target", hasTarget);
+                    //   SmartDashboard.putBoolean("Lined Up", linedUp);
+                    //   SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
                       SmartDashboard.putBoolean(
                           "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
 
@@ -325,7 +327,7 @@ public class RobotContainer {
                       indexerSubsystem.setShooterReady(debouncedShooterReady);
 
                       if (debouncedShooterReady && visionReady) {
-                        intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
+                        //intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
                         LEDSubsystem.setLEDColor(
                             new RGBWColor(
                                 LEDConstants.GREEN[0],
@@ -350,7 +352,7 @@ public class RobotContainer {
                       hoodSubsystem.stopHood();
                       flywheelSubsystem.setFlywheelVelocity(0.0);
                       indexerSubsystem.stopAll();
-                      intakeSubsystem.stopIntake();
+                    //   intakeSubsystem.stopIntake();
                       LEDSubsystem.setLEDAnimation("None", false);
                       hasLockedVisionTarget = false;
                     }));
@@ -362,16 +364,17 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(0.9);
-                indexerSubsystem.runBothForward();
+                  intakeSubsystem.TestingIntakeMotor(0.6);
+                // indexerSubsystem.runBothForward();
         
                 },
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.0);
-                  indexerSubsystem.stopAll();
+                //   indexerSubsystem.stopAll();
                 },
-                intakeSubsystem,
-                indexerSubsystem));
+                intakeSubsystem
+                // indexerSubsystem
+                ));
 
     // Intake reverse + index forward
     driverXbox
