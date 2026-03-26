@@ -145,10 +145,8 @@ public class FlywheelSubsystem extends SubsystemBase {
     }
 
      if (DriverStation.isEnabled()) {
-      // Idle spin when enabled
-      new RunCommand(() -> flywheelSubsystem.setSpeed(0.2));
+      leftMotor.set(FlywheelConstants.FLYWHEEL_SPEED);
     } else {
-      // Safety: stop when disabled
       stopFlywheel();
 
     // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
@@ -162,4 +160,5 @@ public class FlywheelSubsystem extends SubsystemBase {
     // SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
     // SmartDashboard.putString("Flywheel State", state.toString());
   }
+}
 }
