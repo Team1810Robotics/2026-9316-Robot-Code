@@ -1,5 +1,7 @@
 package frc.robot.subsystems.hood;
 
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+
 public final class HoodConstants {
   public static final int HOOD_MOTOR_ID = 15;
   public static final int HOOD_ENCODER_DIO = 1;

@@ -17,7 +17,23 @@ public class VisionSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    if (!targetValid()) {
+    if (DriverStation.isDisabled()) {
+      LimelightHelpers.SetIMUMode(limelightName, 1);
+    } else {
+      LimelightHelpers.SetIMUMode(limelightName, 4);
+    }
+
+    LimelightHelpers.SetRobotOrientation(
+        limelightName,
+        drivetrain.getState().Pose.getRotation().getDegrees(),
+        drivetrain.getState().Speeds.omegaRadiansPerSecond,
+        drivetrain.getPigeon2().getPitch().getValueAsDouble(),
+        0,
+        drivetrain.getPigeon2().getRoll().getValueAsDouble(),
+        0);
+
+    if (!targetValid() || getBotPoseMT2() == null) {
+      DogLog.log("Vision/BotPose", new Pose2d());
       DogLog.log("Vision/TargetValid", false);
       DogLog.log("Vision/TX", 0.0);
       DogLog.log("Vision/TY", 0.0);
@@ -94,5 +110,15 @@ public class VisionSubsystem extends SubsystemBase {
     double fwd = getTargetForwardMeters();
     if (lat == -1.0 && fwd == -1.0) return -1.0;
     return Math.hypot(lat, fwd);
+  }
+  public double getTargetBearingDegrees() {
+    if (!targetValid()) return 0.0;
+
+    double lateral = getTargetLateralMeters();
+    double forward = getTargetForwardMeters();
+
+    if (lateral == -1.0 && forward == -1.0) return 0.0;
+
+    return Math.toDegrees(Math.atan2(lateral, forward)); // gets the angle of the measurement
   }
 }
