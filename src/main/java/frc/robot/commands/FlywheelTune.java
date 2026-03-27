@@ -29,7 +29,7 @@ public class FlywheelTune extends Command {
     flywheelSubsystem.setFlywheelVelocity(targetRPS);
     indexerSubsystem.setShooterReady(flywheelSubsystem.isAtTargetSpeed());
 
-    LEDConstants.IDLE = false;
+    LEDConstants.IDLE = true;
     LEDSubsystem.setLEDColor(
         new RGBWColor(LEDConstants.WHITE[0], LEDConstants.WHITE[1], LEDConstants.WHITE[2], 0),
         false);

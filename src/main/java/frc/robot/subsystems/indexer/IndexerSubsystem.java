@@ -90,6 +90,7 @@ public class IndexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
     boolean index2Broken = isIndex2Broken();
 
     // Motor 1 logic

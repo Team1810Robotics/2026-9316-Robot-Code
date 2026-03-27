@@ -131,15 +131,19 @@ public class LEDSubsystem extends SubsystemBase {
 
   // in the periodic method and to track the selected animation
 
-  private boolean LEDCooldown = false; //Stops the LED idle from changing too often
+  private boolean LEDCooldown = false; // Stops the LED idle from changing too often
 
   @Override
   public void
       periodic() { // This method is called once per scheduler run, used to update the LED animation
     // and color based on the current state and selections
 
-    if (LEDConstants.IDLE && LEDCooldown == false) { // When the robot is idle, set the LEDs to a default color and animation
-      setLEDColor( new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2], 0),false); // Idle is PURPLE
+    if (LEDConstants.IDLE
+        && LEDCooldown
+            == false) { // When the robot is idle, set the LEDs to a default color and animation
+      setLEDColor(
+          new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2], 0),
+          false); // Idle is PURPLE
       setLEDAnimation("ColorFlow", false); // Idle is ColorFlow
       LEDCooldown = true;
     } else {
@@ -265,7 +269,7 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   public static void setLEDAnimation(String animationString, boolean Cycle) {
-    System.out.println(animationString);
+    // System.out.println(animationString);
     animation = null;
     if (Cycle) { // Cycles through the animations in this order: ColorFlow, Rainbow, Twinkle,
       // TwinkleOff, Fire, Larson, RgbFade, SingleFade, Strobe, None
@@ -298,8 +302,8 @@ public class LEDSubsystem extends SubsystemBase {
       // selection
       if (animationString.equals("None")) {
         animation = AnimationType.None;
-      } else if (animationString.equals("ColorFlow")) {
-        animation = AnimationType.ColorFlow;
+        // } else if (animationString.equals("ColorFlow")) {
+        //   animation = AnimationType.ColorFlow;
       } else if (animationString.equals("Rainbow")) {
         animation = AnimationType.Rainbow;
       } else if (animationString.equals("Twinkle")) {
