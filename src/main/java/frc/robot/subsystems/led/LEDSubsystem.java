@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDSubsystem extends SubsystemBase {
 
-  private CANdle m_candle;
+  private static CANdle m_candle;
 
   public LEDSubsystem() {
     m_candle = new CANdle(LEDConstants.CANDLE_ID);
@@ -92,33 +92,67 @@ public class LEDSubsystem extends SubsystemBase {
     TwinkleOff,
   }
 
-  public static String strLEDColor = "";
-  public static String strLEDAnimation = "";
+  public static String strLEDColor =
+      ""; // Used for dashboard display and debugging, updated whenever the color is changed
+  public static String strLEDAnimation =
+      ""; // Used for dashboard display and debugging, updated whenever the animation is changed
 
-  private static final int kSlot0StartIdx = 0;
+  private static final int kSlot0StartIdx =
+      0; // The starting index for the LEDs controlled by slot 0 (0-based index)
   private static final int kSlot0EndIdx =
-      LEDConstants.NUM_LEDS; // Slot 0 controls the first half of the LEDs
+      LEDConstants.NUM_LEDS; // The ending index for the LEDs controlled by slot 0 (0-based index)
 
-  private AnimationType m_anim0State = AnimationType.None;
+  private AnimationType m_anim0State =
+      AnimationType
+          .None; // The current animation state for slot 0, used to prevent setting the same
+  // animation multiple times and to track the current animation
 
-  private static AnimationType animation = AnimationType.None;
+  private static AnimationType animation =
+      AnimationType
+          .None; // The animation that is currently selected, used to set the animation in the
+  // periodic method and to track the selected animation
 
-  private int ColorCycle = 0;
-  private int AnimationCycle = 0;
+  private static int ColorCycle =
+      0; // Used to track the current color in the color cycle, cycles through the colors in this
+  // order: Red, Orange, Yellow, Green, Blue, Purple, White
+  private static int AnimationCycle =
+      0; // Used to track the current animation in the animation cycle, cycles through the
+  // animations in this order: ColorFlow, Rainbow, Twinkle, TwinkleOff, Fire, Larson,
+  // RgbFade, SingleFade, Strobe, None
 
   private final SendableChooser<AnimationType> m_anim0Chooser =
-      new SendableChooser<AnimationType>();
+      new SendableChooser<
+          AnimationType>(); // The chooser for selecting the animation for slot 0, published to the
+  // dashboard and used to select the animation through the dashboard
 
-  private static AnimationType chosenAnim0 = AnimationType.None;
+  private static AnimationType chosenAnim0 =
+      AnimationType
+          .None; // The animation that is currently selected for slot 0, used to set the animation
+
+  // in the periodic method and to track the selected animation
+
+  private boolean LEDCooldown = false; //Stops the LED idle from changing too often
 
   @Override
-  public void periodic() {
+  public void
+      periodic() { // This method is called once per scheduler run, used to update the LED animation
+    // and color based on the current state and selections
+
+    if (LEDConstants.IDLE && LEDCooldown == false) { // When the robot is idle, set the LEDs to a default color and animation
+      setLEDColor( new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2], 0),false); // Idle is PURPLE
+      setLEDAnimation("ColorFlow", false); // Idle is ColorFlow
+      LEDCooldown = true;
+    } else {
+      LEDCooldown = false;
+    }
+
     /* if the selection for slot 0 changes, change animations */
     final var anim0Selection = chosenAnim0;
     if (m_anim0State != anim0Selection) {
       m_anim0State = anim0Selection;
 
-      switch (m_anim0State) {
+      switch (m_anim0State) { // Set the animation based on the selection, default is empty
+          // animation which just turns the LEDs off
         default:
           strLEDAnimation = m_anim0State.toString();
         case ColorFlow:
@@ -165,14 +199,16 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-  public void setLEDColor(RGBWColor color, boolean Cycle) {
+  public static void setLEDColor(RGBWColor color, boolean Cycle) {
     if (Cycle) {
       ColorCycle += 1;
       if (ColorCycle > 7) {
         ColorCycle = 1;
       }
 
-      if (ColorCycle == 1) {
+      if (ColorCycle
+          == 1) { // Cycles through the colors in this order: Red, Orange, Yellow, Green, Blue,
+        // Purple, White
         color =
             new RGBWColor(
                 frc.robot.subsystems.led.LEDConstants.RED[0],
@@ -223,14 +259,16 @@ public class LEDSubsystem extends SubsystemBase {
                 0); // White
       }
     }
-    LEDColor = color;
+    strLEDColor = color.toString();
+    LEDColor = color; // Set the LEDColor variable to the new color so that it can be used
     m_candle.setControl(new SolidColor(0, LEDConstants.NUM_LEDS).withColor(LEDColor));
   }
 
-  public void setLEDAnimation(String animationString, boolean Cycle) {
+  public static void setLEDAnimation(String animationString, boolean Cycle) {
     System.out.println(animationString);
     animation = null;
-    if (Cycle) {
+    if (Cycle) { // Cycles through the animations in this order: ColorFlow, Rainbow, Twinkle,
+      // TwinkleOff, Fire, Larson, RgbFade, SingleFade, Strobe, None
       AnimationCycle += 1;
       if (AnimationCycle > 10) {
         AnimationCycle = 1;
@@ -256,7 +294,8 @@ public class LEDSubsystem extends SubsystemBase {
       } else if (AnimationCycle == 10) {
         animation = AnimationType.None;
       }
-    } else {
+    } else { // Allows you to set the animation based on a string, used for commands and dashboard
+      // selection
       if (animationString.equals("None")) {
         animation = AnimationType.None;
       } else if (animationString.equals("ColorFlow")) {
@@ -280,18 +319,22 @@ public class LEDSubsystem extends SubsystemBase {
       }
     }
 
-    if (animation != null) {
+    if (animation != null) { // If the animation is valid, set it to the chosen animation
       chosenAnim0 = animation;
-    } else {
+    } else { // If the animation is not valid, set it to None
       chosenAnim0 = AnimationType.None;
     }
   }
 
-  public void StopLEDSubsystem() {
+  public void
+      StopLEDSubsystem() { // Turns off the LEDs, used for testing and when the robot is disabled
     setLEDColor(new RGBWColor(0, 0, 0, 0), false);
+    setLEDAnimation("None", false);
   }
 
-  public String getLEDStats() {
+  public String
+      getLEDStats() { // Returns the current LED animation and color as a string, used for debugging
+    // and dashboard display
     System.out.println(
         "LED Animation: " + LEDSubsystem.strLEDAnimation + ", LED Color: " + LEDSubsystem.LEDColor);
     return "LED Animation: "

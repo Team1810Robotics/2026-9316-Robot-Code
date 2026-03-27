@@ -1,43 +1,33 @@
 package frc.robot.subsystems.vision;
 
-// DriverStation not used in this subsystem
+import com.ctre.phoenix6.signals.RGBWColor;
+
 import dev.doglog.DogLog;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
+import frc.robot.subsystems.led.LEDConstants;
+import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.util.LimelightHelpers;
-import frc.robot.util.LimelightHelpers.PoseEstimate;
 
-/**
- * Vision subsystem adapted to use your LimelightHelpers library, auto-selecting the appropriate
- * alliance botpose entries (wpiblue / wpired) based on DriverStation.
- *
- * <p>Includes a small runtime validator to log raw Limelight arrays and converted poses for
- * on-robot verification.
- */
 public class VisionSubsystem extends SubsystemBase {
   public final String limelightName;
 
-  private final CommandSwerveDrivetrain drivetrain;
+  private boolean LED_CD = false;
 
-  // TODO: At some point come by and grab the logging changes I (sam) made in 1810, works a lil
-  // better
+  private final CommandSwerveDrivetrain drivetrain;
 
   public VisionSubsystem(String name, CommandSwerveDrivetrain drivetrain) {
     this.limelightName = name;
     this.drivetrain = drivetrain;
 
-    LimelightHelpers.setPipelineIndex(limelightName, 0);
-    LimelightHelpers.SetIMUAssistAlpha(limelightName, .001);
+  public VisionSubsystem() {
+    this.limelightName = VisionConstants.LIMELIGHT_NAME;
+    LimelightHelpers.setPipelineIndex(limelightName, 2);
   }
 
   @Override
   public void periodic() {
-    // TODO: From 1810 testing, this will need to be slightly different. Probably applying mode 1 in
-    // auto and/or the early part of teleop, then switching to mode 4 after the match starts. This
-    // is because the botpose MT2 entries are very noisy when the robot is stationary, which is most
-    // of auto and the early part of teleop.
     if (DriverStation.isDisabled()) {
       LimelightHelpers.SetIMUMode(limelightName, 1);
     } else {
@@ -53,23 +43,43 @@ public class VisionSubsystem extends SubsystemBase {
         drivetrain.getPigeon2().getRoll().getValueAsDouble(),
         0);
 
-    if (!targetValid()) {
+    if (!targetValid() || getBotPoseMT2() == null) {
       DogLog.log("Vision/BotPose", new Pose2d());
-
-      return;
+      DogLog.log("Vision/TargetValid", false);
+      DogLog.log("Vision/TX", 0.0);
+      DogLog.log("Vision/TY", 0.0);
+      DogLog.log("Vision/TargetID", -1);
+      DogLog.log("Vision/TargetDistanceMeters", -1.0);
+    if (!LED_CD) {
+        LEDConstants.IDLE = true;
+        LED_CD = true;
+      }
+          DogLog.log("Vision/HoodSetpoint", 0.0);
+        return;
     }
 
-    PoseEstimate botPoseMT2 = getBotPoseMT2();
+    LEDConstants.IDLE = false;
+    LEDSubsystem.setLEDColor(
+        new RGBWColor(LEDConstants.PERRYWINKLE[0], LEDConstants.PERRYWINKLE[1], LEDConstants.PERRYWINKLE[2], 0),
+        false);
+    LEDSubsystem.setLEDAnimation("Rainbow", false);
 
+   
+
+    PoseEstimate botPoseMT2 = getBotPoseMT2();
     drivetrain.addVisionMeasurement(botPoseMT2.pose, botPoseMT2.timestampSeconds);
 
-    DogLog.log("Vision/BotPose", getBotPoseMT2().pose);
+    LED_CD = false;
+
+  
+    DogLog.log("Vision/TX", getTx());
+    DogLog.log("Vision/TY", getTy());
+    DogLog.log("Vision/TargetID", getTargetID());
+    DogLog.log("Vision/TargetDistanceMeters", getTargetDistanceMeters());
+    // Log the computed hood setpoint every loop so you can verify it in AdvantageScope
+    DogLog.log("Vision/HoodSetpoint", getHoodSetpointFromTY());
   }
 
-  // gets the april tag ID
-  /**
-   * @return AprilTag / fiducial ID (tid)
-   */
   public int getTargetID() {
     return (int) LimelightHelpers.getFiducialID(limelightName);
   }
@@ -78,28 +88,60 @@ public class VisionSubsystem extends SubsystemBase {
     return LimelightHelpers.getTV(limelightName);
   }
 
-  public PoseEstimate getBotPoseMT1() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue(limelightName);
+  public double getTx() {
+    return LimelightHelpers.getTX(limelightName);
   }
 
-  public PoseEstimate getBotPoseMT2() {
-    return LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(limelightName);
+  public double getTy() {
+    return LimelightHelpers.getTY(limelightName);
   }
 
   /**
-   * this is the one that matters ;)
-   * 676676767676676767676767676767676767676767676767676767676767676767676767676767676767676 CALL
-   * THIS NUMBER -> (913) 488-2670 -sam
-   *
-   * @return
+   * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit.
+   * y = 1.23 - 0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵
+   * Only call this when targetValid() is true.
    */
+  public double getHoodSetpointFromTY() {
+    double x = getTy();
+    return  1.23
+          + (-0.271)   * x
+          + (0.0609)   * Math.pow(x, 2)
+          + (-5.73e-3) * Math.pow(x, 3)
+          + (2.48e-4)  * Math.pow(x, 4)
+          + (-3.94e-6) * Math.pow(x, 5);
+  }
 
-  /*this is the tuffest iteration of this code and pls text
-  +1 (913) 660 6067 and only send the word avacado
-  -Grant */
+  /** Estimated forward distance (Z axis in target space) to target in meters. */
+  public double getTargetForwardMeters() {
+    if (!targetValid()) return -1.0;
+    double[] ts = LimelightHelpers.getBotPose_TargetSpace(limelightName);
+    if (ts == null || ts.length < 3) return -1.0;
+    return ts[2];
+  }
 
-  public Pose2d getBotPoseTargetSpace() {
-    return LimelightHelpers.toPose3D(LimelightHelpers.getBotPose_TargetSpace(limelightName))
-        .toPose2d();
+  /** Estimated lateral offset (X axis in target space) to target in meters. */
+  public double getTargetLateralMeters() {
+    if (!targetValid()) return -1.0;
+    double[] ts = LimelightHelpers.getBotPose_TargetSpace(limelightName);
+    if (ts == null || ts.length < 3) return -1.0;
+    return ts[0];
+  }
+
+  /** Planar distance to target using forward + lateral components. */
+  public double getTargetDistanceMeters() {
+    double lat = getTargetLateralMeters();
+    double fwd = getTargetForwardMeters();
+    if (lat == -1.0 && fwd == -1.0) return -1.0;
+    return Math.hypot(lat, fwd);
+  }
+  public double getTargetBearingDegrees() {
+    if (!targetValid()) return 0.0;
+
+    double lateral = getTargetLateralMeters();
+    double forward = getTargetForwardMeters();
+
+    if (lateral == -1.0 && forward == -1.0) return 0.0;
+
+    return Math.toDegrees(Math.atan2(lateral, forward)); // gets the angle of the measurement
   }
 }

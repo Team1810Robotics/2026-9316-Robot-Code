@@ -1,30 +1,30 @@
 package frc.robot.subsystems.flywheel;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.Follower;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.indexer.IndexerConstants;
 
 public class FlywheelSubsystem extends SubsystemBase {
 
   private final TalonFX leftMotor;
   private final TalonFX rightMotor;
-  // private final DigitalInput beamBreak;
 
-  // VelocityVoltage controller for precise RPM control (TalonFX built-in)
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  // Target velocity in rotations per second (RPS)
-  private double targetVelocity = 200.0;
+  private double defaultVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
+  private double visionVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
+  private boolean hasVisionTarget = false;
+  private double activeTargetVelocityRPS = 0.0;
 
-  // Flywheel state tracking for diagnostics and control
+  private static final String SHOOTER_TARGET_RPS_KEY = "Shooter Target RPS";
+  private static final double DEFAULT_TUNING_RPS = 52.0;
+
   private enum FlywheelState {
     STOPPED,
     SPINNING_UP,
@@ -37,76 +37,120 @@ public class FlywheelSubsystem extends SubsystemBase {
     leftMotor = new TalonFX(FlywheelConstants.leftMotorID);
     rightMotor = new TalonFX(FlywheelConstants.rightMotorID);
 
-    // beamBreak = new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
+    TalonFXConfiguration rightConfig = new TalonFXConfiguration();
 
-    // TODO: Configure motor settings (inversions, PID gains) here
+    rightConfig.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
 
-    TalonFXConfiguration cfg = new TalonFXConfiguration();
+    rightConfig.Slot0 = new Slot0Configs().withKP(0.12).withKI(0.0).withKD(0.0).withKV(0.12);
 
-    cfg.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-
-    rightMotor.getConfigurator().apply(cfg);
+    rightMotor.getConfigurator().apply(rightConfig);
 
     leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
+
+    SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
   }
 
-  // public boolean getBeamBreakTriggered() {
-  //   // Beam break is triggered when FALSE (NPN sensor logic)
-  //   return !beamBreak.get();
-  // }
+  public void setDefaultVelocity(double velocityRPS) {
+    defaultVelocityRPS = velocityRPS;
+  }
 
-  // Set flywheel to specific velocity in rotations per second (RPS)
+  public double getDefaultVelocity() {
+    return defaultVelocityRPS;
+  }
+
+  public void setVisionVelocity(double velocityRPS) {
+    visionVelocityRPS = velocityRPS;
+  }
+
+  public double getVisionVelocity() {
+    return visionVelocityRPS;
+  }
+
+  public void setHasVisionTarget(boolean hasTarget) {
+    hasVisionTarget = hasTarget;
+  }
+
+  public boolean hasVisionTarget() {
+    return hasVisionTarget;
+  }
+
+  public double getRequestedVelocity() {
+    return hasVisionTarget ? visionVelocityRPS : defaultVelocityRPS;
+  }
+
+  public double getDashboardTargetVelocity() {
+    return SmartDashboard.getNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
+  }
+
+  public void setDashboardTargetVelocity(double velocityRPS) {
+    SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, velocityRPS);
+  }
+
+  public void adjustDashboardTargetVelocity(double deltaRPS) {
+    setDashboardTargetVelocity(getDashboardTargetVelocity() + deltaRPS);
+  }
+
+  public void runSelectedVelocity() {
+    activeTargetVelocityRPS = getRequestedVelocity();
+    rightMotor.setControl(velocityControl.withVelocity(activeTargetVelocityRPS));
+  }
+
   public void setFlywheelVelocity(double velocityRPS) {
-    this.targetVelocity = velocityRPS;
-    // Use VelocityVoltage control for precise speed management
-    leftMotor.setControl(velocityControl.withVelocity(velocityRPS));
+    activeTargetVelocityRPS = velocityRPS;
     rightMotor.setControl(velocityControl.withVelocity(velocityRPS));
   }
 
-  public Command setDutyCycleCommand(double dutyCycle) {
-    return Commands.startEnd(() -> rightMotor.set(dutyCycle), () -> rightMotor.stopMotor(), this);
+  public void stopFlywheel() {
+    activeTargetVelocityRPS = 0.0;
+    rightMotor.stopMotor();
   }
 
-  // Set flywheel to percentage power (legacy method for simple control)
   public void setFlywheelPower(double powerPercent) {
-
-    leftMotor.set(powerPercent);
+    activeTargetVelocityRPS = 0.0;
     rightMotor.set(powerPercent);
   }
 
-  // Get current velocity in RPS (for diagnostics and feedback)
   public double getCurrentVelocity() {
-    // Average velocity of both motors
-    double leftVel = leftMotor.getVelocity().getValueAsDouble();
-    double rightVel = rightMotor.getVelocity().getValueAsDouble();
-    return (leftVel + rightVel) / 2.0;
+    return rightMotor.getVelocity().getValueAsDouble();
   }
-
-  // Get target velocity
+  
   public double getTargetVelocity() {
-    return targetVelocity;
+    return activeTargetVelocityRPS;
   }
 
-  // Check if flywheel is at target speed (within tolerance)
   public boolean isAtTargetSpeed() {
-    double tolerance = 2.0; // RPS tolerance (adjust as needed)
-    return Math.abs(getCurrentVelocity() - targetVelocity) < tolerance;
+    double tolerance = 2.0;
+    return Math.abs(getCurrentVelocity() - activeTargetVelocityRPS) < tolerance;
   }
 
-  // Get current state for debugging
   public String getFlywheelState() {
     return state.toString();
   }
-
+  public double computeFlywheelRPMFromTY(double ty) {
+    return  3065
+          + (-70.4) * ty
+          + (5.9)   * Math.pow(ty, 2)
+          + (-0.122) * Math.pow(ty, 3);
+  }
   @Override
   public void periodic() {
-    // Update state machine based on current performance
-    if (targetVelocity == 0.0) {
+    if (activeTargetVelocityRPS == 0.0) {
       state = FlywheelState.STOPPED;
     } else if (isAtTargetSpeed()) {
       state = FlywheelState.AT_SPEED;
     } else {
       state = FlywheelState.SPINNING_UP;
     }
+
+    SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
+    SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Vision RPS", visionVelocityRPS);
+    SmartDashboard.putNumber("Flywheel Dashboard Target RPS", getDashboardTargetVelocity());
+    SmartDashboard.putNumber("Flywheel Current RPM", getCurrentVelocity() * 60.0);
+    SmartDashboard.putNumber("Flywheel Target RPM", activeTargetVelocityRPS * 60.0);
+    SmartDashboard.putBoolean("Flywheel Has Vision Target", hasVisionTarget);
+    SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
+    SmartDashboard.putString("Flywheel State", state.toString());
   }
 }

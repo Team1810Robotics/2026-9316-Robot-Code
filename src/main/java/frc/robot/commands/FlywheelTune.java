@@ -7,33 +7,26 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.led.LEDConstants;
 import frc.robot.subsystems.led.LEDSubsystem;
 
-public class Flywheel extends Command {
+public class FlywheelTune extends Command {
   private final FlywheelSubsystem flywheelSubsystem;
   private final IndexerSubsystem indexerSubsystem;
-  private final double fallbackVelocity;
 
-  public Flywheel(
-    FlywheelSubsystem flywheelSubsystem,
-    IndexerSubsystem indexerSubsystem,
-    double fallbackVelocity) {
+  public FlywheelTune(FlywheelSubsystem flywheelSubsystem, IndexerSubsystem indexerSubsystem) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.indexerSubsystem = indexerSubsystem;
-    this.fallbackVelocity = fallbackVelocity;
-
     addRequirements(flywheelSubsystem);
   }
 
   @Override
   public void initialize() {
-    flywheelSubsystem.setDefaultVelocity(fallbackVelocity);
     indexerSubsystem.setShooting(true);
     indexerSubsystem.setShooterReady(false);
   }
 
   @Override
   public void execute() {
-    flywheelSubsystem.runSelectedVelocity();
-
+    double targetRPS = flywheelSubsystem.getDashboardTargetVelocity();
+    flywheelSubsystem.setFlywheelVelocity(targetRPS);
     indexerSubsystem.setShooterReady(flywheelSubsystem.isAtTargetSpeed());
 
     LEDConstants.IDLE = false;

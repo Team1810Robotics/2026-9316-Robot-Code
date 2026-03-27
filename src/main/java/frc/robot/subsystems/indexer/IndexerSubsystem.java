@@ -1,104 +1,122 @@
 package frc.robot.subsystems.indexer;
 
-import com.ctre.phoenix6.signals.RGBWColor;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.subsystems.led.LEDSubsystem;
 
 public class IndexerSubsystem extends SubsystemBase {
-  private final SparkMax indexer_1_Motor =
-      new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, MotorType.kBrushless); // White Roller
-  private final SparkMax indexer_2_Motor =
-      new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless); // Orange Wheels
+  private final SparkMax indexer1Motor =
+      new SparkMax(IndexerConstants.INDEXER_1_MOTOR_ID, MotorType.kBrushless);
 
-  private final DigitalInput Index_1_BeamBreak =
-      new DigitalInput(
-          IndexerConstants.INDEXER_1_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
-  private final DigitalInput Index_2_BeamBreak =
-      new DigitalInput(
-          IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT); // Index Beam Break Sensor
+  private final SparkMax indexer2Motor =
+      new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless);
 
-  private boolean LEDChange = false; // To make sure the LEDs aren't changed multiple times
-  private boolean Shooting = false; // Determine if the flywheel is activley shooting
-  private boolean IndexingEnabled = false; // If the motors are currently running
+  private final DigitalInput index2BeamBreak =
+      new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
 
-  public void RunIndexer_1() { // Starts the white roller motor
-    indexer_1_Motor.set(IndexerConstants.INDEXER_1_SPEED);
+  private boolean indexingEnabled = false;
+  private boolean shootingEnabled = false;
+  private boolean shooterReady = false;
+  private boolean reverse1Enabled = false;
+  private boolean reverse2Enabled = false;
+
+  public IndexerSubsystem() {}
+
+  public boolean isIndex2Broken() {
+    return !index2BeamBreak.get();
   }
 
-  public void StopIndexer_1() { // Stops the white roller motor
-    indexer_1_Motor.set(0);
+  public void setIndexingEnabled(boolean enabled) {
+    indexingEnabled = enabled;
   }
 
-  public void RunIndexer_2() { // Starts the orange wheel motor
-    indexer_2_Motor.set(IndexerConstants.INDEXER_2_SPEED);
+  public void setShooting(boolean enabled) {
+    shootingEnabled = enabled;
   }
 
-  public void StopIndexer_2() { // Stops the orange wheel motor
-    indexer_2_Motor.set(0);
+  public void setShooterReady(boolean ready) {
+    shooterReady = ready;
   }
 
-  public void SetIndexEnabled(boolean enabled) { // Sets the indexing enabled variable
-    IndexingEnabled = enabled;
+  public void setReverse1(boolean enabled) {
+    reverse1Enabled = enabled;
   }
 
-  public void SetShooting(boolean shooting) { // Sets the shooting variable
-    Shooting = shooting;
+  public void setReverse2(boolean enabled) {
+    reverse2Enabled = enabled;
   }
 
-  public boolean GetIndexingEnabled() { // Gets the indexing enabled variable
-    return IndexingEnabled;
+  public void setReverseBoth(boolean enabled) {
+    reverse1Enabled = enabled;
+    reverse2Enabled = enabled;
   }
 
-  public boolean GetShooting() { // Gets the shooting variable
-    return Shooting;
+  public void stopIndexer1() {
+    indexer1Motor.set(0);
+  }
+
+  public void stopIndexer2() {
+    indexer2Motor.set(0);
+  }
+
+  public void stopAll() {
+    indexingEnabled = false;
+    shootingEnabled = false;
+    shooterReady = false;
+    reverse1Enabled = false;
+    reverse2Enabled = false;
+
+    indexer1Motor.set(0);
+    indexer2Motor.set(0);
+  }
+
+  public void runBothForward() {
+    indexingEnabled = true;
+    shootingEnabled = false;
+    shooterReady = false;
+    reverse1Enabled = false;
+    reverse2Enabled = false;
+  }
+
+  public void runBothReverse() {
+    indexingEnabled = false;
+    shootingEnabled = false;
+    shooterReady = false;
+    reverse1Enabled = true;
+    reverse2Enabled = true;
   }
 
   @Override
   public void periodic() {
-    boolean index_1_Broken =
-        !Index_1_BeamBreak.get(); // Detects if the beam is broken (ball is present)
-    boolean index_2_Broken =
-        !Index_2_BeamBreak
-            .get(); // Detects if the beam is broken in the second area (ball is present)
+    boolean index2Broken = isIndex2Broken();
 
-    if (index_1_Broken == true) {
-      LEDChange = true;
-      LEDSubsystem.LEDColor =
-          new RGBWColor(
-              LEDConstants.ORANGE[0],
-              LEDConstants.ORANGE[1],
-              LEDConstants.ORANGE[2],
-              0); // Lets drive team know that a ball is detected in the indexer
-      System.out.println("Ball Detected");
+    // Motor 1 logic
+    if (reverse1Enabled) {
+      indexer1Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
+    } else if (indexingEnabled || shootingEnabled) {
+      indexer1Motor.set(IndexerConstants.INDEXER_1_SPEED);
     } else {
-      if (LEDChange == true) { // Puts the LEDs back into idle
-        LEDChange = false;
-        // TODO: Change IDLE to false
-      }
+      indexer1Motor.set(0);
     }
 
-    if (IndexingEnabled
-        || Shooting) { // Only runs if Indexing is enabled or shooting is enabled ONLY FOR WHITE
-      // ROLLERS
-      RunIndexer_1();
+    // Motor 2 logic
+    if (reverse2Enabled) {
+      indexer2Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
+    } else if (shootingEnabled && shooterReady) {
+      indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
+    } else if (indexingEnabled && !index2Broken) {
+      indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
     } else {
-      StopIndexer_1();
+      indexer2Motor.set(0);
     }
 
-    if (Shooting) { // Only runs if shooting is enabled ONLY FOR ORANGE WHEELS
-      RunIndexer_2();
-    } else if (IndexingEnabled
-        && !index_2_Broken) { // Only runs if indexing is enabled and there isn't a ball in the
-      // second area (to prevent jamming)
-      RunIndexer_2();
-    } else {
-      StopIndexer_2();
-    }
+    SmartDashboard.putBoolean("Indexer 2 Broken", index2Broken);
+    SmartDashboard.putBoolean("Indexing Enabled", indexingEnabled);
+    SmartDashboard.putBoolean("Shooting Enabled", shootingEnabled);
+    SmartDashboard.putBoolean("Shooter Ready", shooterReady);
+    SmartDashboard.putBoolean("Reverse 1 Enabled", reverse1Enabled);
+    SmartDashboard.putBoolean("Reverse 2 Enabled", reverse2Enabled);
   }
 }
-
-// Code by: Will Edwards (The best programmer in the world?)
