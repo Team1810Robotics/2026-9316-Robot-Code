@@ -11,21 +11,21 @@
         "x": 2.758131241084164,
         "y": 7.211440798858773
       },
-      "isLocked": false,
+      "isLocked": true,
       "linkedName": "EndPos1"
     },
     {
       "anchor": {
-        "x": 2.732253922967189,
-        "y": 5.011868758915835
+        "x": 2.797079545454545,
+        "y": 5.230590909090909
       },
       "prevControl": {
-        "x": 2.2923395149786012,
-        "y": 6.021084165477888
+        "x": 2.3571651374659575,
+        "y": 6.239806315652962
       },
       "nextControl": null,
-      "isLocked": false,
-      "linkedName": null
+      "isLocked": true,
+      "linkedName": "shoot 1"
     }
   ],
   "rotationTargets": [],
