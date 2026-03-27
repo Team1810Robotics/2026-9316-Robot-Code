@@ -11,7 +11,6 @@ import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
-
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.filter.Debouncer;
@@ -28,7 +27,6 @@ import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
 import frc.robot.subsystems.hood.HoodConstants;
 import frc.robot.subsystems.hood.HoodSubsystem;
-import frc.robot.subsystems.indexer.IndexerConstants;
 import frc.robot.subsystems.indexer.IndexerSubsystem;
 import frc.robot.subsystems.intake.IntakeConstants;
 import frc.robot.subsystems.intake.IntakeSubsystem;
@@ -91,7 +89,8 @@ public class RobotContainer {
     autoChooser = AutoBuilder.buildAutoChooser();
     SmartDashboard.putData("Auto Chooser", autoChooser);
 
-    DogLog.setOptions(new DogLogOptions().withCaptureNt(true).withCaptureDs(true).withNtPublish(true));
+    DogLog.setOptions(
+        new DogLogOptions().withCaptureNt(true).withCaptureDs(true).withNtPublish(true));
   }
 
   private void registerNamedCommands() {
@@ -111,105 +110,100 @@ public class RobotContainer {
     NamedCommands.registerCommand(
         "Shoot",
         Commands.run(
-                    () -> {
-                      boolean hasTarget = visionSubsystem.targetValid();
+                () -> {
+                  boolean hasTarget = visionSubsystem.targetValid();
 
-                      if (hasTarget) {
-                        double ty = visionSubsystem.getTy();
+                  if (hasTarget) {
+                    double ty = visionSubsystem.getTy();
 
-                        if (!hasLockedVisionTarget
-                            || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
-                          lastVisionTy = ty;
-                          hasLockedVisionTarget = true;
+                    if (!hasLockedVisionTarget
+                        || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
+                      lastVisionTy = ty;
+                      hasLockedVisionTarget = true;
 
-                          double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
-                          hoodSubsystem.setVisionSetPoint(hoodTarget);
-                          hoodSubsystem.setPoint(hoodTarget);
+                      double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
+                      hoodSubsystem.setVisionSetPoint(hoodTarget);
+                      hoodSubsystem.setPoint(hoodTarget);
 
-                          double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
-                          flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
-                        }
-                      } else {
-                        hasLockedVisionTarget = false;
+                      double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
+                      flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
+                    }
+                  } else {
+                    hasLockedVisionTarget = false;
 
-                        // Fallback/default shot if no valid AprilTag is seen
-                        hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
-                        flywheelSubsystem.setFlywheelVelocity(
-                            flywheelSubsystem.getDefaultVelocity());
-                      }
+                    // Fallback/default shot if no valid AprilTag is seen
+                    hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
+                    flywheelSubsystem.setFlywheelVelocity(flywheelSubsystem.getDefaultVelocity());
+                  }
 
-                      boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
+                  boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
 
-                      SmartDashboard.putBoolean("Has Target", hasTarget);
-                      SmartDashboard.putBoolean("Lined Up", linedUp);
-                      SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
-                      SmartDashboard.putBoolean(
-                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
+                  SmartDashboard.putBoolean("Has Target", hasTarget);
+                  SmartDashboard.putBoolean("Lined Up", linedUp);
+                  SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
+                  SmartDashboard.putBoolean(
+                      "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
 
-                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
-                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
-                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
-                      SmartDashboard.putNumber(
-                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
-                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
-                      SmartDashboard.putNumber(
-                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
-                      SmartDashboard.putNumber(
-                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
+                  SmartDashboard.putNumber("TX", visionSubsystem.getTx());
+                  SmartDashboard.putNumber("TY", visionSubsystem.getTy());
+                  SmartDashboard.putNumber("Locked TY", lastVisionTy);
+                  SmartDashboard.putNumber(
+                      "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
+                  SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
+                  SmartDashboard.putNumber(
+                      "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
+                  SmartDashboard.putNumber(
+                      "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
 
-                      boolean visionReady =
-                          hasTarget
-                              && linedUp
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
+                  boolean visionReady =
+                      hasTarget
+                          && linedUp
+                          && hoodSubsystem.isAtSetPoint()
+                          && flywheelSubsystem.isAtTargetSpeed();
 
-                      boolean fallbackReady =
-                          !hasTarget
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
+                  boolean fallbackReady =
+                      !hasTarget
+                          && hoodSubsystem.isAtSetPoint()
+                          && flywheelSubsystem.isAtTargetSpeed();
 
-                      boolean rawShooterReady = visionReady || fallbackReady;
-                      boolean debouncedShooterReady =
-                          shooterReadyDebouncer.calculate(rawShooterReady);
+                  boolean rawShooterReady = visionReady || fallbackReady;
+                  boolean debouncedShooterReady = shooterReadyDebouncer.calculate(rawShooterReady);
 
-                      SmartDashboard.putBoolean("Vision Ready", visionReady);
-                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
-                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
-                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
+                  SmartDashboard.putBoolean("Vision Ready", visionReady);
+                  SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
+                  SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
+                  SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
 
-                      indexerSubsystem.setShooting(true);
-                      indexerSubsystem.setShooterReady(debouncedShooterReady);
+                  indexerSubsystem.setShooting(true);
+                  indexerSubsystem.setShooterReady(debouncedShooterReady);
 
-                      if (debouncedShooterReady && visionReady) {
-                        intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.GREEN[0],
-                                LEDConstants.GREEN[1],
-                                LEDConstants.GREEN[2],
-                                0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      } else if (debouncedShooterReady && fallbackReady) {
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      }
-                    },
-                    hoodSubsystem,
-                    flywheelSubsystem,
-                    indexerSubsystem)
-                .finallyDo(
-                    interrupted -> {
-                      hoodSubsystem.stopHood();
-                      flywheelSubsystem.setFlywheelVelocity(0.0);
-                      indexerSubsystem.stopAll();
-                      intakeSubsystem.stopIntake();
-                      LEDSubsystem.setLEDAnimation("None", false);
-                      hasLockedVisionTarget = false;
-                    }));
+                  if (debouncedShooterReady && visionReady) {
+                    intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
+                    LEDSubsystem.setLEDColor(
+                        new RGBWColor(
+                            LEDConstants.GREEN[0], LEDConstants.GREEN[1], LEDConstants.GREEN[2], 0),
+                        false);
+                    LEDSubsystem.setLEDAnimation("SingleFade", false);
+                  } else if (debouncedShooterReady && fallbackReady) {
+                    LEDSubsystem.setLEDColor(
+                        new RGBWColor(
+                            LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
+                        false);
+                    LEDSubsystem.setLEDAnimation("SingleFade", false);
+                  }
+                },
+                hoodSubsystem,
+                flywheelSubsystem,
+                indexerSubsystem)
+            .finallyDo(
+                interrupted -> {
+                  hoodSubsystem.stopHood();
+                  flywheelSubsystem.setFlywheelVelocity(0.0);
+                  indexerSubsystem.stopAll();
+                  intakeSubsystem.stopIntake();
+                  LEDSubsystem.setLEDAnimation("None", false);
+                  hasLockedVisionTarget = false;
+                }));
 
     NamedCommands.registerCommand(
         "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll(), indexerSubsystem));
@@ -219,10 +213,12 @@ public class RobotContainer {
         new AimAtHub(drivetrain, visionSubsystem, ledSubsystem, () -> 0, () -> 0).withTimeout(10));
 
     NamedCommands.registerCommand(
-        "IntakeOut", 
-        new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
+        "IntakeOut",
+        new InstantCommand(
+            () -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
 
-    NamedCommands.registerCommand("ZeroHood", new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false).withTimeout(1));
+    NamedCommands.registerCommand(
+        "ZeroHood", new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false).withTimeout(1));
     // If you later want intake named commands, use subsystem requirements like this:
     // NamedCommands.registerCommand(
     //     "StartIntake",
@@ -363,8 +359,7 @@ public class RobotContainer {
             Commands.startEnd(
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.9);
-                indexerSubsystem.runBothForward();
-        
+                  indexerSubsystem.runBothForward();
                 },
                 () -> {
                   intakeSubsystem.TestingIntakeMotor(0.0);

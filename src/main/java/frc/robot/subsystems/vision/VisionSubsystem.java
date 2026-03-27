@@ -59,8 +59,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   /**
    * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit. y =
-   * 1.01+0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵ Only call this when targetValid()
-   * is true.
+   * 1.01+0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵ Only call this when targetValid() is
+   * true.
    */
   public double getHoodSetpointFromTY() {
     double x = Math.abs(getTy());

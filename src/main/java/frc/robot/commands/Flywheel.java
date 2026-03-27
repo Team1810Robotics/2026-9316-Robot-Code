@@ -13,9 +13,9 @@ public class Flywheel extends Command {
   private final double fallbackVelocity;
 
   public Flywheel(
-    FlywheelSubsystem flywheelSubsystem,
-    IndexerSubsystem indexerSubsystem,
-    double fallbackVelocity) {
+      FlywheelSubsystem flywheelSubsystem,
+      IndexerSubsystem indexerSubsystem,
+      double fallbackVelocity) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.indexerSubsystem = indexerSubsystem;
     this.fallbackVelocity = fallbackVelocity;
