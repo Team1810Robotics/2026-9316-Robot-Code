@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftStartToShoot"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "shoot from starting point 1 to pick up fuel"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "actually pick up fuel (universal)"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "after fuel ready to shoot"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}
