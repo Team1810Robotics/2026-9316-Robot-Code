@@ -14,10 +14,7 @@ public final class LEDConstants {
 
   public static final int CANDLE_ID = 35; // CANdle ID (Depends on wiring)
 
-  public static final int NUM_LEDS = 100; // TODO: Find Actual LED amount
+  public static final int NUM_LEDS = 162; // TODO: Find Actual LED amount
 
   public static final float LED_Brightness = 0.65f; // Brightness level (0-1) (MAX is VERY bright)
-
-  public static boolean IDLE =
-      true; // If the Robot are in idle mode or not (Not a constant because it needs to be changed)
 }

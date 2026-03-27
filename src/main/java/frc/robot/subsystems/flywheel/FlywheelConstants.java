@@ -6,5 +6,5 @@ public final class FlywheelConstants {
   // public static final int FlywheelBeamBreak = 4;
   public static final double FLYWHEEL_SPEED = 0.3;
 
-  public static final double IDLE_VELOCITY = 35; // Max velocity in rotations per second (RPS)
+  public static final double IDLE_VELOCITY = 0.3;
 }

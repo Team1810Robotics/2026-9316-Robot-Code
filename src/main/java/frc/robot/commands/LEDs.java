@@ -18,11 +18,6 @@ public class LEDs extends Command {
   }
 
   @Override
-  public void end(boolean interrupted) {
-    LEDsubsystem.StopLEDSubsystem();
-  }
-
-  @Override
   public boolean isFinished() {
     return false; // Runs until interrupted
   }

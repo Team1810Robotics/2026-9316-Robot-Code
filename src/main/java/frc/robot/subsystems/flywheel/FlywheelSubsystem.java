@@ -7,7 +7,6 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -144,21 +143,21 @@ public class FlywheelSubsystem extends SubsystemBase {
       state = FlywheelState.SPINNING_UP;
     }
 
-     if (DriverStation.isEnabled()) {
-      leftMotor.set(FlywheelConstants.FLYWHEEL_SPEED);
+    if (DriverStation.isEnabled()) {
+      rightMotor.setControl(velocityControl.withVelocity(15));
     } else {
       stopFlywheel();
 
-    // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
-    // SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
-    // SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
-    // SmartDashboard.putNumber("Flywheel Vision RPS", visionVelocityRPS);
-    // SmartDashboard.putNumber("Flywheel Dashboard Target RPS", getDashboardTargetVelocity());
-    // SmartDashboard.putNumber("Flywheel Current RPM", getCurrentVelocity() * 60.0);
-    // SmartDashboard.putNumber("Flywheel Target RPM", activeTargetVelocityRPS * 60.0);
-    // SmartDashboard.putBoolean("Flywheel Has Vision Target", hasVisionTarget);
-    // SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
-    // SmartDashboard.putString("Flywheel State", state.toString());
+      // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
+      // SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
+      // SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
+      // SmartDashboard.putNumber("Flywheel Vision RPS", visionVelocityRPS);
+      // SmartDashboard.putNumber("Flywheel Dashboard Target RPS", getDashboardTargetVelocity());
+      // SmartDashboard.putNumber("Flywheel Current RPM", getCurrentVelocity() * 60.0);
+      // SmartDashboard.putNumber("Flywheel Target RPM", activeTargetVelocityRPS * 60.0);
+      // SmartDashboard.putBoolean("Flywheel Has Vision Target", hasVisionTarget);
+      // SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
+      // SmartDashboard.putString("Flywheel State", state.toString());
+    }
   }
-}
 }

@@ -1,10 +1,7 @@
 package frc.robot.subsystems.vision;
 
-import com.ctre.phoenix6.signals.RGBWColor;
 import dev.doglog.DogLog;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.led.LEDConstants;
-import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.util.LimelightHelpers;
 
 public class VisionSubsystem extends SubsystemBase {
@@ -35,10 +32,11 @@ public class VisionSubsystem extends SubsystemBase {
     DogLog.log("Vision/HoodSetpoint", getHoodSetpointFromTY());
 
     // Valid target seen = purple LEDs by default
-    LEDSubsystem.setLEDColor(
-        new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2], 0),
-        false);
-    LEDSubsystem.setLEDAnimation("None", false);
+    //   LEDSubsystem.setLEDColor(
+    //       new RGBWColor(LEDConstants.PURPLE[0], LEDConstants.PURPLE[1], LEDConstants.PURPLE[2],
+    // 0),
+    //       false);
+    //   LEDSubsystem.setLEDAnimation("None", false);
   }
 
   public int getTargetID() {
@@ -59,8 +57,8 @@ public class VisionSubsystem extends SubsystemBase {
 
   /**
    * Computes desired hood encoder position from current TY using a 5th-degree polynomial fit. y =
-   * 1.01+0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵ Only call this when targetValid()
-   * is true.
+   * 1.01+0.271x + 0.0609x² - 5.73E-3x³ + 2.48E-4x⁴ - 3.94E-6x⁵ Only call this when targetValid() is
+   * true.
    */
   public double getHoodSetpointFromTY() {
     double x = Math.abs(getTy());

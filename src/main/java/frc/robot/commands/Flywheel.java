@@ -11,14 +11,17 @@ public class Flywheel extends Command {
   private final FlywheelSubsystem flywheelSubsystem;
   private final IndexerSubsystem indexerSubsystem;
   private final double fallbackVelocity;
+  private final LEDSubsystem ledSubsystem;
 
   public Flywheel(
       FlywheelSubsystem flywheelSubsystem,
       IndexerSubsystem indexerSubsystem,
-      double fallbackVelocity) {
+      double fallbackVelocity,
+      LEDSubsystem ledSubsystem) {
     this.flywheelSubsystem = flywheelSubsystem;
     this.indexerSubsystem = indexerSubsystem;
     this.fallbackVelocity = fallbackVelocity;
+    this.ledSubsystem = ledSubsystem;
 
     addRequirements(flywheelSubsystem);
   }
@@ -36,7 +39,7 @@ public class Flywheel extends Command {
 
     indexerSubsystem.setShooterReady(flywheelSubsystem.isAtTargetSpeed());
 
-    LEDConstants.IDLE = false;
+    ledSubsystem.LedIdleChange(false);
     LEDSubsystem.setLEDColor(
         new RGBWColor(LEDConstants.WHITE[0], LEDConstants.WHITE[1], LEDConstants.WHITE[2], 0),
         false);
@@ -47,7 +50,7 @@ public class Flywheel extends Command {
     flywheelSubsystem.stopFlywheel();
     indexerSubsystem.setShooting(false);
     indexerSubsystem.setShooterReady(false);
-    LEDConstants.IDLE = true;
+    ledSubsystem.LedIdleChange(true);
   }
 
   @Override

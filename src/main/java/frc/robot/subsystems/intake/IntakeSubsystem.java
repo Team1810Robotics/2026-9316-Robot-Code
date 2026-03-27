@@ -117,11 +117,11 @@ public class IntakeSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    SmartDashboard.putBoolean("Intake Encoder Connected", intakeEncoder.isConnected());
-    SmartDashboard.putNumber("Intake Encoder", getIntakeEncoder());
-    SmartDashboard.putString("Intake Mode", intakeMode.toString());
-    SmartDashboard.putNumber("Intake SetPoint", currentSetPoint);
-    SmartDashboard.putBoolean("Intake At SetPoint", isAtSetPoint());
+    // SmartDashboard.putBoolean("Intake Encoder Connected", intakeEncoder.isConnected());
+    // SmartDashboard.putNumber("Intake Encoder", getIntakeEncoder());
+    // SmartDashboard.putString("Intake Mode", intakeMode.toString());
+    // SmartDashboard.putNumber("Intake SetPoint", currentSetPoint);
+    // SmartDashboard.putBoolean("Intake At SetPoint", isAtSetPoint());
 
     if (!intakeEncoder.isConnected()) {
       stopIntakeLevel();
