@@ -140,22 +140,22 @@ public class RobotContainer {
 
                       boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
 
-                      SmartDashboard.putBoolean("Has Target", hasTarget);
-                      SmartDashboard.putBoolean("Lined Up", linedUp);
-                      SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
-                      SmartDashboard.putBoolean(
-                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
+                    //   SmartDashboard.putBoolean("Has Target", hasTarget);
+                    //   SmartDashboard.putBoolean("Lined Up", linedUp);
+                    //   SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
+                    //   SmartDashboard.putBoolean(
+                    //       "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
 
-                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
-                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
-                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
-                      SmartDashboard.putNumber(
-                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
-                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
-                      SmartDashboard.putNumber(
-                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
-                      SmartDashboard.putNumber(
-                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
+                    //   SmartDashboard.putNumber("TX", visionSubsystem.getTx());
+                    //   SmartDashboard.putNumber("TY", visionSubsystem.getTy());
+                    //   SmartDashboard.putNumber("Locked TY", lastVisionTy);
+                    //   SmartDashboard.putNumber(
+                    //       "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
+                    //   SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
+                    //   SmartDashboard.putNumber(
+                    //       "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
+                    //   SmartDashboard.putNumber(
+                    //       "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
 
                       boolean visionReady =
                           hasTarget
@@ -172,10 +172,10 @@ public class RobotContainer {
                       boolean debouncedShooterReady =
                           shooterReadyDebouncer.calculate(rawShooterReady);
 
-                      SmartDashboard.putBoolean("Vision Ready", visionReady);
-                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
-                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
-                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
+                    //   SmartDashboard.putBoolean("Vision Ready", visionReady);
+                    //   SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
+                    //   SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
+                    //   SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
 
                       indexerSubsystem.setShooting(true);
                       indexerSubsystem.setShooterReady(debouncedShooterReady);
@@ -204,7 +204,8 @@ public class RobotContainer {
                 .finallyDo(
                     interrupted -> {
                       hoodSubsystem.stopHood();
-                      flywheelSubsystem.setFlywheelVelocity(0.0);
+                      flywheelSubsystem.setHasVisionTarget(false);
+                        flywheelSubsystem.runSelectedVelocity();
                       indexerSubsystem.stopAll();
                       intakeSubsystem.stopIntake();
                       LEDSubsystem.setLEDAnimation("None", false);
@@ -237,6 +238,11 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     return autoChooser.getSelected();
+  }
+
+  public void setFlywheelToIdle() {
+    flywheelSubsystem.setHasVisionTarget(false);
+    flywheelSubsystem.runSelectedVelocity();
   }
 
   private void configureBindings() {
@@ -292,16 +298,16 @@ public class RobotContainer {
                       SmartDashboard.putBoolean(
                           "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
 
-                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
-                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
-                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
-                      SmartDashboard.putNumber(
-                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
-                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
-                      SmartDashboard.putNumber(
-                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
-                      SmartDashboard.putNumber(
-                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
+                    //   SmartDashboard.putNumber("TX", visionSubsystem.getTx());
+                    //   SmartDashboard.putNumber("TY", visionSubsystem.getTy());
+                    //   SmartDashboard.putNumber("Locked TY", lastVisionTy);
+                    //   SmartDashboard.putNumber(
+                    //       "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
+                    //   SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
+                    //   SmartDashboard.putNumber(
+                    //       "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
+                    //   SmartDashboard.putNumber(
+                    //       "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
 
                       boolean visionReady =
                           hasTarget
@@ -318,10 +324,10 @@ public class RobotContainer {
                       boolean debouncedShooterReady =
                           shooterReadyDebouncer.calculate(rawShooterReady);
 
-                      SmartDashboard.putBoolean("Vision Ready", visionReady);
-                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
-                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
-                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
+                    //   SmartDashboard.putBoolean("Vision Ready", visionReady);
+                    //   SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
+                    //   SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
+                    //   SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
 
                       indexerSubsystem.setShooting(true);
                       indexerSubsystem.setShooterReady(debouncedShooterReady);
@@ -350,7 +356,8 @@ public class RobotContainer {
                 .finallyDo(
                     interrupted -> {
                       hoodSubsystem.stopHood();
-                      flywheelSubsystem.setFlywheelVelocity(0.0);
+                      flywheelSubsystem.setHasVisionTarget(false);
+                        flywheelSubsystem.runSelectedVelocity();
                       indexerSubsystem.stopAll();
                     //   intakeSubsystem.stopIntake();
                       LEDSubsystem.setLEDAnimation("None", false);

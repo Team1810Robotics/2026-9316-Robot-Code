@@ -18,10 +18,10 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  private double defaultVelocityRPS = 50;
+  private double defaultVelocityRPS = 2200.0 / 60.0; // Convert from RPM to RPS, top # is the target RPM for the flywheel;
   private double visionVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
   private boolean hasVisionTarget = false;
-  private double activeTargetVelocityRPS = 0.0;
+  private double activeTargetVelocityRPS = 2200.0 / 60.0; // Initial value matches default, but will be updated when runSelectedVelocity is called;
 
   private static final String SHOOTER_TARGET_RPS_KEY = "Shooter Target RPS";
   private static final double DEFAULT_TUNING_RPS = 52.0;
@@ -120,7 +120,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public boolean isAtTargetSpeed() {
-    double tolerance = 10.0;
+    double tolerance = 5.0; 
     return Math.abs(getCurrentVelocity() - activeTargetVelocityRPS) < tolerance;
   }
 
@@ -135,6 +135,12 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (DriverStation.isEnabled()) {
+      rightMotor.setControl(velocityControl.withVelocity(activeTargetVelocityRPS));
+    } else {
+      stopFlywheel();
+    }
+
     if (activeTargetVelocityRPS == 0.0) {
       state = FlywheelState.STOPPED;
     } else if (isAtTargetSpeed()) {
@@ -142,11 +148,6 @@ public class FlywheelSubsystem extends SubsystemBase {
     } else {
       state = FlywheelState.SPINNING_UP;
     }
-
-    if (DriverStation.isEnabled()) {
-      rightMotor.setControl(velocityControl.withVelocity(15));
-    } else {
-      stopFlywheel();
 
       // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
       // SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
