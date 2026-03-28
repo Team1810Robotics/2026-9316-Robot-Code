@@ -20,7 +20,7 @@ public class IntakeConstants {
   public static final double PIVOT_TOLERANCE =
       0.01; // Tolerance for considering the intake to be at the setpoint
 
-  public static final double ROLLER_IN_SPEED = 0.90; // Speed for intaking game pieces
+  public static final double ROLLER_IN_SPEED = 0.99; // Speed for intaking game pieces
   public static final double ROLLER_OUT_SPEED = -0.2; // Speed for ejecting game pieces
   public static double IN_POSITION =
       0.64; // Set point for the intake being fully retracted (arm up)
