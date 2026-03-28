@@ -5,7 +5,7 @@ import frc.robot.subsystems.indexer.IndexerSubsystem;
 
 public class Indexer extends Command {
   private final IndexerSubsystem indexer;
-  private final boolean reverse;
+  private boolean reverse;
 
   public Indexer(IndexerSubsystem indexer, boolean reverse) {
     this.indexer = indexer;
@@ -18,7 +18,7 @@ public class Indexer extends Command {
     if (reverse) {
       indexer.setReverseBoth(true);
     } else {
-      indexer.setIndexingEnabled(true);
+      indexer.setIndexEnabled(true);// using setIndexEnabled() method which doesnt exist so i changed it, might not be what we want
     }
   }
 
@@ -27,7 +27,7 @@ public class Indexer extends Command {
     if (reverse) {
       indexer.setReverseBoth(false);
     } else {
-      indexer.setIndexingEnabled(false);
+      indexer.setIndexEnabled(false);// using setIndexEnabled() method which doesnt exist so i changed it, might not be what we want
     }
     indexer.stopAll();
   }

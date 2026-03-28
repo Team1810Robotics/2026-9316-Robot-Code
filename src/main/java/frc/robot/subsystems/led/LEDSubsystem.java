@@ -132,14 +132,22 @@ public class LEDSubsystem extends SubsystemBase {
 
   private boolean LEDCooldown = false; // Stops the LED idle from changing too often
 
-  @Override
-  public void
-      periodic() { // This method is called once per scheduler run, used to update the LED animation
-    // and color based on the current state and selections
-    if (DriverStation.isEnabled()) {
-      setLEDColor(new RGBWColor(255, 0, 255, 0), false);
-    }
+@Override
+public void periodic() {
+  boolean enabled = DriverStation.isEnabled();
+  
+ boolean wasEnabled = enabled;
+
+    if (enabled && !wasEnabled) {
+    setLEDColor(new RGBWColor(255, 0, 255, 0), false);
   }
+
+  if (!enabled && wasEnabled) {
+    setLEDColor(new RGBWColor(0, 0, 0, 0), false);
+  }
+
+  
+}
 
   // if (LED_IDLE) { // When the robot is idle, set the LEDs to a default color and animation
   //   if (LEDCooldown == false) {

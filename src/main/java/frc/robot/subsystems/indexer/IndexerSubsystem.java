@@ -14,6 +14,7 @@ public class IndexerSubsystem extends SubsystemBase {
   private boolean shootingEnabled = false;
   private boolean shooterReady = false;
   private boolean reverseEnabled = false;
+  // public boolean setIndexEnabled = true;
 
   public IndexerSubsystem() {}
 
@@ -35,6 +36,11 @@ public class IndexerSubsystem extends SubsystemBase {
 
   public void stopIndexer2() {
     indexer2Motor.set(0);
+  }
+  
+  public void setIndexEnabled(boolean enabled) {
+    indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
+    indexer1Motor.set(IndexerConstants.INDEXER_1_SPEED);
   }
 
   public void stopAll() {
@@ -63,7 +69,7 @@ public class IndexerSubsystem extends SubsystemBase {
     if (reverseEnabled) {
       indexer1Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
       indexer2Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
-    } else if (shootingEnabled && shooterReady) {
+    } else if (shootingEnabled) {
       indexer1Motor.set(IndexerConstants.INDEXER_1_SPEED);
       indexer2Motor.set(IndexerConstants.INDEXER_2_SHOOTER_SPEED);
     } else {

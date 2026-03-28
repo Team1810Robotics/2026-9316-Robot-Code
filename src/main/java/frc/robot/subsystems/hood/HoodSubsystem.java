@@ -66,17 +66,17 @@ public class HoodSubsystem extends SubsystemBase {
 
     hoodMotor.stopMotor();
 
-    SmartDashboard.putData("Hood Encoder", hoodEncoder);
+    // SmartDashboard.putData("Hood Encoder", hoodEncoder);
 
-    SmartDashboard.putNumber("Hood Raw Encoder", 0.0);
-    // SmartDashboard.putNumber("Hood Wrapped Encoder", 0.0);
-    SmartDashboard.putNumber("Hood Continuous Encoder", 0.0);
-    SmartDashboard.putNumber("Hood Encoder Rotations", 0.0);
-    // SmartDashboard.putNumber("Hood Zero Offset", 0.0);
-    // SmartDashboard.putNumber("Hood Desired Position", currentSetPoint);
-    // SmartDashboard.putNumber("Hood Vision Calculated", visionSetPoint);
-    SmartDashboard.putNumber("Hood TY Raw", 0.0);
-    SmartDashboard.putNumber("Hood TY Used", 0.0);
+    // SmartDashboard.putNumber("Hood Raw Encoder", 0.0);
+    // // SmartDashboard.putNumber("Hood Wrapped Encoder", 0.0);
+    // SmartDashboard.putNumber("Hood Continuous Encoder", 0.0);
+    // SmartDashboard.putNumber("Hood Encoder Rotations", 0.0);
+    // // SmartDashboard.putNumber("Hood Zero Offset", 0.0);
+    // // SmartDashboard.putNumber("Hood Desired Position", currentSetPoint);
+    // // SmartDashboard.putNumber("Hood Vision Calculated", visionSetPoint);
+    // SmartDashboard.putNumber("Hood TY Raw", 0.0);
+    // SmartDashboard.putNumber("Hood TY Used", 0.0);
     // SmartDashboard.putNumber("Hood Polynomial Output", 0.0);
     // SmartDashboard.putNumber("Hood Polynomial Clamped", 0.0);
     // SmartDashboard.putNumber("Hood Raw Delta", 0.0);
@@ -321,24 +321,24 @@ public class HoodSubsystem extends SubsystemBase {
       }
     }
 
-    SmartDashboard.putNumber("Hood Raw Encoder", getHoodRawEncoder());
-    // SmartDashboard.putNumber("Hood Wrapped Encoder", getWrappedEncoder());
-    SmartDashboard.putNumber("Hood Continuous Encoder", getContinuousHoodEncoder());
-    SmartDashboard.putNumber("Hood Encoder Rotations", hoodEncoderRotations);
-    // SmartDashboard.putNumber("Hood Zero Offset", hoodZeroOffset);
-    // SmartDashboard.putNumber("Hood Desired Position", currentSetPoint);
-    // SmartDashboard.putNumber("Hood Vision Calculated", visionSetPoint);
-    SmartDashboard.putNumber("Hood TY Raw", lastTYRaw);
-    SmartDashboard.putNumber("Hood TY Used", lastTYUsed);
-    // SmartDashboard.putNumber("Hood Polynomial Output", lastPolynomialOutput);
-    // SmartDashboard.putNumber("Hood Polynomial Clamped", lastPolynomialClamped);
-    // SmartDashboard.putNumber("Hood Raw Delta", lastEncoderDelta);
-    // SmartDashboard.putNumber("Hood PID Error", currentSetPoint - getContinuousHoodEncoder());
-    // SmartDashboard.putNumber("Hood PID Output", lastPidOutput);
+    // SmartDashboard.putNumber("Hood Raw Encoder", getHoodRawEncoder());
+    // // SmartDashboard.putNumber("Hood Wrapped Encoder", getWrappedEncoder());
+    // SmartDashboard.putNumber("Hood Continuous Encoder", getContinuousHoodEncoder());
+    // SmartDashboard.putNumber("Hood Encoder Rotations", hoodEncoderRotations);
+    // // SmartDashboard.putNumber("Hood Zero Offset", hoodZeroOffset);
+    // // SmartDashboard.putNumber("Hood Desired Position", currentSetPoint);
+    // // SmartDashboard.putNumber("Hood Vision Calculated", visionSetPoint);
+    // SmartDashboard.putNumber("Hood TY Raw", lastTYRaw);
+    // SmartDashboard.putNumber("Hood TY Used", lastTYUsed);
+    // // SmartDashboard.putNumber("Hood Polynomial Output", lastPolynomialOutput);
+    // // SmartDashboard.putNumber("Hood Polynomial Clamped", lastPolynomialClamped);
+    // // SmartDashboard.putNumber("Hood Raw Delta", lastEncoderDelta);
+    // // SmartDashboard.putNumber("Hood PID Error", currentSetPoint - getContinuousHoodEncoder());
+    // // SmartDashboard.putNumber("Hood PID Output", lastPidOutput);
 
-    // SmartDashboard.putBoolean("Hood Zeroed", hoodZeroed);
-    SmartDashboard.putBoolean("Hood Limit Switch Raw", getLimitSwitchRaw());
-    SmartDashboard.putBoolean("Hood Limit Switch Pressed", isLimitSwitchPressed());
+    // // SmartDashboard.putBoolean("Hood Zeroed", hoodZeroed);
+    // SmartDashboard.putBoolean("Hood Limit Switch Raw", getLimitSwitchRaw());
+    // SmartDashboard.putBoolean("Hood Limit Switch Pressed", isLimitSwitchPressed());
     //   SmartDashboard.putBoolean("Hood Has Vision Target", hasVisionTarget);
     //   SmartDashboard.putBoolean("Hood At SetPoint", isAtSetPoint());
     //   SmartDashboard.putBoolean("Hood Encoder Connected", hoodEncoder.isConnected());

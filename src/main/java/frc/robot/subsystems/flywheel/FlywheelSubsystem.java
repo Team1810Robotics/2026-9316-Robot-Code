@@ -7,6 +7,8 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.MotorAlignmentValue;
+import com.ctre.phoenix6.signals.RGBWColor;
+
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,7 +20,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  private double defaultVelocityRPS = 2200.0 / 60.0; // Convert from RPM to RPS, top # is the target RPM for the flywheel;
+  private double defaultVelocityRPS = 3000.0 / 60.0; // Convert from RPM to RPS, top # is the target RPM for the flywheel;
   private double visionVelocityRPS = FlywheelConstants.IDLE_VELOCITY;
   private boolean hasVisionTarget = false;
   private double activeTargetVelocityRPS = 2200.0 / 60.0; // Initial value matches default, but will be updated when runSelectedVelocity is called;
@@ -48,7 +50,7 @@ public class FlywheelSubsystem extends SubsystemBase {
 
     leftMotor.setControl(new Follower(FlywheelConstants.rightMotorID, MotorAlignmentValue.Opposed));
 
-    SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
+    //SmartDashboard.putNumber(SHOOTER_TARGET_RPS_KEY, DEFAULT_TUNING_RPS);
   }
 
   public void setDefaultVelocity(double velocityRPS) {
@@ -120,7 +122,7 @@ public class FlywheelSubsystem extends SubsystemBase {
   }
 
   public boolean isAtTargetSpeed() {
-    double tolerance = 5.0; 
+    double tolerance = 3.0; 
     return Math.abs(getCurrentVelocity() - activeTargetVelocityRPS) < tolerance;
   }
 
@@ -133,22 +135,31 @@ public class FlywheelSubsystem extends SubsystemBase {
     return 3065 + (-70.4) * x + (5.9) * Math.pow(x, 2) + (-0.122) * Math.pow(x, 3);
   }
 
-  @Override
-  public void periodic() {
-    if (DriverStation.isEnabled()) {
-      rightMotor.setControl(velocityControl.withVelocity(activeTargetVelocityRPS));
-    } else {
-      stopFlywheel();
-    }
+  private boolean wasEnabled = false;
 
-    if (activeTargetVelocityRPS == 0.0) {
-      state = FlywheelState.STOPPED;
-    } else if (isAtTargetSpeed()) {
-      state = FlywheelState.AT_SPEED;
-    } else {
-      state = FlywheelState.SPINNING_UP;
-    }
+@Override
+public void periodic() {
+  boolean enabled = DriverStation.isEnabled();
 
+  if (enabled && !wasEnabled) {
+    setFlywheelVelocity(3000.0 / 60.0);
+  }
+
+  if (!enabled && wasEnabled) {
+    stopFlywheel();
+  }
+
+  wasEnabled = enabled;
+
+  if (activeTargetVelocityRPS == 0.0) {
+    state = FlywheelState.STOPPED;
+  } else if (isAtTargetSpeed()) {
+    state = FlywheelState.AT_SPEED;
+  } else {
+    state = FlywheelState.SPINNING_UP;
+  }
+}
+    
       // SmartDashboard.putNumber("Flywheel Current RPS", getCurrentVelocity());
       // SmartDashboard.putNumber("Flywheel Active Target RPS", activeTargetVelocityRPS);
       // SmartDashboard.putNumber("Flywheel Default RPS", defaultVelocityRPS);
@@ -160,5 +171,5 @@ public class FlywheelSubsystem extends SubsystemBase {
       // SmartDashboard.putBoolean("Flywheel At Speed", isAtTargetSpeed());
       // SmartDashboard.putString("Flywheel State", state.toString());
     }
-  }
-}
+
+

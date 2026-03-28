@@ -137,7 +137,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+    //SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }
@@ -165,7 +165,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+    //SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }
@@ -204,7 +204,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+    //SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }
@@ -262,18 +262,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
               });
     }
 
-    SwerveDriveState state = getState();
+     SwerveDriveState state = getState();
 
-    DogLog.log("Drive/DriveState/Pose", state.Pose);
-    DogLog.log("Drive/DriveState/Speeds", state.Speeds);
-    DogLog.log("Drive/DriveState/ModuleStates", state.ModuleStates);
-    DogLog.log("Drive/DriveState/ModuleTargets", state.ModuleTargets);
-    DogLog.log("Drive/DriveState/ModulePositions", state.ModulePositions);
-    DogLog.log("Drive/DriveState/OdometryPeriod", state.OdometryPeriod, Seconds);
+    // DogLog.log("Drive/DriveState/Pose", state.Pose);
+    // DogLog.log("Drive/DriveState/Speeds", state.Speeds);
+    // DogLog.log("Drive/DriveState/ModuleStates", state.ModuleStates);
+    // DogLog.log("Drive/DriveState/ModuleTargets", state.ModuleTargets);
+    // DogLog.log("Drive/DriveState/ModulePositions", state.ModulePositions);
+    // DogLog.log("Drive/DriveState/OdometryPeriod", state.OdometryPeriod, Seconds);
 
-    DogLog.log("Drive/Pigeon/Yaw", getPigeon2().getYaw().getValueAsDouble());
-    DogLog.log("Drive/Pigeon/Pitch", getPigeon2().getPitch().getValueAsDouble());
-    DogLog.log("Drive/Pigeon/Roll", getPigeon2().getRoll().getValueAsDouble());
+    // DogLog.log("Drive/Pigeon/Yaw", getPigeon2().getYaw().getValueAsDouble());
+    // DogLog.log("Drive/Pigeon/Pitch", getPigeon2().getPitch().getValueAsDouble());
+    // DogLog.log("Drive/Pigeon/Roll", getPigeon2().getRoll().getValueAsDouble());
 
     field2d.setRobotPose(state.Pose);
   }

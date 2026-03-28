@@ -160,13 +160,13 @@ public class RobotContainer {
                       boolean visionReady =
                           hasTarget
                               && linedUp
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
+                              && hoodSubsystem.isAtSetPoint();
+                            //   && flywheelSubsystem.isAtTargetSpeed();
 
                       boolean fallbackReady =
                           !hasTarget
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
+                              && hoodSubsystem.isAtSetPoint();
+                            //   && flywheelSubsystem.isAtTargetSpeed()
 
                       boolean rawShooterReady = visionReady || fallbackReady;
                       boolean debouncedShooterReady =
@@ -229,11 +229,11 @@ public class RobotContainer {
    
     NamedCommands.registerCommand(
         "StartIntake",
-        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.9), intakeSubsystem));
+        Commands.runOnce(() -> intakeSubsystem.runIntakeMotor(0.9), intakeSubsystem));
     
     NamedCommands.registerCommand(
         "StopIntake",
-        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
+        Commands.runOnce(() -> intakeSubsystem.runIntakeMotor(0.0), intakeSubsystem));
   }
 
   public Command getAutonomousCommand() {
@@ -295,8 +295,8 @@ public class RobotContainer {
                     //   SmartDashboard.putBoolean("Has Target", hasTarget);
                     //   SmartDashboard.putBoolean("Lined Up", linedUp);
                     //   SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
-                      SmartDashboard.putBoolean(
-                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
+                    //   SmartDashboard.putBoolean(
+                    //       "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
 
                     //   SmartDashboard.putNumber("TX", visionSubsystem.getTx());
                     //   SmartDashboard.putNumber("TY", visionSubsystem.getTy());
@@ -321,8 +321,7 @@ public class RobotContainer {
                               && flywheelSubsystem.isAtTargetSpeed();
 
                       boolean rawShooterReady = visionReady || fallbackReady;
-                      boolean debouncedShooterReady =
-                          shooterReadyDebouncer.calculate(rawShooterReady);
+                      boolean debouncedShooterReady = shooterReadyDebouncer.calculate(rawShooterReady);
 
                     //   SmartDashboard.putBoolean("Vision Ready", visionReady);
                     //   SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
@@ -334,20 +333,20 @@ public class RobotContainer {
 
                       if (debouncedShooterReady && visionReady) {
                         //intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.GREEN[0],
-                                LEDConstants.GREEN[1],
-                                LEDConstants.GREEN[2],
-                                0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      } else if (debouncedShooterReady && fallbackReady) {
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
+                    //     LEDSubsystem.setLEDColor(
+                    //         new RGBWColor(
+                    //             LEDConstants.GREEN[0],
+                    //             LEDConstants.GREEN[1],
+                    //             LEDConstants.GREEN[2],
+                    //             0),
+                    //         false);
+                    //     LEDSubsystem.setLEDAnimation("SingleFade", false);
+                    //   } else if (debouncedShooterReady && fallbackReady) {
+                    //     LEDSubsystem.setLEDColor(
+                    //         new RGBWColor(
+                    //             LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
+                    //         false);
+                    //     LEDSubsystem.setLEDAnimation("SingleFade", false);
                       }
                     },
                     hoodSubsystem,
@@ -371,12 +370,12 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(0.6);
+                  intakeSubsystem.runIntakeMotor(0.8);
                 // indexerSubsystem.runBothForward();
         
                 },
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(0.0);
+                  intakeSubsystem.runIntakeMotor(0.0);
                 //   indexerSubsystem.stopAll();
                 },
                 intakeSubsystem
@@ -389,11 +388,11 @@ public class RobotContainer {
         .whileTrue(
             Commands.startEnd(
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(-0.5);
+                  intakeSubsystem.runIntakeMotor(-0.5);
                   indexerSubsystem.runBothReverse();
                 },
                 () -> {
-                  intakeSubsystem.TestingIntakeMotor(0.0);
+                  intakeSubsystem.runIntakeMotor(0.0);
                   indexerSubsystem.stopAll();
                 },
                 intakeSubsystem,
@@ -404,8 +403,8 @@ public class RobotContainer {
         .rightBumper()
         .whileTrue(
             Commands.startEnd(
-                () -> intakeSubsystem.TestingIntakeMotor(-0.5),
-                () -> intakeSubsystem.TestingIntakeMotor(0.0),
+                () -> intakeSubsystem.runIntakeMotor(-0.5),
+                () -> intakeSubsystem.runIntakeMotor(0.0),
                 intakeSubsystem));
 
     // Intake arm out
@@ -428,7 +427,9 @@ public class RobotContainer {
     driverXbox.povUp().whileTrue(new Hood(hoodSubsystem, HoodConstants.HOOD_SPEED, false));
 
     // D-pad down = hood down while held
-    driverXbox.povDown().whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
+    driverXbox.povDown(
+
+    ).whileTrue(new Hood(hoodSubsystem, -HoodConstants.HOOD_SPEED, false));
 
     // Hold A to aim horizontally at hub
     driverXbox
