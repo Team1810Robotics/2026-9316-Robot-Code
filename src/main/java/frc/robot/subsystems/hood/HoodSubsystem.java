@@ -254,12 +254,12 @@ public class HoodSubsystem extends SubsystemBase {
     double x = Math.abs(ty);
 
     double setpoint =
-        0.892
-            + (-0.271) * x
-            + (0.0609) * Math.pow(x, 2)
-            + (-5.73e-3) * Math.pow(x, 3)
-            + (2.48e-4) * Math.pow(x, 4)
-            + (-3.94e-6) * Math.pow(x, 5);
+        -46.2
+            + (16.4) * x
+            + (-2.25) * Math.pow(x, 2)
+            + (0.151) * Math.pow(x, 3)
+            + (-4.94e-3) * Math.pow(x, 4)
+            + (6.35e-5) * Math.pow(x, 5);
 
     double clamped = MathUtil.clamp(setpoint, 0.0, 3.0);
 

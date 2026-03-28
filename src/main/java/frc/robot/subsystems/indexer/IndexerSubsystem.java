@@ -12,8 +12,8 @@ public class IndexerSubsystem extends SubsystemBase {
   private final SparkMax indexer2Motor =
       new SparkMax(IndexerConstants.INDEXER_2_MOTOR_ID, MotorType.kBrushless);
 
-  private final DigitalInput index2BeamBreak =
-      new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
+  // private final DigitalInput index2BeamBreak =
+  //     new DigitalInput(IndexerConstants.INDEXER_2_BEAM_BREAK_SENSOR_PORT);
 
   private boolean indexingEnabled = false;
   private boolean shootingEnabled = false;
@@ -23,9 +23,9 @@ public class IndexerSubsystem extends SubsystemBase {
 
   public IndexerSubsystem() {}
 
-  public boolean isIndex2Broken() {
-    return !index2BeamBreak.get();
-  }
+  // public boolean isIndex2Broken() {
+  //   return !index2BeamBreak.get();
+  // }
 
   public void setIndexingEnabled(boolean enabled) {
     indexingEnabled = enabled;
@@ -71,9 +71,27 @@ public class IndexerSubsystem extends SubsystemBase {
     indexer2Motor.set(0);
   }
 
-  public void runBothForward() {
+  // Used for bumper/intake feed
+  public void runIndexFeed() {
     indexingEnabled = true;
     shootingEnabled = false;
+    shooterReady = false;
+    reverse1Enabled = false;
+    reverse2Enabled = false;
+  }
+
+  // Used for shooter feed after flywheel/hood are ready
+  public void runShooterFeed() {
+    indexingEnabled = false;
+    shootingEnabled = true;
+    shooterReady = true;
+    reverse1Enabled = false;
+    reverse2Enabled = false;
+  }
+
+  public void prepareToShoot() {
+    indexingEnabled = false;
+    shootingEnabled = true;
     shooterReady = false;
     reverse1Enabled = false;
     reverse2Enabled = false;
@@ -89,15 +107,14 @@ public class IndexerSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-
-    boolean index2Broken = isIndex2Broken();
-
     // Motor 1 logic
     if (reverse1Enabled) {
       indexer1Motor.set(IndexerConstants.INDEXER_1_REVERSE_SPEED);
-    } else if (indexingEnabled || shootingEnabled) {
+    } else if (shootingEnabled && shooterReady) {
       indexer1Motor.set(IndexerConstants.INDEXER_1_SPEED);
-    } else {
+    } //else if (indexingEnabled) {
+      //indexer1Motor.set(IndexerConstants.INDEXER_1_SPEED);}
+     else {
       indexer1Motor.set(0);
     }
 
@@ -106,17 +123,10 @@ public class IndexerSubsystem extends SubsystemBase {
       indexer2Motor.set(IndexerConstants.INDEXER_2_REVERSE_SPEED);
     } else if (shootingEnabled && shooterReady) {
       indexer2Motor.set(IndexerConstants.INDEXER_2_SHOOTER_SPEED);
-    } else if (indexingEnabled) {
-      indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);
-    } else {
+    } //else if (indexingEnabled) {
+      //indexer2Motor.set(IndexerConstants.INDEXER_2_SPEED);}
+     else {
       indexer2Motor.set(0);
     }
-
-    // SmartDashboard.putBoolean("Indexer 2 Broken", index2Broken);
-    // SmartDashboard.putBoolean("Indexing Enabled", indexingEnabled);
-    // SmartDashboard.putBoolean("Shooting Enabled", shootingEnabled);
-    // SmartDashboard.putBoolean("Shooter Ready", shooterReady);
-    // SmartDashboard.putBoolean("Reverse 1 Enabled", reverse1Enabled);
-    // SmartDashboard.putBoolean("Reverse 2 Enabled", reverse2Enabled);
   }
 }

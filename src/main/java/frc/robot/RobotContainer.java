@@ -35,6 +35,7 @@ import frc.robot.subsystems.intake.IntakeSubsystem;
 import frc.robot.subsystems.led.LEDConstants;
 import frc.robot.subsystems.led.LEDSubsystem;
 import frc.robot.subsystems.vision.VisionSubsystem;
+import frc.robot.commands.ShootCommand;
 
 // import frc.robot.subsystems.climb.ClimbSubsystem;
 
@@ -50,6 +51,7 @@ public class RobotContainer {
   private final HoodSubsystem hoodSubsystem = new HoodSubsystem();
   private final FlywheelSubsystem flywheelSubsystem = new FlywheelSubsystem();
   public final LEDSubsystem ledSubsystem = new LEDSubsystem();
+  
 
   // ---------------- DRIVE CONFIG ----------------
   private final double MaxSpeed = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -81,6 +83,16 @@ public class RobotContainer {
   private boolean hasLockedVisionTarget = false;
   private static final double TY_UPDATE_THRESHOLD = 0.2;
 
+  public void startShooterIdle() {
+  flywheelSubsystem.runIdle();
+}
+
+public void stopShooter() {
+  flywheelSubsystem.stopFlywheel();
+  indexerSubsystem.stopAll();
+  hoodSubsystem.stopHood();
+}
+
   // ---------------- AUTO ----------------
   private final SendableChooser<Command> autoChooser;
 
@@ -109,107 +121,13 @@ public class RobotContainer {
         Commands.runOnce(() -> flywheelSubsystem.stopFlywheel(), flywheelSubsystem));
 
     NamedCommands.registerCommand(
-        "Shoot",
-        Commands.run(
-                    () -> {
-                      boolean hasTarget = visionSubsystem.targetValid();
-
-                      if (hasTarget) {
-                        double ty = visionSubsystem.getTy();
-
-                        if (!hasLockedVisionTarget
-                            || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
-                          lastVisionTy = ty;
-                          hasLockedVisionTarget = true;
-
-                          double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
-                          hoodSubsystem.setVisionSetPoint(hoodTarget);
-                          hoodSubsystem.setPoint(hoodTarget);
-
-                          double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
-                          flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
-                        }
-                      } else {
-                        hasLockedVisionTarget = false;
-
-                        // Fallback/default shot if no valid AprilTag is seen
-                        hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
-                        flywheelSubsystem.setFlywheelVelocity(
-                            flywheelSubsystem.getDefaultVelocity());
-                      }
-
-                      boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
-
-                      SmartDashboard.putBoolean("Has Target", hasTarget);
-                      SmartDashboard.putBoolean("Lined Up", linedUp);
-                      SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
-                      SmartDashboard.putBoolean(
-                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
-
-                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
-                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
-                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
-                      SmartDashboard.putNumber(
-                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
-                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
-                      SmartDashboard.putNumber(
-                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
-                      SmartDashboard.putNumber(
-                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
-
-                      boolean visionReady =
-                          hasTarget
-                              && linedUp
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
-
-                      boolean fallbackReady =
-                          !hasTarget
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
-
-                      boolean rawShooterReady = visionReady || fallbackReady;
-                      boolean debouncedShooterReady =
-                          shooterReadyDebouncer.calculate(rawShooterReady);
-
-                      SmartDashboard.putBoolean("Vision Ready", visionReady);
-                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
-                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
-                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
-
-                      indexerSubsystem.setShooting(true);
-                      indexerSubsystem.setShooterReady(debouncedShooterReady);
-
-                      if (debouncedShooterReady && visionReady) {
-                        intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.GREEN[0],
-                                LEDConstants.GREEN[1],
-                                LEDConstants.GREEN[2],
-                                0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      } else if (debouncedShooterReady && fallbackReady) {
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      }
-                    },
-                    hoodSubsystem,
-                    flywheelSubsystem,
-                    indexerSubsystem)
-                .finallyDo(
-                    interrupted -> {
-                      hoodSubsystem.stopHood();
-                      flywheelSubsystem.setFlywheelVelocity(0.0);
-                      indexerSubsystem.stopAll();
-                      intakeSubsystem.stopIntake();
-                      LEDSubsystem.setLEDAnimation("None", false);
-                      hasLockedVisionTarget = false;
-                    }));
+    "Shoot",
+    new ShootCommand(
+        visionSubsystem,
+        flywheelSubsystem,
+        hoodSubsystem,
+        indexerSubsystem,
+        ledSubsystem));
 
     NamedCommands.registerCommand(
         "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll(), indexerSubsystem));
@@ -254,108 +172,14 @@ public class RobotContainer {
 
     // ---------------- SHOOTER / VISION ----------------
     driverXbox
-        .rightTrigger()
-        .whileTrue(
-            Commands.run(
-                    () -> {
-                      boolean hasTarget = visionSubsystem.targetValid();
-
-                      if (hasTarget) {
-                        double ty = visionSubsystem.getTy();
-
-                        if (!hasLockedVisionTarget
-                            || Math.abs(ty - lastVisionTy) > TY_UPDATE_THRESHOLD) {
-                          lastVisionTy = ty;
-                          hasLockedVisionTarget = true;
-
-                          double hoodTarget = hoodSubsystem.computeHoodSetpointFromTY(lastVisionTy);
-                          hoodSubsystem.setVisionSetPoint(hoodTarget);
-                          hoodSubsystem.setPoint(hoodTarget);
-
-                          double rpm = flywheelSubsystem.computeFlywheelRPMFromTY(lastVisionTy);
-                          flywheelSubsystem.setFlywheelVelocity(rpm / 60.0);
-                        }
-                      } else {
-                        hasLockedVisionTarget = false;
-
-                        // Fallback/default shot if no valid AprilTag is seen
-                        hoodSubsystem.setPoint(HoodConstants.DEFAULT_POSITION);
-                        flywheelSubsystem.setFlywheelVelocity(
-                            flywheelSubsystem.getDefaultVelocity());
-                      }
-
-                      boolean linedUp = hasTarget && Math.abs(visionSubsystem.getTx()) < 3.0;
-
-                    //   SmartDashboard.putBoolean("Has Target", hasTarget);
-                    //   SmartDashboard.putBoolean("Lined Up", linedUp);
-                    //   SmartDashboard.putBoolean("Hood At SetPoint", hoodSubsystem.isAtSetPoint());
-                      SmartDashboard.putBoolean(
-                          "Flywheel At Target Speed", flywheelSubsystem.isAtTargetSpeed());
-
-                      SmartDashboard.putNumber("TX", visionSubsystem.getTx());
-                      SmartDashboard.putNumber("TY", visionSubsystem.getTy());
-                      SmartDashboard.putNumber("Locked TY", lastVisionTy);
-                      SmartDashboard.putNumber(
-                          "Hood Position", hoodSubsystem.getContinuousHoodEncoder());
-                      SmartDashboard.putNumber("Hood SetPoint", hoodSubsystem.getSetPoint());
-                      SmartDashboard.putNumber(
-                          "Flywheel Current RPS", flywheelSubsystem.getCurrentVelocity());
-                      SmartDashboard.putNumber(
-                          "Flywheel Target RPS", flywheelSubsystem.getTargetVelocity());
-
-                      boolean visionReady =
-                          hasTarget
-                              && linedUp
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
-
-                      boolean fallbackReady =
-                          !hasTarget
-                              && hoodSubsystem.isAtSetPoint()
-                              && flywheelSubsystem.isAtTargetSpeed();
-
-                      boolean rawShooterReady = visionReady || fallbackReady;
-                      boolean debouncedShooterReady =
-                          shooterReadyDebouncer.calculate(rawShooterReady);
-
-                      SmartDashboard.putBoolean("Vision Ready", visionReady);
-                      SmartDashboard.putBoolean("Fallback Ready", fallbackReady);
-                      SmartDashboard.putBoolean("Raw Shooter Ready", rawShooterReady);
-                      SmartDashboard.putBoolean("Debounced Shooter Ready", debouncedShooterReady);
-
-                      indexerSubsystem.setShooting(true);
-                      indexerSubsystem.setShooterReady(debouncedShooterReady);
-
-                      if (debouncedShooterReady && visionReady) {
-                        //intakeSubsystem.run(IntakeConstants.ROLLER_IN_SPEED);
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.GREEN[0],
-                                LEDConstants.GREEN[1],
-                                LEDConstants.GREEN[2],
-                                0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      } else if (debouncedShooterReady && fallbackReady) {
-                        LEDSubsystem.setLEDColor(
-                            new RGBWColor(
-                                LEDConstants.RED[0], LEDConstants.RED[1], LEDConstants.RED[2], 0),
-                            false);
-                        LEDSubsystem.setLEDAnimation("SingleFade", false);
-                      }
-                    },
-                    hoodSubsystem,
-                    flywheelSubsystem,
-                    indexerSubsystem)
-                .finallyDo(
-                    interrupted -> {
-                      hoodSubsystem.stopHood();
-                      flywheelSubsystem.setFlywheelVelocity(0.0);
-                      indexerSubsystem.stopAll();
-                    //   intakeSubsystem.stopIntake();
-                      LEDSubsystem.setLEDAnimation("None", false);
-                      hasLockedVisionTarget = false;
-                    }));
+    .rightTrigger()
+    .whileTrue(
+        new ShootCommand(
+            visionSubsystem,
+            flywheelSubsystem,
+            hoodSubsystem,
+            indexerSubsystem,
+            ledSubsystem));
     // ---------------- INTAKE CONTROLS ----------------
 
     // Intake in + index forward
