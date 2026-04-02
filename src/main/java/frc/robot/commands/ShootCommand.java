@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import com.ctre.phoenix6.signals.RGBWColor;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -21,7 +22,7 @@ public class ShootCommand extends Command {
   private final IndexerSubsystem indexerSubsystem;
   private final LEDSubsystem ledSubsystem;
 
-  private final Debouncer shooterReadyDebouncer = new Debouncer(0.15);
+  private final Debouncer shooterReadyDebouncer = new Debouncer(0.15, DebounceType.kRising);
 
   private boolean useVisionShot = false;
   private double lockedTy = 0.0;
@@ -78,7 +79,7 @@ public class ShootCommand extends Command {
     boolean flywheelReady = flywheelSubsystem.isAtTargetSpeed();
     currentTime = Timer.getFPGATimestamp();
 
-    waited = currentTime - startTime > Timer.getFPGATimestamp();
+    waited = currentTime - startTime > shooterTiming;
 
     boolean aimReady = true;
     if (useVisionShot) {
@@ -88,7 +89,7 @@ public class ShootCommand extends Command {
 boolean rawShooterReady;
 
     if (useVisionShot) {
-        rawShooterReady = hoodReady && flywheelReady && aimReady && waited;
+        rawShooterReady = aimReady && waited;
     } else {
         rawShooterReady = currentTime - startTime > shooterTiming;
     }
@@ -96,10 +97,12 @@ boolean rawShooterReady;
 
     indexerSubsystem.setShooterReady(debouncedShooterReady);
 
-    // SmartDashboard.putBoolean("Shoot Hood Ready", hoodReady);
-    // SmartDashboard.putBoolean("Shoot Flywheel Ready", flywheelReady);
-    // SmartDashboard.putBoolean("Shoot Aim Ready", aimReady);
-    // SmartDashboard.putBoolean("Shoot Ready", debouncedShooterReady);
+    SmartDashboard.putBoolean("Shoot Hood Ready", hoodReady);
+    SmartDashboard.putBoolean("Shoot Flywheel Ready", flywheelReady);
+    SmartDashboard.putBoolean("Shoot Aim Ready", aimReady);
+    SmartDashboard.putBoolean("Waited", waited);
+    SmartDashboard.putBoolean("Shoot Ready", debouncedShooterReady);
+    SmartDashboard.putBoolean("Use Vision Shot", useVisionShot);
 
   //   if (debouncedShooterReady && useVisionShot) {
   //     LEDSubsystem.setLEDColor(

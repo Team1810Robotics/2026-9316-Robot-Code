@@ -42,6 +42,12 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "IntakeIn"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "REALSHOOT"
@@ -51,6 +57,12 @@
           "type": "path",
           "data": {
             "pathName": "New Path"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeOut"
           }
         },
         {
@@ -94,6 +106,12 @@
           "type": "named",
           "data": {
             "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "StartIntake"
           }
         }
       ]
