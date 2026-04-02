@@ -18,7 +18,7 @@ public final class HoodConstants {
   // These now represent CONTINUOUS encoder positions, not raw 0-1 values.
   // Replace these with your real measured values from SmartDashboard.
   public static final double POSITION1 = 0.195;
-  public static final double POSITION2 = 1.200;
+  public static final double POSITION2 = 1.500;
   public static final double POSITION3 = 2.244;
 
   public static final double DEFAULT_POSITION = POSITION2;

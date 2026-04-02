@@ -15,6 +15,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import dev.doglog.DogLog;
 import dev.doglog.DogLogOptions;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -99,9 +100,10 @@ public void stopShooter() {
   public RobotContainer() {
     configureBindings();
     registerNamedCommands();
+autoChooser = AutoBuilder.buildAutoChooser();
 
-    autoChooser = AutoBuilder.buildAutoChooser();
-    SmartDashboard.putData("Auto Chooser", autoChooser);
+Shuffleboard.getTab("Autonomous")
+    .add("Auto Chooser", autoChooser);
 
     DogLog.setOptions(new DogLogOptions().withCaptureNt(true).withCaptureDs(true).withNtPublish(true));
   }
@@ -123,11 +125,11 @@ public void stopShooter() {
     NamedCommands.registerCommand(
     "Shoot",
     new ShootCommand(
-        visionSubsystem,
-        flywheelSubsystem,
-        hoodSubsystem,
-        indexerSubsystem,
-        ledSubsystem));
+            visionSubsystem,
+            flywheelSubsystem,
+            hoodSubsystem,
+            indexerSubsystem,
+            ledSubsystem));
 
     NamedCommands.registerCommand(
         "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll(), indexerSubsystem));
@@ -139,6 +141,10 @@ public void stopShooter() {
     NamedCommands.registerCommand(
         "IntakeOut", 
         new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.OUT_POSITION), intakeSubsystem));
+    
+    NamedCommands.registerCommand(
+        "IntakeIn", 
+        new InstantCommand(() -> intakeSubsystem.setPoint(IntakeConstants.IN_POSITION), intakeSubsystem));
 
     NamedCommands.registerCommand(
         "ZeroHood",

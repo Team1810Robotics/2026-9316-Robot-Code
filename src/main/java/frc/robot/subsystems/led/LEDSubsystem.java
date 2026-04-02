@@ -136,9 +136,7 @@ public class LEDSubsystem extends SubsystemBase {
   public void
       periodic() { // This method is called once per scheduler run, used to update the LED animation
     // and color based on the current state and selections
-    if (DriverStation.isEnabled()) {
-      setLEDColor(new RGBWColor(255, 0, 255, 0), false);
-    }
+
   }
 
   // if (LED_IDLE) { // When the robot is idle, set the LEDs to a default color and animation

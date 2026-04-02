@@ -137,7 +137,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+   // SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }
@@ -165,7 +165,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+    // SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }
@@ -204,7 +204,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     // configureAutoBuilder();
 
     field2d = new Field2d();
-    SmartDashboard.putData("Field", field2d);
+   // SmartDashboard.putData("Field", field2d);
 
     configureAutoBuilder();
   }

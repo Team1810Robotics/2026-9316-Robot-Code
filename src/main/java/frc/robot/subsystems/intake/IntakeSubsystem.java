@@ -50,7 +50,7 @@ public class IntakeSubsystem extends SubsystemBase {
     // If you have a tolerance constant, use it here
     // intakePIDController.setTolerance(IntakeConstants.INTAKE_TOLERANCE);
 
-    SmartDashboard.putData("Intake Raw Encoder", intakeEncoder);
+   // SmartDashboard.putData("Intake Raw Encoder", intakeEncoder);
   }
 
   // -------------------------

@@ -62,12 +62,13 @@ public class VisionSubsystem extends SubsystemBase {
    */
   public double getHoodSetpointFromTY() {
     double x = Math.abs(getTy());
-    return 0.892
-        + (-0.271) * x
-        + (0.0609) * Math.pow(x, 2)
-        + (-5.73e-3) * Math.pow(x, 3)
-        + (2.48e-4) * Math.pow(x, 4)
-        + (-3.94e-6) * Math.pow(x, 5);
+    return 0.401
+            + (0.154) * x
+            + (-0.0801) * Math.pow(x, 2)
+            + (0.0196) * Math.pow(x, 3)
+            + (-2.11e-3) * Math.pow(x, 4)
+            + (1.03e-4) * Math.pow(x, 5)
+            + (-1.87e-6) * Math.pow(x, 6);
   }
 
   /** Estimated forward distance (Z axis in target space) to target in meters. */

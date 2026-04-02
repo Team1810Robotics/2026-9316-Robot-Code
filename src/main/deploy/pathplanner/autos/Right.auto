@@ -40,6 +40,30 @@
               }
             ]
           }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeIn"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "IntakeIn"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Shoot"
+          }
         }
       ]
     }

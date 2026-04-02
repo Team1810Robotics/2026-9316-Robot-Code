@@ -48,7 +48,7 @@ public class Intake extends Command {
 
   @Override
   public void execute() {
-    SmartDashboard.putNumber("Intake Encoder Raw", intakeSubsystem.intakeEncoder.get());
+    // SmartDashboard.putNumber("Intake Encoder Raw", intakeSubsystem.intakeEncoder.get());
     /*
 
 
