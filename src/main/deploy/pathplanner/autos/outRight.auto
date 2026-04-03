@@ -13,7 +13,7 @@
         {
           "type": "path",
           "data": {
-            "pathName": "shoot"
+            "pathName": "RightStartToShoot"
           }
         },
         {
@@ -62,13 +62,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "ShootFlip"
+            "pathName": "ReverseRightStartToShoot"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "p1 to out"
+            "pathName": "New New Path"
           }
         },
         {
@@ -93,19 +93,19 @@
         {
           "type": "path",
           "data": {
-            "pathName": "come again"
+            "pathName": "actually pick up fuel (universal)"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "REALSHOOT"
+            "pathName": "New New New Path"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "New Path"
+            "pathName": "Copy of RightStartToShoot"
           }
         },
         {
@@ -165,14 +165,14 @@
                 "data": {
                   "name": "Shoot"
                 }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StopIntake"
+                }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
           }
         }
       ]
