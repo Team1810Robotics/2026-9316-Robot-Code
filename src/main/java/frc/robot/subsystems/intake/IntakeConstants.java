@@ -19,7 +19,7 @@ public class IntakeConstants {
       0.30; // Limit the maximum output to prevent damage to the mechanism
   public static final double PIVOT_TOLERANCE =
       0.01; // Tolerance for considering the intake to be at the setpoint
-
+  public static final double STOP = 0.0;
   public static final double ROLLER_IN_SPEED = 0.99; // Speed for intaking game pieces
   public static final double ROLLER_OUT_SPEED = -0.2; // Speed for ejecting game pieces
   public static double IN_POSITION =

@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AimAtHub;
 import frc.robot.commands.Hood;
+import frc.robot.commands.Intake;
 import frc.robot.subsystems.drive.CommandSwerveDrivetrain;
 import frc.robot.subsystems.drive.TunerConstants;
 import frc.robot.subsystems.flywheel.FlywheelSubsystem;
@@ -124,19 +125,19 @@ Shuffleboard.getTab("Autonomous")
 
     NamedCommands.registerCommand(
     "Shoot",
-    new ShootCommand(
+        new ShootCommand (
             visionSubsystem,
             flywheelSubsystem,
             hoodSubsystem,
             indexerSubsystem,
-            ledSubsystem));
+            ledSubsystem).withTimeout(5.0));
 
     NamedCommands.registerCommand(
         "StopIndexer", Commands.runOnce(() -> indexerSubsystem.stopAll(), indexerSubsystem));
 
     NamedCommands.registerCommand(
         "AimAtHub",
-        new AimAtHub(drivetrain, visionSubsystem, ledSubsystem, () -> 0, () -> 0).withTimeout(10));
+        new AimAtHub(drivetrain, visionSubsystem, ledSubsystem, () -> 0, () -> 0).withTimeout(3.0));
 
     NamedCommands.registerCommand(
         "IntakeOut", 
@@ -152,11 +153,16 @@ Shuffleboard.getTab("Autonomous")
    
     NamedCommands.registerCommand(
         "StartIntake",
-        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.9), intakeSubsystem));
+        Commands.runEnd(
+            () -> intakeSubsystem.TestingIntakeMotor(IntakeConstants.ROLLER_IN_SPEED),
+            () -> intakeSubsystem.TestingIntakeMotor(IntakeConstants.STOP),
+             intakeSubsystem)
+             .withTimeout(2)
+             );
     
     NamedCommands.registerCommand(
         "StopIntake",
-        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(0.0), intakeSubsystem));
+        Commands.runOnce(() -> intakeSubsystem.TestingIntakeMotor(IntakeConstants.STOP), intakeSubsystem));
   }
 
   public Command getAutonomousCommand() {

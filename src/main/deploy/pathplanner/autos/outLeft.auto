@@ -35,7 +35,31 @@
               {
                 "type": "named",
                 "data": {
+                  "name": "Shoot"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
                   "name": "StartIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeIn"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "StartIntake"
+                }
+              },
+              {
+                "type": "named",
+                "data": {
+                  "name": "IntakeOut"
                 }
               },
               {
@@ -48,12 +72,6 @@
                 "type": "named",
                 "data": {
                   "name": "IntakeIn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StopIntake"
                 }
               }
             ]
@@ -69,110 +87,6 @@
           "type": "path",
           "data": {
             "pathName": "p1 to out"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeOut"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StartIntake"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "come again"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "REALSHOOT"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "New Path"
-          }
-        },
-        {
-          "type": "sequential",
-          "data": {
-            "commands": [
-              {
-                "type": "named",
-                "data": {
-                  "name": "AimAtHub"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "StartIntake"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeIn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeOut"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeIn"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "IntakeOut"
-                }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "Shoot"
-                }
-              }
-            ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "StopIntake"
           }
         }
       ]

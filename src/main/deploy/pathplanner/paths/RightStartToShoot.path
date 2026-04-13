@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 2.456457831325301,
-        "y": 2.5488313253012054
+        "x": 2.4,
+        "y": 2.6143975903614454
       },
       "prevControl": {
-        "x": 2.572564759036144,
-        "y": 2.2786188389923336
+        "x": 2.516106927710843,
+        "y": 2.3441851040525736
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RightShoot"
     }
   ],
   "rotationTargets": [],
